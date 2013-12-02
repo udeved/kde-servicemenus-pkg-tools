@@ -5,13 +5,13 @@ pkgver=0.r6.d40a0bb
 pkgrel=1
 pkgdesc="Kde servicemenu for makepkg, repo-add & repo-remove, anmcap & aur upload."
 arch=('any')
-url="https://github.com/udeved/kde-servicemenus-pacman-tools"
+url="https://github.com/udeved/kde-servicemenus-pkg-tools"
 license=('GPL2')
 depends=('kdebase-dolphin' 'pacman' 'namcap' 'curl')
 makedepends=('git')
-conflicts=('kde-servicemenus-pacman-tools')
+conflicts=('kde-servicemenus-pkg-tools')
 install=pkg-tools.install
-source=("$pkgname"::'git://github.com/udeved/kde-servicemenu-pacman-tools.git')
+source=("$pkgname"::'git://github.com/udeved/kde-servicemenu-pkg-tools.git')
 md5sums=('SKIP')
 
 pkgver() {
@@ -26,7 +26,7 @@ package() {
 
       install -Dm644  ServiceMenus/repo-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/repo-magic.desktop
       install -Dm644  ServiceMenus/pkg-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/pkg-magic.desktop
-      #install -Dm644  ServiceMenus/pacman-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/pacman-magic.desktop
+      install -Dm644  ServiceMenus/pacman-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/pacman-magic.desktop
       install -Dm644  ServiceMenus/namcap-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/namcap-magic.desktop
       install -Dm644  ServiceMenus/aur-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/aur-magic.desktop
 

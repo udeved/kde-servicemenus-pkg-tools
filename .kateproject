@@ -1,0 +1,3 @@
+{
+      "name": "kde-servicemenu-pkg-tools", "files": [ { "directory": "", "filters": ["PKGBUILD", "-*.xz", "*.install", "*.*", "*", ".kateproject"], "recursive": 1 } ]
+}
