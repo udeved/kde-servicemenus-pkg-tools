@@ -1,0 +1,38 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/x-xz-pkg;
+Actions=add;remove;_SEPARATOR_;add_signed;remove_signed;_SEPARATOR_;add_files;remove_files;
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+X-KDE-Submenu=repo
+
+[Desktop Action add]
+Name=add selected package(s) to pkg db
+Icon=list-add
+Exec=/home/funtux/bin/pkg-magic "-R" "%U" "" "add" "db"
+
+[Desktop Action remove]
+Name=remove selected package(s) from pkg db
+Icon=list-remove
+Exec=/home/funtux/bin/pkg-magic "-R" "%U" "" "remove" "db"
+
+[Desktop Action add_signed]
+Name=add selected package(s) to signed pkg db
+Icon=list-add
+Exec=/home/funtux/bin/pkg-magic "-R" "%U" "-s" "add" "db"
+
+[Desktop Action remove_signed]
+Name=remove selected package(s) from signed pkg db
+Icon=list-remove
+Exec=/home/funtux/bin/pkg-magic "-R" "%U" "-s" "remove" "db"
+
+[Desktop Action add_files]
+Name=add selected package(s) to files db
+Icon=list-add
+Exec=/home/funtux/bin/pkg-magic "-R" "%U" "-f" "add" "files"
+
+[Desktop Action remove_files]
+Name=remove selected package(s) from files db
+Icon=list-remove
+Exec=/home/funtux/bin/pkg-magic "-R" "%U" "-f" "remove" "files"

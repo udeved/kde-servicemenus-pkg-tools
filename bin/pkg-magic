@@ -1,0 +1,167 @@
+#!/bin/bash
+
+param=$1
+uri=$2
+args=$3
+action=$4
+type=$5
+
+config="$HOME/.config/aurlogin"
+aur_url="https://aur.archlinux.org"
+log="$HOME/debug.log"
+ext="tar.xz"
+categories=('daemons' 'devel' 'editors' 'emulators' 'games' 'gnome' 'i18n' 'kde' 'kernels' 'lib' 'modules' 'multimedia' 'network' 'office' 'science' 'system' 'x11' 'xfce')
+
+userbox(){
+      echo $(kdialog --inputbox "Enter username:" "AUR")
+}
+
+pwdbox(){
+      echo $(kdialog --password "Enter password:")
+}
+
+catbox(){
+      echo $(kdialog --combobox "Select category"  "${categories[@]}")
+}
+
+ynbox(){
+  echo $(kdialog --title $1 --yesno $2)
+}
+
+popup(){
+  echo $(kdialog --title "$1" --passivepopup '<a href="'$2'">'$2'</a>' 10)
+}
+
+log_writer(){
+      echo $1 >> "$log"
+}
+
+config_writer(){
+      echo $1 >> "$config"
+}
+
+create_config(){
+	echo -n > "$config"
+	local user pwd
+	user=$(userbox)
+	config_writer "USR=$user"
+	pwd=$(pwdbox)
+	config_writer "PWD=$pwd"
+}
+
+configure(){
+      if [[ -f "$config" ]]; then
+        yn=$(ynbox "Overwrite?" "$config already exists.")
+        if [ $? = 0 ]; then
+	  create_config
+	else
+	  exit 1
+	fi
+      else
+	create_config
+      fi
+}
+
+aur_login(){
+      local user pwd
+      if [[ -f "$config" ]];then
+	  source $config
+      fi
+      if [ ! -z $USR ] && [ ! -z $PWD ];then
+	user=$USR
+	pwd=$PWD
+      else
+	user=$(userbox)
+	pwd=$(pwdbox)
+      fi
+      local page=$(curl -sSi -F user=$user -F passwd=$pwd -H 'Expect: ' "${aur_url}/login/")
+      session=$(echo "$page" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
+}
+
+aur_submit(){
+      local page sid
+      page=$(curl -sSi -H 'Expect: ' -b $session "${aur_url}/submit/")
+      sid=$(echo "$page" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
+      page=$(curl -sSi -H 'Expect: ' -F token="$sid" -F pkgsubmit=1 -F category=$cat -F pfile=@$uri -b $session "${aur_url}/submit/")
+      pkg_url="${aur_url}"$(echo "$page" | awk '/^Location: / {print $2}')
+}
+
+upload(){
+      aur_login
+      cat=$(catbox)
+      aur_submit
+      popup "AUR upload finished." ${pkg_url}
+}
+
+selected_files(){
+  local fn reqfn list
+  IFS=" "
+  for i in ${uri};do
+    fn=$(basename $i)
+    if [ ${action} == "remove" ];then
+      reqfn=${fn%%-[0-9]*}
+      list+=" $reqfn"
+    else
+      list+=" $fn"
+    fi
+  done
+  IFS=""
+  echo ${list}
+}
+
+cmd_gen(){
+  local bin cmd
+  case ${param} in
+    "-M")
+      bin="makepkg"
+      cmd="${bin} ${args}"
+    ;;
+    "-N")
+      bin="namcap"
+      cmd="${bin} ${args} ${uri}"
+    ;;
+    "-R")
+      bin="repo"
+      cmd="${bin}-${action} ${args} ${repo_name}.${type}.$ext $(selected_files)"
+    ;;
+    "-P")
+      bin="pacman"
+      cmd="sudo ${bin} ${args} $(selected_files)"
+    ;;
+  esac
+  echo ${cmd}
+}
+
+run_in_konsole(){
+    konsole --noclose --workdir "$wd" -e $SHELL -c "eval $(cmd_gen)"
+}
+
+main(){
+#   echo -n > $log
+#   log_writer ${param}
+  case ${param} in
+    "-M" | "-N")
+      wd=$(dirname $uri)
+      run_in_konsole
+    ;;
+    "-R" | "-P")
+      IFS=" "
+      for i in ${uri};do
+	wd=$(dirname $i)
+	repo_name=$(basename $wd)
+      done
+      IFS=""
+      run_in_konsole
+      #log_writer "$(cmd_gen)"
+    ;;
+    "-U")
+      upload
+    ;;
+    "-C")
+      configure
+    ;;
+  esac
+}
+
+main
+

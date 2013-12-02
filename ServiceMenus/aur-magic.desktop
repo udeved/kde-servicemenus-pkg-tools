@@ -1,0 +1,18 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/x-gz-src;
+Actions=upload;_SEPARATOR_;configure;
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+X-KDE-Submenu=AUR
+
+[Desktop Action upload]
+Name=Upload srcpkg
+Icon=go-up
+Exec=/home/funtux/bin/pkg-magic "-U" "%u"
+
+[Desktop Action configure]
+Name=Configure login
+Icon=configure
+Exec=/home/funtux/bin/pkg-magic "-C"
