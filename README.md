@@ -6,7 +6,7 @@ kde-servicemenus-pkg-tools
 * makepkg
 * namcap
 * pacman install local file(s)
-* local repo manaegemnt
+* local repo management
 * aur upload
 
 
