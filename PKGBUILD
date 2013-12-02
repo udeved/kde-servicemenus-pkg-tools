@@ -22,13 +22,13 @@ pkgver() {
 package() {
       cd "$pkgname"
 
-      install -Dm755 bin/pacman-magic $pkgdir/usr/bin/pkg-magic
+      install -Dm755 bin/pkg-magic $pkgdir/usr/bin/pkg-magic
 
-      install -Dm644  ServiceMenus/repo-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/repo-magic.desktop
-      install -Dm644  ServiceMenus/pkg-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/pkg-magic.desktop
-      install -Dm644  ServiceMenus/pacman-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/pacman-magic.desktop
-      install -Dm644  ServiceMenus/namcap-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/namcap-magic.desktop
-      install -Dm644  ServiceMenus/aur-magic.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/aur-magic.desktop
+      install -Dm644  ServiceMenus/repo-action.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/repo-action.desktop
+      install -Dm644  ServiceMenus/makepkg.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/makepkg.desktop
+      install -Dm644  ServiceMenus/pacman.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/pacman.desktop
+      install -Dm644  ServiceMenus/namcap.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/namcap.desktop
+      install -Dm644  ServiceMenus/aur-upload.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/aur-upload.desktop
 
       install -Dm644 mime/application/x-xz-pkg.xml $pkgdir/usr/share/mime/application/x-xz-pkg.xml
       install -Dm644 mime/application/x-pkgbuild.xml $pkgdir/usr/share/mime/application/x-pkgbuild.xml
