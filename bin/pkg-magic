@@ -64,7 +64,7 @@ new_config(){
 	local user pwd ret=$?
 	user=$(userbox)
 	pwd=$(pwdbox)
-	debug $user $pwd
+	debug "$user $pwd"
 	if [[ -z $user ]] && [[ -z $pwd ]];then
 		popup "Warning" "No config written"
 	else
@@ -83,46 +83,50 @@ configure(){
 }
 
 aur_login(){
-	local user pwd page info target="${aur_url}/login/"
+	local user pwd login info url="${aur_url}/login/" session
 
 	[[ -f "$config" ]] &&  source $config
 
 	if [[ ! -z $USR ]] && [[ ! -z $PWD ]];then
 		user=$USR
 		pwd=$PWD
+		#debug "$user $pwd"
 	else
 		user=$(userbox)
 		pwd=$(pwdbox)
+		#debug "$user $pwd"
 	fi
-	page=$(curl -sSi -F user=$user -F passwd=$pwd -H 'Expect: ' $target)
-	if [[ ! -z $session ]];then
-		session=$(echo "$page" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
-	else
-		info=$(popup "Login failed." "Check your AUR user and pwd.")
-	fi
+
+	login=$(curl -sSi -F user=$user -F passwd=$pwd -H 'Expect: ' $url)
+
+	session=$(echo "$login" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
+	#debug "$session"
+	echo $session
 }
 
 aur_submit(){
-	local page sid info cat=$(catbox) target="${aur_url}/submit/"
+	local submit sid info cat=$(catbox) url="${aur_url}/submit/"
 
-	if [[ -z $session ]];then
-		info=$(popup "No session registered." "Aborted AUR upload.")
+	if [[ -z $1 ]];then
+		info=$(popup "Cancelled AUR upload." "No session registered.")
+		exit
 	fi
 
-	page=$(curl -sSi -H 'Expect: ' -b $session $target)
+	submit=$(curl -sSi -H 'Expect: ' -b $1 $url)
 
-	sid=$(echo "$page" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
+	sid=$(echo "$submit" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
+	#debug "$sid"
+	submit=$(curl -sSi -H 'Expect: ' -F token="$sid" -F pkgsubmit=1 -F category=$cat -F pfile=@$uri -b $1 $url | tr -d '\r')
 
-	page=$(curl -sSi -H 'Expect: ' -F token="$sid" -F pkgsubmit=1 -F category=$cat -F pfile=@$uri -b $session $target | tr -d '\r')
-
-	local pkg_url html='<a href="'"${pkg_url}"'">'"${pkg_url}"'</a>'
-	pkg_url="${aur_url}"$(echo "$page" | awk '/^Location: / {print $2}')
-	info=$(popup "AUR upload finished." "${html}")
+	pkg_url="${aur_url}"$(echo "$submit" | awk '/^Location: / {print $2}')
+	debug "$pkg_url"
 }
 
 upload(){
-	aur_login
-	aur_submit
+	local html='<a href="'"${pkg_url}"'">'"${pkg_url}"'</a>' info
+	info=$(popup "AUR upload started." "$(basename $uri)")
+	aur_submit "$(aur_login)"
+	info=$(popup "AUR upload finished." "${html}")
 }
 
 selected_files(){
