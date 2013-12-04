@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#set -x
-
 param=$1
 uri=$2
 args=$3
@@ -44,7 +42,7 @@ ynbox(){
 	kdialog --warningcontinuecancel "${config} already exists. Overwrite?"
 	local flag=$?
 	if [ ${flag} -eq 0 ];then
-		new_config
+		configdlg
 	else
 		exit
 	fi
@@ -54,36 +52,57 @@ writer(){
 	echo $1 >> "${config}"
 }
 
-verbose(){
-	popup "pkg-tools info" $1
+new_config(){
+	echo -n > ${config}
 }
 
-new_config(){
+configdlg(){
 	local user pwd ret=$?
 	user=$(userbox)
 	pwd=$(pwdbox)
 	if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
 		popup "Warning" "No config written"
 	else
-		echo -n > "${config}"
+		new_config
 		writer "USR=${user}"
 		writer "PWD=${pwd}"
 	fi
 }
 
+pkgbox(){
+	source $uri
+	local list i=0 select nlist
+	if [[ ! -z $pkgbase ]];then
+		for n in ${pkgname[*]};do
+			list[$i]="$i $n off"
+			nlist[$i]="$n"
+			i=$((i+1))
+		done
+	fi
+	select=$(kdialog --checklist "Select packages:" ${list[@]})
+	local flag=$?
+	if [ $flag -eq 1 ];then
+		popup "Chancel" "No packages selected."
+		exit
+	fi
+	local p=${select//\"/}
+	for j in $p;do
+		plist+="${nlist[$j]},"
+	done
+	echo ${plist}
+}
+
 configure(){
    	if [[ ! -f "${config}" ]]; then
-		new_config
+		configdlg
 	else
 		ynbox
 	fi
 }
 
-aur_login(){
-	local user pwd login url="${aur_url}/login/" session
-
+get_session(){
+	local user pwd  url="${aur_url}/login/" login session
 	[[ -f "${config}" ]] &&  source ${config}
-
 	if [[ ! -z ${USR} ]] && [[ ! -z ${PWD} ]];then
 		user=${USR}
 		pwd=${PWD}
@@ -91,40 +110,32 @@ aur_login(){
 		user=$(userbox)
 		pwd=$(pwdbox)
 	fi
-
 	login=$(curl -sSi -F user=${user} -F passwd=${pwd} -H 'Expect: ' ${url})
-
 	session=$(echo "${login}" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
-	#verbose "${session}"
 	echo ${session}
 }
 
-aur_submit(){
+submit(){
+	# $1: session
 	local submit sid cat=$(catbox) url="${aur_url}/submit/"
-
 	if [[ -z $1 ]];then
 		popup "Cancelled AUR upload." "No session registered."
 		exit
 	fi
-	#verbose "$1"
 	submit=$(curl -sSi -H 'Expect: ' -b $1 ${url})
-
 	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-	#verbose "${sid}"
 	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category=${cat} -F pfile=@$uri -b $1 ${url} | tr -d '\r')
-
 	pkg_url="${aur_url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
-	verbose "$pkg_url"
 }
 
 upload(){
-	local html='<a href="'"${pkg_url}"'">'"${pkg_url}"'</a>'
 	popup "AUR upload started." "$(basename $uri)"
-	aur_submit "$(aur_login)"
+	submit "$(get_session)"
+	local html='<a href="'"${pkg_url}"'">'"${pkg_url}"'</a>'
 	popup "AUR upload finished." "${html}"
 }
 
-selected_files(){
+file_list(){
 	local fn reqfn list
 	for i in ${uri[*]};do
 		fn=$(basename $i)
@@ -142,69 +153,30 @@ run_in_konsole(){
 	konsole --noclose --workdir "${wd}" -e $SHELL -c "$(cmd_gen)"
 }
 
-pkg_select(){
-	source $uri
-	local list i=0 select nlist
-	if [[ ! -z $pkgbase ]];then
-		for n in ${pkgname[*]};do
-			list[$i]="$i $n off"
-			nlist[$i]="$n"
-			i=$((i+1))
-		done
-	fi
-	select=$(kdialog --checklist "Select packages:" ${list[@]})
-	local flag=$?
-	if [ $flag -eq 1 ];then
-		popup "Chancel" "No packages selected."
-		exit 1
-	fi
-	local p=${select//\"/}
-	for j in $p;do
-		plist+="${nlist[$j]},"
-	done
-	echo ${plist}
-}
-
-is_pkg_opt(){
-	local a=$args
-	verbose $a
-	for p in ${args[*]};do
-		if [[ $p == "--pkg" ]];then
-			echo "true"
-		else
-			echo "false"
-		fi
-	done
-}
-
-# param="-M"
-# uri="/home/funtux/projects/pkgbuilds-testing/PKGBUILD"
-# args="-sr --pkg"
-
 cmd_gen(){
 	local bin cmd ext="tar.xz"
 	case ${param} in
-		"-M")
+		"-m")
 			bin="makepkg"
 			for p in ${args[*]};do
 				if [[ $p == "--pkg" ]];then
-					cmd="${bin} ${args} $(pkg_select)"
+					cmd="${bin} ${args} $(pkgbox)"
 				else
 					cmd="${bin} ${args}"
 				fi
 			done
 		;;
-		"-N")
+		"-n")
 			bin="namcap"
 			cmd="${bin} ${args} ${uri}"
 		;;
-		"-R")
+		"-r")
 			bin="repo"
-			cmd="${bin}-${action} ${args} ${repo_name}.${type}.$ext $(selected_files)"
+			cmd="${bin}-${action} ${args} ${repo_name}.${type}.$ext $(file_list)"
 		;;
-		"-P")
+		"-p")
 			bin="pacman"
-			cmd="sudo ${bin} ${args} $(selected_files)"
+			cmd="sudo ${bin} ${args} $(file_list)"
 		;;
 	esac
 	echo ${cmd}
@@ -212,25 +184,24 @@ cmd_gen(){
 
 main(){
 	case ${param} in
-		"-M" | "-N")
+		"-m" | "-n")
 			wd=$(dirname ${uri})
 			run_in_konsole
 		;;
-		"-R" | "-P")
+		"-r" | "-p")
 			for i in ${uri[*]};do
 				wd=$(dirname $i)
 				repo_name=$(basename ${wd})
 			done
 			run_in_konsole
 		;;
-		"-U")
+		"-a")
 			upload
 		;;
-		"-C")
+		"-c")
 			configure
 		;;
 	esac
 }
 
 main
-
