@@ -3,11 +3,11 @@ Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-xz-pkg;
 Actions=install_local;
-#X-KDE-Priority=TopLevel
+X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
-#X-KDE-Submenu=pacman
+X-KDE-Submenu=Pacman
 
 [Desktop Action install_local]
 Name=Install selected package(s)
 Icon=run-build-install
-Exec=/home/funtux/bin/pkg-magic "-P" "%U" "-U"
+Exec=/home/funtux/bin/pkg-magic "-p" "%U" "-U"

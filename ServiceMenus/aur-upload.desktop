@@ -10,9 +10,9 @@ X-KDE-Submenu=AUR
 [Desktop Action upload]
 Name=Upload srcpkg
 Icon=go-up
-Exec=/home/funtux/bin/pkg-magic "-U" "%u"
+Exec=/home/funtux/bin/pkg-magic "-a" "%u"
 
 [Desktop Action configure]
 Name=Configure login
 Icon=configure
-Exec=/home/funtux/bin/pkg-magic "-C"
+Exec=/home/funtux/bin/pkg-magic "-c"

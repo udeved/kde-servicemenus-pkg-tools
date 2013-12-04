@@ -2,57 +2,62 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-pkgbuild;
-Actions=mk_md5;_SEPARATOR_;mk;mk_nodeps;mk_sign;mk_src;_SEPARATOR_;mk_install;_SEPARATOR_;mk_repack;mk_nobuild;_SEPARATOR_;mk_clean;_SEPARATOR_;mk_selected;
+Actions=mk_md5;_SEPARATOR_;mk;mk_nodeps;mk_sign;mk_src;_SEPARATOR_;mk_install;_SEPARATOR_;mk_repack;mk_nobuild;_SEPARATOR_;mk_clean;_SEPARATOR_;mk_selected;mk_selected_sign;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
-X-KDE-Submenu=makepkg
+X-KDE-Submenu=Makepkg
 
 [Desktop Action mk_md5]
-Name=Add Checksum
+Name=Add checksum
 Icon=run-build-configure
-Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-g >> $(basename "%f")"
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-g >> $(basename "%f")"
 
 [Desktop Action mk]
 Name=Make Package
 Icon=run-build
-Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-sr"
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-sr"
 
 [Desktop Action mk_nodeps]
-Name=Make Package (ignore deps)
+Name=Make package (ignore deps)
 Icon=debug-run
-Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-d"
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-d"
 
 [Desktop Action mk_src]
-Name=Make Source Package
+Name=Make source package
 Icon=run-build-file
-Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-S"
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-S"
 
 [Desktop Action mk_sign]
-Name=Make Signed Package
+Name=Make signed package
 Icon=document-sign
-Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-sr --sign"
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-sr --sign"
 
 [Desktop Action mk_install]
-Name=Make & install Package
+Name=Make & install package
 Icon=run-build-install
-Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-sri"
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-sri"
 
 [Desktop Action mk_clean]
 Name=Clean workdir
 Icon=run-build-clean
-Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-c"
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-c"
 
 [Desktop Action mk_repack]
 Name=Repackage without building
 Icon=system-software-update
-Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-Rf"
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-Rf"
 
 [Desktop Action mk_nobuild]
 Name=Get and extract
 Icon=run-build-install-root
-Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-o"
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-o"
 
 [Desktop Action mk_selected]
-Name=Make selected package(s) of split-pkg
-Icon=run-build-install-root
-Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-sr --pkg"
+Name=Make selected package(s) (split package)
+Icon=run-build
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-sr --pkg"
+
+[Desktop Action mk_selected_sign]
+Name=Make signed selected package(s) (split package)
+Icon=document-sign
+Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-sr --sign --pkg"
