@@ -2,14 +2,9 @@
 
 #set -x
 
-param="-M"
-uri="/home/funtux/projects/kde-servicemanus/kde-servicemenus-pkg-tools/test-split/PKGBUILD"
-args="-sr --pkg"
-
-
-# param=$1
-# uri=$2
-# args=$3
+param=$1
+uri=$2
+args=$3
 action=$4
 type=$5
 
@@ -181,11 +176,11 @@ cmd_gen(){
 	case ${param} in
 		"-M")
 			bin="makepkg"
-			#if [[ $(is_split) == "--pkg" ]];then
-			#	cmd="${bin} ${args} $(pkg_select)"
-			#else
+			if [[ $(is_split) == "--pkg" ]];then
+				cmd="${bin} ${args} $(pkg_select)"
+			else
 				cmd="${bin} ${args}"
-			#fi
+			fi
 		;;
 		"-N")
 			bin="namcap"
