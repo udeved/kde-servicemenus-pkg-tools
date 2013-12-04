@@ -1,18 +1,20 @@
 #!/bin/bash
 
-#set -e
+#set -x
 
-param=$1
-uri=$2
-args=$3
+param="-M"
+uri="/home/funtux/projects/kde-servicemanus/kde-servicemenus-pkg-tools/test-split/PKGBUILD"
+args="-sr --pkg"
+
+
+# param=$1
+# uri=$2
+# args=$3
 action=$4
 type=$5
 
 config="$HOME/.config/aurlogin"
 aur_url="https://aur.archlinux.org"
-log="$HOME/debug.log"
-ext="tar.xz"
-categories=('daemons' 'devel' 'editors' 'emulators' 'games' 'gnome' 'i18n' 'kde' 'kernels' 'lib' 'modules' 'multimedia' 'network' 'office' 'science' 'system' 'x11' 'xfce')
 
 userbox(){
 	kdialog --inputbox "Enter username:"
@@ -31,6 +33,7 @@ pwdbox(){
 }
 
 catbox(){
+	local categories=('daemons' 'devel' 'editors' 'emulators' 'games' 'gnome' 'i18n' 'kde' 'kernels' 'lib' 'modules' 'multimedia' 'network' 'office' 'science' 'system' 'x11' 'xfce')
 	kdialog --combobox "Select category"  "${categories[@]}"
 	local flag=$?
 	if [ $flag -eq 1 ];then
@@ -43,7 +46,7 @@ popup(){
 }
 
 ynbox(){
-	kdialog --warningcontinuecancel "$config already exists. Overwrite?"
+	kdialog --warningcontinuecancel "${config} already exists. Overwrite?"
 	local flag=$?
 	if [ ${flag} -eq 0 ];then
 		new_config
@@ -52,30 +55,52 @@ ynbox(){
 	fi
 }
 
-writer(){
-	echo $1 >> "$config"
+pkg_select(){
+	source $uri
+	local list i=0 select nlist
+	if [[ ! -z $pkgbase ]];then
+		for n in ${pkgname[*]};do
+			list[$i]="$i $n off"
+			nlist[$i]="$n"
+			i=$((i+1))
+		done
+	fi
+	select=$(kdialog --checklist "Select packages:" ${list[@]})
+	local flag=$?
+	if [ $flag -eq 1 ];then
+		popup "Chancel" "No packages selected."
+		exit 1
+	fi
+	foo=${select//\"/}
+	for j in $foo;do
+		plist+="${nlist[$j]},"
+	done
+	echo ${plist}
 }
 
-debug(){
-	popup "Debug" $1
+writer(){
+	echo $1 >> "${config}"
+}
+
+verbose(){
+	popup "pkg-tools info" $1
 }
 
 new_config(){
 	local user pwd ret=$?
 	user=$(userbox)
 	pwd=$(pwdbox)
-	debug "$user $pwd"
-	if [[ -z $user ]] && [[ -z $pwd ]];then
+	if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
 		popup "Warning" "No config written"
 	else
-		echo -n > "$config"
-		writer "USR=$user"
-		writer "PWD=$pwd"
+		echo -n > "${config}"
+		writer "USR=${user}"
+		writer "PWD=${pwd}"
 	fi
 }
 
 configure(){
-   	if [[ ! -f "$config" ]]; then
+   	if [[ ! -f "${config}" ]]; then
 		new_config
 	else
 		ynbox
@@ -83,74 +108,84 @@ configure(){
 }
 
 aur_login(){
-	local user pwd login info url="${aur_url}/login/" session
+	local user pwd login url="${aur_url}/login/" session
 
-	[[ -f "$config" ]] &&  source $config
+	[[ -f "${config}" ]] &&  source ${config}
 
-	if [[ ! -z $USR ]] && [[ ! -z $PWD ]];then
-		user=$USR
-		pwd=$PWD
-		#debug "$user $pwd"
+	if [[ ! -z ${USR} ]] && [[ ! -z ${PWD} ]];then
+		user=${USR}
+		pwd=${PWD}
 	else
 		user=$(userbox)
 		pwd=$(pwdbox)
-		#debug "$user $pwd"
 	fi
 
-	login=$(curl -sSi -F user=$user -F passwd=$pwd -H 'Expect: ' $url)
+	login=$(curl -sSi -F user=${user} -F passwd=${pwd} -H 'Expect: ' ${url})
 
-	session=$(echo "$login" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
-	#debug "$session"
-	echo $session
+	session=$(echo "${login}" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
+	#verbose "${session}"
+	echo ${session}
 }
 
 aur_submit(){
-	local submit sid info cat=$(catbox) url="${aur_url}/submit/"
+	local submit sid cat=$(catbox) url="${aur_url}/submit/"
 
 	if [[ -z $1 ]];then
-		info=$(popup "Cancelled AUR upload." "No session registered.")
+		popup "Cancelled AUR upload." "No session registered."
 		exit
 	fi
+	#verbose "$1"
+	submit=$(curl -sSi -H 'Expect: ' -b $1 ${url})
 
-	submit=$(curl -sSi -H 'Expect: ' -b $1 $url)
+	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
+	#verbose "${sid}"
+	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category=${cat} -F pfile=@$uri -b $1 ${url} | tr -d '\r')
 
-	sid=$(echo "$submit" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-	#debug "$sid"
-	submit=$(curl -sSi -H 'Expect: ' -F token="$sid" -F pkgsubmit=1 -F category=$cat -F pfile=@$uri -b $1 $url | tr -d '\r')
-
-	pkg_url="${aur_url}"$(echo "$submit" | awk '/^Location: / {print $2}')
-	debug "$pkg_url"
+	pkg_url="${aur_url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
+	verbose "$pkg_url"
 }
 
 upload(){
-	local html='<a href="'"${pkg_url}"'">'"${pkg_url}"'</a>' info
-	info=$(popup "AUR upload started." "$(basename $uri)")
+	local html='<a href="'"${pkg_url}"'">'"${pkg_url}"'</a>'
+	popup "AUR upload started." "$(basename $uri)"
 	aur_submit "$(aur_login)"
-	info=$(popup "AUR upload finished." "${html}")
+	popup "AUR upload finished." "${html}"
 }
 
 selected_files(){
 	local fn reqfn list
-	IFS=" "
-	for i in ${uri};do
+	for i in ${uri[*]};do
 		fn=$(basename $i)
 		if [ ${action} == "remove" ];then
 			reqfn=${fn%%-[0-9]*}
-			list+=" $reqfn"
+			list+=" ${reqfn}"
 		else
-			list+=" $fn"
+			list+=" ${fn}"
 		fi
 	done
-	IFS=""
 	echo ${list}
 }
 
+is_split(){
+	#todo: signed check
+	local flag=${args#-sr} flag2=${args#-sri} p=${args% --pkg}
+	if [[ $p == "-sr" ]];then
+		echo $flag
+	else
+		echo $flag2
+	fi
+}
+
 cmd_gen(){
-	local bin cmd
+	local bin cmd ext="tar.xz"
 	case ${param} in
 		"-M")
 			bin="makepkg"
-			cmd="${bin} ${args}"
+			#if [[ $(is_split) == "--pkg" ]];then
+			#	cmd="${bin} ${args} $(pkg_select)"
+			#else
+				cmd="${bin} ${args}"
+			#fi
 		;;
 		"-N")
 			bin="namcap"
@@ -169,22 +204,20 @@ cmd_gen(){
 }
 
 run_in_konsole(){
-	konsole --noclose --workdir "$wd" -e $SHELL -c "eval $(cmd_gen)"
+	konsole --noclose --workdir "${wd}" -e $SHELL -c "$(cmd_gen)"
 }
 
 main(){
 	case ${param} in
 		"-M" | "-N")
-			wd=$(dirname $uri)
+			wd=$(dirname ${uri})
 			run_in_konsole
 		;;
 		"-R" | "-P")
-			IFS=" "
-			for i in ${uri};do
+			for i in ${uri[*]};do
 				wd=$(dirname $i)
-				repo_name=$(basename $wd)
+				repo_name=$(basename ${wd})
 			done
-			IFS=""
 			run_in_konsole
 		;;
 		"-U")
