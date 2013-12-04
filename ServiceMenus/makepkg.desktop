@@ -2,7 +2,7 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-pkgbuild;
-Actions=mk_md5;_SEPARATOR_;mk;mk_nodeps;mk_sign;mk_src;_SEPARATOR_;mk_install;_SEPARATOR_;mk_repack;mk_nobuild;_SEPARATOR_;mk_clean;
+Actions=mk_md5;_SEPARATOR_;mk;mk_nodeps;mk_sign;mk_src;_SEPARATOR_;mk_install;_SEPARATOR_;mk_repack;mk_nobuild;_SEPARATOR_;mk_clean;_SEPARATOR_;mk_selected;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=makepkg
@@ -51,3 +51,8 @@ Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-Rf"
 Name=Get and extract
 Icon=run-build-install-root
 Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-o"
+
+[Desktop Action mk_selected]
+Name=Make selected package(s) of split-pkg
+Icon=run-build-install-root
+Exec=/home/funtux/bin/pkg-magic "-M" "%u" "-sr --pkg"
