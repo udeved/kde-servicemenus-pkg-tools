@@ -50,29 +50,6 @@ ynbox(){
 	fi
 }
 
-pkg_select(){
-	source $uri
-	local list i=0 select nlist
-	if [[ ! -z $pkgbase ]];then
-		for n in ${pkgname[*]};do
-			list[$i]="$i $n off"
-			nlist[$i]="$n"
-			i=$((i+1))
-		done
-	fi
-	select=$(kdialog --checklist "Select packages:" ${list[@]})
-	local flag=$?
-	if [ $flag -eq 1 ];then
-		popup "Chancel" "No packages selected."
-		exit 1
-	fi
-	foo=${select//\"/}
-	for j in $foo;do
-		plist+="${nlist[$j]},"
-	done
-	echo ${plist}
-}
-
 writer(){
 	echo $1 >> "${config}"
 }
@@ -161,26 +138,61 @@ selected_files(){
 	echo ${list}
 }
 
-is_split(){
-	#todo: signed check
-	local flag=${args#-sr} flag2=${args#-sri} p=${args% --pkg}
-	if [[ $p == "-sr" ]];then
-		echo $flag
-	else
-		echo $flag2
-	fi
+run_in_konsole(){
+	konsole --noclose --workdir "${wd}" -e $SHELL -c "$(cmd_gen)"
 }
+
+pkg_select(){
+	source $uri
+	local list i=0 select nlist
+	if [[ ! -z $pkgbase ]];then
+		for n in ${pkgname[*]};do
+			list[$i]="$i $n off"
+			nlist[$i]="$n"
+			i=$((i+1))
+		done
+	fi
+	select=$(kdialog --checklist "Select packages:" ${list[@]})
+	local flag=$?
+	if [ $flag -eq 1 ];then
+		popup "Chancel" "No packages selected."
+		exit 1
+	fi
+	local p=${select//\"/}
+	for j in $p;do
+		plist+="${nlist[$j]},"
+	done
+	echo ${plist}
+}
+
+is_pkg_opt(){
+	local a=$args
+	verbose $a
+	for p in ${args[*]};do
+		if [[ $p == "--pkg" ]];then
+			echo "true"
+		else
+			echo "false"
+		fi
+	done
+}
+
+# param="-M"
+# uri="/home/funtux/projects/pkgbuilds-testing/PKGBUILD"
+# args="-sr --pkg"
 
 cmd_gen(){
 	local bin cmd ext="tar.xz"
 	case ${param} in
 		"-M")
 			bin="makepkg"
-			if [[ $(is_split) == "--pkg" ]];then
-				cmd="${bin} ${args} $(pkg_select)"
-			else
-				cmd="${bin} ${args}"
-			fi
+			for p in ${args[*]};do
+				if [[ $p == "--pkg" ]];then
+					cmd="${bin} ${args} $(pkg_select)"
+				else
+					cmd="${bin} ${args}"
+				fi
+			done
 		;;
 		"-N")
 			bin="namcap"
@@ -196,10 +208,6 @@ cmd_gen(){
 		;;
 	esac
 	echo ${cmd}
-}
-
-run_in_konsole(){
-	konsole --noclose --workdir "${wd}" -e $SHELL -c "$(cmd_gen)"
 }
 
 main(){
