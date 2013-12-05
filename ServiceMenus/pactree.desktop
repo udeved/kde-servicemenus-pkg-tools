@@ -1,0 +1,39 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/x-xz-pkg;
+Actions=show_dep;show_revdep;_SEPARATOR_;show_dep_sync;show_revdep_sync;_SEPARATOR_;show_noduplicates;
+#_SEPARATOR_;gen_graph;
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+X-KDE-Submenu=Pactree
+
+[Desktop Action show_dep]
+Name=Show dependencies
+Icon=zoom-next
+Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-c"
+
+[Desktop Action show_revdep]
+Name=Show reverse dependencies
+Icon=zoom-previous
+Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-cr"
+
+[Desktop Action show_noduplicates]
+Name=Show dependencies with no duplicates
+Icon=zoom-select
+Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-clu"
+
+[Desktop Action show_dep_sync]
+Name=Show dependencies (sync DBs)
+Icon=zoom-next
+Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-cs"
+
+[Desktop Action show_revdep_sync]
+Name=Show reverse dependencies (sync DBs)
+Icon=zoom-previous
+Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-crs"
+
+# [Desktop Action gen_graph]
+# Name=Generate output for graphviz's dot
+# Icon=zoom-select
+# Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-g"

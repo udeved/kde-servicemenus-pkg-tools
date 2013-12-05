@@ -61,25 +61,26 @@ configdlg(){
 	user=$(userbox)
 	pwd=$(pwdbox)
 	if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
-		popup "Warning" "No config written"
+		popup "Warning" "No config written."
 	else
 		new_config
 		writer "USR=${user}"
 		writer "PWD=${pwd}"
+		popup "Success" "Config written."
 	fi
 }
 
 pkgbox(){
-	source $uri
-	local list i=0 select nlist
+	source ${uri}
+	local i=0 ilist nlist plist select
 	if [[ ! -z $pkgbase ]];then
 		for n in ${pkgname[*]};do
-			list[$i]="$i $n off"
+			ilist[$i]="$i $n off"
 			nlist[$i]="$n"
 			i=$((i+1))
 		done
 	fi
-	select=$(kdialog --checklist "Select packages:" ${list[@]})
+	select=$(kdialog --checklist "Select packages:" ${ilist[@]})
 	local flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No packages selected."
@@ -90,6 +91,11 @@ pkgbox(){
 		plist+="${nlist[$j]},"
 	done
 	echo ${plist}
+}
+
+truncate(){
+	local fn=$1
+	echo ${fn%%-[0-9]*}
 }
 
 configure(){
@@ -124,7 +130,7 @@ submit(){
 	fi
 	submit=$(curl -sSi -H 'Expect: ' -b $1 ${url})
 	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category=${cat} -F pfile=@$uri -b $1 ${url} | tr -d '\r')
+	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category=${cat} -F pfile=@${uri} -b $1 ${url} | tr -d '\r')
 	pkg_url="${aur_url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 }
 
@@ -136,21 +142,21 @@ upload(){
 }
 
 file_list(){
-	local fn reqfn list
+	local fn reqfn flist
 	for i in ${uri[*]};do
 		fn=$(basename $i)
 		if [ ${action} == "remove" ];then
-			reqfn=${fn%%-[0-9]*}
-			list+=" ${reqfn}"
+			reqfn=$(truncate $fn)
+			flist+=" ${reqfn}"
 		else
-			list+=" ${fn}"
+			flist+=" ${fn}"
 		fi
 	done
-	echo ${list}
+	echo ${flist}
 }
 
 run_in_konsole(){
-	konsole --noclose --workdir "${wd}" -e $SHELL -c "$(cmd_gen)"
+	konsole --noclose --hide-menubar --workdir "${wd}" -e $SHELL -c "$(cmd_gen)"
 }
 
 cmd_gen(){
@@ -178,13 +184,23 @@ cmd_gen(){
 			bin="pacman"
 			cmd="sudo ${bin} ${args} $(file_list)"
 		;;
+		"-t")
+			bin="pactree"
+			fn=$(basename $uri)
+			reqfn=$(truncate $fn)
+			cmd="${bin} ${args} ${reqfn}"
+		;;
 	esac
 	echo ${cmd}
 }
 
+cmd_out(){
+	echo "$(eval $(cmd_gen))"
+}
+
 main(){
 	case ${param} in
-		"-m" | "-n")
+		"-m" | "-n" | "-t")
 			wd=$(dirname ${uri})
 			run_in_konsole
 		;;
