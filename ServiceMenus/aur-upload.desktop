@@ -8,11 +8,13 @@ X-KDE-StartupNotify=false
 X-KDE-Submenu=AUR
 
 [Desktop Action upload]
-Name=Upload srcpkg
+Name=Upload source package
 Icon=go-up
-Exec=/home/funtux/bin/pkg-magic "-a" "%u"
+Exec=pkg-magic "-a" "%u"
+TryExec=curl
 
 [Desktop Action configure]
 Name=Configure login
 Icon=configure
-Exec=/home/funtux/bin/pkg-magic "-c"
+Exec=pkg-magic "-c"
+TryExec=curl

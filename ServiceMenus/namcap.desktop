@@ -10,9 +10,11 @@ X-KDE-Submenu=Namcap
 [Desktop Action check]
 Name=Check
 Icon=kbugbuster
-Exec=/home/funtux/bin/pkg-magic "-n" "%u"
+Exec=pkg-magic "-n" "%u"
+TryExec=namcap
 
 [Desktop Action check_info]
 Name=Check (with info msgs)
 Icon=help-hint
-Exec=/home/funtux/bin/pkg-magic "-n" "%u" "-i"
+Exec=pkg-magic "-n" "%u" "-i"
+TryExec=namcap

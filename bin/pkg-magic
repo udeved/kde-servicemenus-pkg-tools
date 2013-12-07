@@ -31,6 +31,7 @@ catbox(){
 	local flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No category"
+		exit
 	fi
 }
 
@@ -62,6 +63,7 @@ configdlg(){
 	pwd=$(pwdbox)
 	if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
 		popup "Warning" "No config written."
+		exit
 	else
 		new_config
 		writer "USR=${user}"
@@ -86,7 +88,7 @@ pkgbox(){
 		popup "Chancel" "No packages selected."
 		exit
 	fi
-	local p=${select//\"/}
+	local p="${select//\"/}"
 	for j in $p;do
 		plist+="${nlist[$j]},"
 	done
@@ -155,8 +157,17 @@ file_list(){
 	echo ${flist}
 }
 
+cmd_out(){
+	cd $wd
+	echo "$(eval $(cmd_gen))"
+}
+
 run_in_konsole(){
 	konsole --noclose --hide-menubar --workdir "${wd}" -e $SHELL -c "$(cmd_gen)"
+}
+
+run_msgbox(){
+	kdialog --msgbox "$(cmd_out)"
 }
 
 cmd_gen(){
@@ -192,10 +203,6 @@ cmd_gen(){
 		;;
 	esac
 	echo ${cmd}
-}
-
-cmd_out(){
-	echo "$(eval $(cmd_gen))"
 }
 
 main(){

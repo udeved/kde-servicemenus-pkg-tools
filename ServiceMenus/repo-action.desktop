@@ -10,29 +10,35 @@ X-KDE-Submenu=Repo
 [Desktop Action add]
 Name=Add selected package(s) to pkg db
 Icon=list-add
-Exec=/home/funtux/bin/pkg-magic "-r" "%U" "" "add" "db"
+Exec=pkg-magic "-r" "%U" "" "add" "db"
+TryExec=repo-add
 
 [Desktop Action remove]
 Name=Remove selected package(s) from pkg db
 Icon=list-remove
-Exec=/home/funtux/bin/pkg-magic "-r" "%U" "" "remove" "db"
+Exec=pkg-magic "-r" "%U" "" "remove" "db"
+TryExec=repo-remove
 
 [Desktop Action add_signed]
 Name=Add selected package(s) to signed pkg db
 Icon=list-add
-Exec=/home/funtux/bin/pkg-magic "-r" "%U" "-s" "add" "db"
+Exec=pkg-magic "-r" "%U" "-s" "add" "db"
+TryExec=repo-add
 
 [Desktop Action remove_signed]
 Name=Remove selected package(s) from signed pkg db
 Icon=list-remove
-Exec=/home/funtux/bin/pkg-magic "-r" "%U" "-s" "remove" "db"
+Exec=pkg-magic "-r" "%U" "-s" "remove" "db"
+TryExec=repo-remove
 
 [Desktop Action add_files]
 Name=Add selected package(s) to files db
 Icon=list-add
-Exec=/home/funtux/bin/pkg-magic "-r" "%U" "-f" "add" "files"
+Exec=pkg-magic "-r" "%U" "-f" "add" "files"
+TryExec=repo-add
 
 [Desktop Action remove_files]
 Name=Remove selected package(s) from files db
 Icon=list-remove
-Exec=/home/funtux/bin/pkg-magic "-r" "%U" "-f" "remove" "files"
+Exec=pkg-magic "-r" "%U" "-f" "remove" "files"
+TryExec=repo-remove

@@ -11,29 +11,34 @@ X-KDE-Submenu=Pactree
 [Desktop Action show_dep]
 Name=Show dependencies
 Icon=zoom-next
-Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-c"
+Exec=pkg-magic "-t" "%u" "-c"
+TryExec=pactree
 
 [Desktop Action show_revdep]
 Name=Show reverse dependencies
 Icon=zoom-previous
-Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-cr"
+Exec=pkg-magic "-t" "%u" "-cr"
+TryExec=pactree
 
 [Desktop Action show_noduplicates]
 Name=Show dependencies with no duplicates
 Icon=zoom-select
-Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-clu"
+Exec=pkg-magic "-t" "%u" "-clu"
+TryExec=pactree
 
 [Desktop Action show_dep_sync]
 Name=Show dependencies (sync DBs)
 Icon=zoom-next
-Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-cs"
+Exec=pkg-magic "-t" "%u" "-cs"
+TryExec=pactree
 
 [Desktop Action show_revdep_sync]
 Name=Show reverse dependencies (sync DBs)
 Icon=zoom-previous
-Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-crs"
+Exec=pkg-magic "-t" "%u" "-crs"
+TryExec=pactree
 
 # [Desktop Action gen_graph]
 # Name=Generate output for graphviz's dot
 # Icon=zoom-select
-# Exec=/home/funtux/bin/pkg-magic "-t" "%u" "-g"
+# Exec=pkg-magic "-t" "%u" "-g"

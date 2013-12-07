@@ -10,54 +10,65 @@ X-KDE-Submenu=Makepkg
 [Desktop Action mk_md5]
 Name=Add checksum
 Icon=run-build-configure
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-g >> $(basename "%f")"
+Exec=pkg-magic "-m" "%u" "-g >> $(basename "%f")"
+TryExec=makepkg
 
 [Desktop Action mk]
 Name=Make Package
 Icon=run-build
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-sr"
+Exec=pkg-magic "-m" "%u" "-sr"
+TryExec=makepkg
 
 [Desktop Action mk_nodeps]
 Name=Make package (ignore deps)
 Icon=debug-run
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-d"
+Exec=pkg-magic "-m" "%u" "-d"
+TryExec=makepkg
 
 [Desktop Action mk_src]
 Name=Make source package
 Icon=run-build-file
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-S"
+Exec=pkg-magic "-m" "%u" "-S"
+TryExec=makepkg
 
 [Desktop Action mk_sign]
 Name=Make signed package
 Icon=document-sign
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-sr --sign"
+Exec=pkg-magic "-m" "%u" "-sr --sign"
+TryExec=makepkg
 
 [Desktop Action mk_install]
 Name=Make & install package
 Icon=run-build-install
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-sri"
+Exec=pkg-magic "-m" "%u" "-sri"
+TryExec=makepkg
 
 [Desktop Action mk_clean]
 Name=Clean workdir
 Icon=run-build-clean
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-c"
+Exec=pkg-magic "-m" "%u" "-c"
+TryExec=makepkg
 
 [Desktop Action mk_repack]
 Name=Repackage without building
 Icon=system-software-update
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-Rf"
+Exec=pkg-magic "-m" "%u" "-Rf"
+TryExec=makepkg
 
 [Desktop Action mk_nobuild]
 Name=Get and extract
 Icon=run-build-install-root
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-o"
+Exec=pkg-magic "-m" "%u" "-o"
+TryExec=makepkg
 
 [Desktop Action mk_selected]
 Name=Make selected package(s) (split package)
 Icon=run-build
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-sr --pkg"
+Exec=pkg-magic "-m" "%u" "-sr --pkg"
+TryExec=makepkg
 
 [Desktop Action mk_selected_sign]
 Name=Make signed selected package(s) (split package)
 Icon=document-sign
-Exec=/home/funtux/bin/pkg-magic "-m" "%u" "-sr --sign --pkg"
+Exec=pkg-magic "-m" "%u" "-sr --sign --pkg"
+TryExec=makepkg
