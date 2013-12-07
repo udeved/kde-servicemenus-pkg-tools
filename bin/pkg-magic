@@ -130,11 +130,11 @@ submit(){
 		popup "Cancelled AUR upload." "No session registered."
 		exit
 	fi
-	category=$(catbox)
+	category="$(catbox)"
 	popup "Selected AUR category" "${category}"
 	submit=$(curl -sSi -H 'Expect: ' -b $1 ${url})
 	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category=${category} -F pfile=@${uri} -b $1 ${url} | tr -d '\r')
+	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${category}" -F pfile=@${uri} -b $1 ${url} | tr -d '\r')
 	pkg_url="${aur_url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 }
 
