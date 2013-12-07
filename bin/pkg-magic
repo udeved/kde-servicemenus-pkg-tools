@@ -26,12 +26,36 @@ pwdbox(){
 }
 
 catbox(){
-	local categories=('daemons' 'devel' 'editors' 'emulators' 'games' 'gnome' 'i18n' 'kde' 'kernels' 'lib' 'modules' 'multimedia' 'network' 'office' 'science' 'system' 'x11' 'xfce')
-	kdialog --combobox "Select category"  "${categories[@]}"
-	local flag=$?
+	declare -A entry
+	entry[any]=0
+	entry[daemons]=2
+	entry[devel]=3
+	entry[editors]=4
+	entry[emulators]=5
+	entry[games]=6
+	entry[gnome]=7
+	entry[i18n]=8
+	entry[kde]=9
+	entry[kernels]=19
+	entry[lib]=10
+	entry[modules]=11
+	entry[multimedia]=12
+	entry[network]=13
+	entry[office]=14
+	entry[science]=15
+	entry[system]=16
+	entry[x11]=17
+	entry[xfce]=18
+
+	local select=$(kdialog --combobox "Select category"  "${!entry[@]}") flag=$?
 	if [ $flag -eq 1 ];then
-		popup "Chancel" "No category"
 		exit
+	else
+		if [[ ! -z $select ]];then
+			echo "${entry[$select]}"
+		else
+			echo ${entry[any]}
+		fi
 	fi
 }
 
@@ -74,25 +98,24 @@ configdlg(){
 
 pkgbox(){
 	source ${uri}
-	local i=0 ilist nlist plist select
-	if [[ ! -z $pkgbase ]];then
+	local i=0 item name switch=off
+	if [[ ! -z ${pkgbase} ]];then
 		for n in ${pkgname[*]};do
-			ilist[$i]="$i $n off"
-			nlist[$i]="$n"
+			item[$i]="$i $n $switch"
+			name[$i]="$n"
 			i=$((i+1))
 		done
 	fi
-	select=$(kdialog --checklist "Select packages:" ${ilist[@]})
-	local flag=$?
+	local select=$(kdialog --checklist "Select packages:" ${item[@]}) flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No packages selected."
 		exit
 	fi
-	local p="${select//\"/}"
-	for j in $p;do
-		plist+="${nlist[$j]},"
+	local list
+	for s in ${select//\"/};do
+		list+="${name[$s]},"
 	done
-	echo ${plist}
+	echo ${list}
 }
 
 truncate(){
@@ -127,14 +150,16 @@ submit(){
 	# $1: session
 	local submit sid category url="${aur_url}/submit/"
 	if [[ -z $1 ]];then
-		popup "Cancelled AUR upload." "No session registered."
+		popup "Canceled AUR upload." "No session registered."
 		exit
+	else
+		popup "AUR Session" "$1"
 	fi
-	category="$(catbox)"
-	popup "Selected AUR category" "${category}"
 	submit=$(curl -sSi -H 'Expect: ' -b $1 ${url})
 	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${category}" -F pfile=@${uri} -b $1 ${url} | tr -d '\r')
+
+	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="$(catbox)" -F pfile=@${uri} -b $1 ${url} | tr -d '\r')
+
 	pkg_url="${aur_url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 }
 
