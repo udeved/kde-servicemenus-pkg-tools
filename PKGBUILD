@@ -7,7 +7,7 @@ pkgdesc="Kde servicemenu for makepkg, repo-add & repo-remove, namcap & aur uploa
 arch=('any')
 url="https://github.com/udeved/kde-servicemenus-pkg-tools"
 license=('GPL2')
-depends=('kdebase-runtime')
+depends=('kdebase-kdialog' 'namcap' 'pacman')
 makedepends=('git')
 conflicts=('kde-servicemenus-pkg-tools')
 install=pkg-tools.install
@@ -24,17 +24,17 @@ package() {
 
 	install -Dm755 bin/pkg-magic $pkgdir/usr/bin/pkg-magic
 
-# 	for f in ServiceMenus/*;do
-# 		install -Dm644  $f $pkgdir/usr/share/kde4/services/$f
-# 	done
+	for f in ServiceMenus/*;do
+		install -Dm644  $f $pkgdir/usr/share/kde4/services/$f
+	done
 
-	install -Dm644  ServiceMenus/aur-upload.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/aur-upload.desktop
-
-	install -Dm644  ServiceMenus/makepkg.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/makepkg.desktop
-
-	install -Dm644  ServiceMenus/namcap.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/namcap.desktop
-
-	install -Dm644  ServiceMenus/repo-action.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/repo-action.desktop
+# 	install -Dm644  ServiceMenus/aur-upload.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/aur-upload.desktop
+#
+# 	install -Dm644  ServiceMenus/makepkg.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/makepkg.desktop
+#
+# 	install -Dm644  ServiceMenus/namcap.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/namcap.desktop
+#
+# 	install -Dm644  ServiceMenus/repo-action.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/repo-action.desktop
 
 	for f in mime/application/*;do
 		install -Dm644 $f $pkgdir/usr/share/$f
