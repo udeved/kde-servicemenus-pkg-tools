@@ -10,5 +10,5 @@ X-KDE-Submenu=Pacman
 [Desktop Action install_local]
 Name=Install selected package(s)
 Icon=run-build-install
-Exec=pkg-magic "-p" "%U" "-U"
 TryExec=pacman
+Exec=pkg-magic "-p" "%U" "-U"

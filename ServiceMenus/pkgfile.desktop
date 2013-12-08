@@ -9,12 +9,12 @@ X-KDE-Submenu=Pkgfile
 
 [Desktop Action list]
 Name=List contents of a package
-Icon=run-build-install
+Icon=zoom-select
 TryExec=pkgfile
 Exec=pkg-magic "-f" "%u" "-l"
 
 [Desktop Action update]
 Name=Update repo files lists
-Icon=run-build-install
+Icon=download
 TryExec=pkgfile
 Exec=pkg-magic "-f" "%u" "-u"
