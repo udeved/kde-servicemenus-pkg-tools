@@ -1,0 +1,20 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/x-xz-pkg;
+Actions=list;_SEPARATOR_;update;
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+X-KDE-Submenu=Pkgfile
+
+[Desktop Action list]
+Name=List contents of a package
+Icon=run-build-install
+TryExec=pkgfile
+Exec=pkg-magic "-f" "%u" "-l"
+
+[Desktop Action update]
+Name=Update repo files lists
+Icon=run-build-install
+TryExec=pkgfile
+Exec=pkg-magic "-f" "%u" "-u"
