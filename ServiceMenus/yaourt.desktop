@@ -1,0 +1,26 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=inode/directory;
+Actions=search_aur;_SEPARATOR_;query_provides;query_depends;
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+X-KDE-Submenu=Yaourt
+
+[Desktop Action search_aur]
+Name=Search AUR
+Icon=zoom-select
+TryExec=yaourt
+Exec=pkg-magic "-y" "%U" "-Ss"
+
+[Desktop Action query_provides]
+Name=Search for provides
+Icon=zoom-select
+TryExec=yaourt
+Exec=pkg-magic "-y" "%U" "-Q --provides"
+
+[Desktop Action query_depends]
+Name=Search for depends
+Icon=zoom-select
+TryExec=yaourt
+Exec=pkg-magic "-y" "%U" "-Q --depends"
