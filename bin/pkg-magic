@@ -113,7 +113,27 @@ pkgbox(){
 	fi
 	local list
 	for s in ${select//\"/};do
-		list+="${name[$s]},"
+		list="${list:-}${list:+,}${name[$s]}"
+	done
+	echo ${list}
+}
+
+rulesbox(){
+ 	local rules=('anyelf' 'array' 'badbackups' 'capsnamespkg' 'carch' 'checksums' 'directoryname' 'elfexecstack' 'elfpaths' 'elftextrel' 'emptydir' 'extravars' 'fhs-infopages' 'fhs-manpages' 'filenames' 'fileownership' 'giomodules' 'glibschemas' 'gnomemime' 'hardlinks' 'hicoloricons' 'infodirectory' 'infoinstall' 'invalidstartdir' 'javafiles' 'kdeprograms' 'libtool' 'license' 'licensepkg' 'lots-of-docs' 'mimedesktop' 'mimefiles' 'missingbackups' 'perllocal' 'permissions' 'pkgnameindesc' 'rpath' 'rubypaths' 'scrollkeeper' 'sfurl' 'shebangdepends' 'sodepends' 'splitpkgfunctions' 'splitpkgmakedeps' 'symlink' 'tags' 'urlpkg')
+	local i=0 item rule switch=off
+	for n in ${rules[*]};do
+ 			item[$i]="$i $n $switch"
+ 			rule[$i]="$n"
+			i=$((i+1))
+	done
+	local select=$(kdialog --checklist "Select rules:" ${item[@]}) flag=$?
+	if [ $flag -eq 1 ];then
+		popup "Chancel" "No rules selected."
+		exit
+	fi
+	local list
+	for s in ${select//\"/};do
+		list="${list:-}${list:+,}${rules[$s]}"
 	done
 	echo ${list}
 }
@@ -160,6 +180,8 @@ submit(){
 
 	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="$(catbox)" -F pfile=@${uri} -b $1 ${url} | tr -d '\r')
 
+	echo "$(echo $submit)" > $wd/submit.log
+
 	pkg_url="${aur_url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 }
 
@@ -184,17 +206,8 @@ file_list(){
 	echo ${flist}
 }
 
-cmd_out(){
-	cd $wd
-	echo "$(eval $(cmd_gen))"
-}
-
 run_in_konsole(){
 	konsole --noclose --hide-menubar --workdir "${wd}" -e $SHELL -c "$(cmd_gen)"
-}
-
-run_msgbox(){
-	kdialog --msgbox "$(cmd_out)"
 }
 
 cmd_gen(){
@@ -212,7 +225,11 @@ cmd_gen(){
 		;;
 		"-n")
 			bin="namcap"
-			cmd="${bin} ${args} ${uri}"
+			if [[ $args == "-r" ]] || [[ $args == "-e" ]];then
+				cmd="${bin} ${args} $(rulesbox) $uri"
+			else
+				cmd="${bin} ${args} $uri"
+			fi
 		;;
 		"-r")
 			bin="repo"
@@ -228,13 +245,23 @@ cmd_gen(){
 			reqfn=$(truncate $fn)
 			cmd="${bin} ${args} ${reqfn}"
 		;;
+		"-f")
+			bin="pkgfile"
+			fn=$(basename $uri)
+			reqfn=$(truncate $fn)
+			if [[ $args == "-u" ]];then
+				cmd="sudo ${bin} ${args} ${reqfn}"
+			else
+				cmd="${bin} ${args} ${reqfn}"
+			fi
+		;;
 	esac
 	echo ${cmd}
 }
 
 main(){
 	case ${param} in
-		"-m" | "-n" | "-t")
+		"-m" | "-t" | "-f" | "-n")
 			wd=$(dirname ${uri})
 			run_in_konsole
 		;;
