@@ -206,6 +206,16 @@ file_list(){
 	echo ${flist}
 }
 
+optbox(){
+	local q=$(kdialog --inputbox "Enter query:")
+	#local flag=$?
+	#if [ $flag -eq 1 ];then
+		#popup "Chancel" "No input:"
+	#else
+		echo $q
+	#fi
+}
+
 run_in_konsole(){
 	konsole --noclose --hide-menubar --workdir "${wd}" -e $SHELL -c "$(cmd_gen)"
 }
@@ -237,7 +247,7 @@ cmd_gen(){
 		;;
 		"-p")
 			bin="pacman"
-			cmd="sudo ${bin} ${args} $(file_list)"
+			cmd="${bin} ${args} $(file_list)"
 		;;
 		"-t")
 			bin="pactree"
@@ -254,6 +264,10 @@ cmd_gen(){
 			else
 				cmd="${bin} ${args} ${reqfn}"
 			fi
+		;;
+		"-y")
+			bin="yaourt"
+			cmd="${bin} ${args} $(optbox)"
 		;;
 	esac
 	echo ${cmd}
@@ -277,6 +291,9 @@ main(){
 		;;
 		"-c")
 			configure
+		;;
+		"-y")
+			run_in_konsole
 		;;
 	esac
 }
