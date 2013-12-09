@@ -6,7 +6,7 @@ Actions=show_dep;show_revdep;_SEPARATOR_;show_dep_sync;show_revdep_sync;_SEPARAT
 #_SEPARATOR_;gen_graph;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
-X-KDE-Submenu=Pactree
+X-KDE-Submenu=Pkg-tools
 
 [Desktop Action show_dep]
 Name=Show dependencies

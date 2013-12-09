@@ -19,35 +19,35 @@ pwdbox(){
 }
 
 catbox(){
-	declare -A items
-	items[any]=0
-	items[daemons]=2
-	items[devel]=3
-	items[editors]=4
-	items[emulators]=5
-	items[games]=6
-	items[gnome]=7
-	items[i18n]=8
-	items[kde]=9
-	items[lib]=10
-	items[modules]=11
-	items[multimedia]=12
-	items[network]=13
-	items[office]=14
-	items[science]=15
-	items[system]=16
-	items[x11]=17
-	items[xfce]=18
-	items[kernels]=19
+	declare -A item
+	item[any]=0
+	item[daemons]=2
+	item[devel]=3
+	item[editors]=4
+	item[emulators]=5
+	item[games]=6
+	item[gnome]=7
+	item[i18n]=8
+	item[kde]=9
+	item[lib]=10
+	item[modules]=11
+	item[multimedia]=12
+	item[network]=13
+	item[office]=14
+	item[science]=15
+	item[system]=16
+	item[x11]=17
+	item[xfce]=18
+	item[kernels]=19
 
-	local select=$(kdialog --combobox "Select category"  "${!items[@]}") flag=$?
+	local select=$(kdialog --combobox "Select category"  "${!item[@]}") flag=$?
 	if [ $flag -eq 1 ];then
 		exit
 	else
 		if [[ ! -z $select ]];then
-			echo "${items[$select]}"
+			echo "${item[$select]}"
 		else
-			echo ${items[any]}
+			echo ${item[any]}
 		fi
 	fi
 }
@@ -91,22 +91,22 @@ configdlg(){
 
 pkgbox(){
 	source ${URI}
-	local i=0 items names switch=off
+	local i=0 item name switch=off
 	if [[ ! -z ${pkgbase} ]];then
 		for n in ${pkgname[*]};do
-			items[$i]="$i $n $switch"
-			names[$i]="$n"
+			item[$i]="$i $n $switch"
+			name[$i]="$n"
 			i=$((i+1))
 		done
 	fi
-	local select=$(kdialog --checklist "Select packages:" ${items[@]}) flag=$?
+	local select=$(kdialog --checklist "Select packages:" ${item[@]}) flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No packages selected."
 		exit
 	else
 		local list
 		for s in ${select//\"/};do
-			list="${list:-}${list:+,}${names[$s]}"
+			list="${list:-}${list:+,}${name[$s]}"
 		done
 		echo ${list}
 	fi
@@ -114,74 +114,74 @@ pkgbox(){
 }
 
 rulesbox(){
-	declare -A rules
-	rules[0]=anyelf
-	rules[1]=array
-	rules[2]=badbackups
-	rules[3]=capsnamespkg
-	rules[4]=carch
-	rules[5]=checksums
-	rules[6]=directoryname
-	rules[7]=elfexecstack
-	rules[8]=elfpaths
-	rules[9]=elftextrel
-	rules[10]=emptydir
-	rules[11]=extravars
-	rules[12]=fhs-infopages
-	rules[13]=fhs-manpages
-	rules[14]=filenames
-	rules[15]=fileownership
-	rules[16]=giomodules
-	rules[17]=glibschemas
-	rules[18]=gnomemime
-	rules[19]=hardlinks
-	rules[20]=hicoloricons
-	rules[21]=infodirectory
-	rules[22]=infoinstall
-	rules[23]=invalidstartdir
-	rules[24]=javafiles
-	rules[25]=kdeprograms
-	rules[26]=libtool
-	rules[27]=license
-	rules[28]=licensepkg
-	rules[29]=lots-of-docs
-	rules[30]=mimedesktop
-	rules[31]=mimefiles
-	rules[32]=missingbackups
-	rules[33]=perllocal
-	rules[34]=permissions
-	rules[35]=pkgnameindesc
-	rules[36]=rpath
-	rules[37]=rubypaths
-	rules[38]=scrollkeeper
-	rules[39]=sfurl
-	rules[40]=shebangdepends
-	rules[41]=sodepends
-	rules[42]=splitpkgfunctions
-	rules[43]=splitpkgmakedeps
-	rules[44]=symlink
-	rules[45]=tags
-	rules[46]=urlpkg
+	declare -A rule
+	rule[0]=anyelf
+	rule[1]=array
+	rule[2]=badbackups
+	rule[3]=capsnamespkg
+	rule[4]=carch
+	rule[5]=checksums
+	rule[6]=directoryname
+	rule[7]=elfexecstack
+	rule[8]=elfpaths
+	rule[9]=elftextrel
+	rule[10]=emptydir
+	rule[11]=extravars
+	rule[12]=fhs-infopages
+	rule[13]=fhs-manpages
+	rule[14]=filenames
+	rule[15]=fileownership
+	rule[16]=giomodules
+	rule[17]=glibschemas
+	rule[18]=gnomemime
+	rule[19]=hardlinks
+	rule[20]=hicoloricons
+	rule[21]=infodirectory
+	rule[22]=infoinstall
+	rule[23]=invalidstartdir
+	rule[24]=javafiles
+	rule[25]=kdeprograms
+	rule[26]=libtool
+	rule[27]=license
+	rule[28]=licensepkg
+	rule[29]=lots-of-docs
+	rule[30]=mimedesktop
+	rule[31]=mimefiles
+	rule[32]=missingbackups
+	rule[33]=perllocal
+	rule[34]=permissions
+	rule[35]=pkgnameindesc
+	rule[36]=rpath
+	rule[37]=rubypaths
+	rule[38]=scrollkeeper
+	rule[39]=sfurl
+	rule[40]=shebangdepends
+	rule[41]=sodepends
+	rule[42]=splitpkgfunctions
+	rule[43]=splitpkgmakedeps
+	rule[44]=symlink
+	rule[45]=tags
+	rule[46]=urlpkg
 
- 	local items switch=off
-	for (( i=0; i<${#rules[@]}; ++i));do
-		items[$i]="$i ${rules[$i]} ${switch}"
+ 	local item switch=off
+	for (( i=0; i<${#rule[@]}; ++i));do
+		item[$i]="$i ${rule[$i]} ${switch}"
 	done
- 	local select=$(kdialog --checklist "Select rules:" ${items[@]}) flag=$?
+ 	local select=$(kdialog --checklist "Select rules:" ${item[@]}) flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No rules selected."
 		return
 	else
 	 	local list
 		for s in ${select//\"/};do
-			list="${list:-}${list:+,}${rules[$s]}"
+			list="${list:-}${list:+,}${rule[$s]}"
 		done
 		echo ${list}
 	fi
 }
 
 optbox(){
-	local q=$(kdialog --inputbox "Enter query:") flag=$?
+	local q=$(kdialog --inputbox "Enter query or parameter:") flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No input."
 		exit
@@ -230,8 +230,6 @@ submit(){
 
 	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="$(catbox)" -F pfile=@${URI} -b $1 ${url} | tr -d '\r')
 
-	echo "$(echo $submit)" > $wd/submit.log
-
 	pkg_url="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 }
 
@@ -246,7 +244,7 @@ file_list(){
 	local fn reqfn list
 	for i in ${URI[*]};do
 		fn=$(basename $i)
-		if [[ ${PARAM} == "-Rr" ]];then
+		if [[ ${PARAM} == "-r" ]];then
 			reqfn=$(truncate $fn)
 			list="${list:-}${list:+ }${reqfn}"
 		else
@@ -277,65 +275,74 @@ run_in_konsole(){
 }
 
 cmd_gen(){
-	declare -A BIN
-	BIN[-m]=makepkg
-	BIN[-n]=namcap
-	BIN[-Ra]=repo-add
-	BIN[-Rr]=repo-remove
-	BIN[-p]=pacman
-	BIN[-t]=pactree
-	BIN[-f]=pkgfile
-	BIN[-y]=yaourt
-	BIN[-c]=configure
-	BIN[-a]=upload
+	declare -A bin
+	bin[-m]=makepkg
+	bin[-n]=namcap
+	bin[-r]=repo-add
+	bin[-a]=repo-remove
+	bin[-i]=yaourt
+	bin[-t]=pactree
+	bin[-f]=pkgfile
+	bin[-y]=yaourt
+	bin[-c]=configure
+	bin[-u]=upload
+	bin[-o]=pacman-optimize
 
-	local CMD MISC EXT="tar.xz" IS_SU=0
+	local cmd misc ext="tar.xz" is_su=0
 	case ${PARAM} in
-		"-Ra" | "-Rr")
-			local REPO=$(basename $(get_workdir))
-			MISC="${REPO}.${OPTS}.${EXT} $(file_list)"
+		"-a" | "-r")
+			local repo=$(basename $(get_workdir))
+			misc="${repo}.${OPTS}.${ext} $(file_list)"
 		;;
 		"-m")
 			for p in ${ARGS[*]};do
 				if [[ $p == "--pkg" ]];then
-					MISC=$(pkgbox)
+					misc=$(pkgbox)
 				fi
 			done
 		;;
-		"-p")
-			MISC=$(file_list)
-			IS_SU=1
-		;;
 		"-t")
-			MISC=$(truncate $(basename ${URI}))
+			misc=$(truncate $(basename ${URI}))
 		;;
 		"-y")
-			MISC=$(optbox)
+			if [[ ${ARGS} == "-Syua" ]];then
+				is_su=1
+			if [[ ${ARGS} == "-U" ]];then
+				misc=$(file_list)
+				is_su=1
+			else
+				misc=$(optbox)
+			fi
 		;;
 		"-n")
 			if [[ ${ARGS} == "-r" ]] || [[ ${ARGS} == "-e" ]];then
-				MISC="$(rulesbox) ${URI}"
+				misc="$(rulesbox) ${URI}"
 			else
-				MISC=${URI}
+				misc=${URI}
 			fi
 		;;
 		"-f")
 			if [[ ${ARGS} == "-u" ]];then
-				IS_SU=1
+				is_su=1
+			elif [[ ${ARGS} == "-s" ]];then
+				misc=$(optbox)
 			else
-				MISC=$(truncate $(basename ${URI}))
+				misc=$(truncate $(basename ${URI}))
 			fi
 		;;
+		"-o")
+			is_su=1
+		;;
 	esac
-	if [ ${IS_SU} -eq 1 ];then
-		CMD="sudo ${BIN[${PARAM}]} ${ARGS} ${MISC}"
+	if [ ${is_su} -eq 1 ];then
+		cmd="sudo ${bin[${PARAM}]} ${ARGS} ${misc}"
 	else
-		CMD="${BIN[${PARAM}]} ${ARGS} ${MISC}"
+		cmd="${bin[${PARAM}]} ${ARGS} ${misc}"
 	fi
-	echo ${CMD}
+	echo ${cmd}
 }
 
-if [[ ${PARAM} == "-a" ]] || [[ ${PARAM} == "-c" ]];then
+if [[ ${PARAM} == "-u" ]] || [[ ${PARAM} == "-c" ]];then
 	$(cmd_gen)
 else
 	#popup "CMD" "$(cmd_gen)"

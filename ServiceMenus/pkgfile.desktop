@@ -2,10 +2,10 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-xz-pkg;
-Actions=list;_SEPARATOR_;update;
+Actions=search;list;_SEPARATOR_;update;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
-X-KDE-Submenu=Pkgfile
+X-KDE-Submenu=Pkg-tools
 
 [Desktop Action list]
 Name=List contents of a package
@@ -14,7 +14,13 @@ TryExec=pkgfile
 Exec=pkg-magic "-f" "%u" "-l"
 
 [Desktop Action update]
-Name=Update repo files lists
+Name=Update the stored metadata files
 Icon=download
 TryExec=pkgfile
 Exec=pkg-magic "-f" "%u" "-u"
+
+[Desktop Action search]
+Name=Search for packages containing the provided target
+Icon=zoom-select
+TryExec=pkgfile
+Exec=pkg-magic "-f" "%u" "-s"

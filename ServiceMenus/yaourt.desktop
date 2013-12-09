@@ -2,16 +2,10 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=inode/directory;
-Actions=search_aur;_SEPARATOR_;query_provides;query_depends;
+Actions=search_aur;_SEPARATOR_;query;query_provides;query_depends;_SEPARATOR_;sync;optimize;configure;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
-X-KDE-Submenu=Yaourt
-
-[Desktop Action search_aur]
-Name=Search AUR
-Icon=zoom-select
-TryExec=yaourt
-Exec=pkg-magic "-y" "%U" "-Ss"
+X-KDE-Submenu=Pkg-tools
 
 [Desktop Action query_provides]
 Name=Search for provides
@@ -24,3 +18,33 @@ Name=Search for depends
 Icon=zoom-select
 TryExec=yaourt
 Exec=pkg-magic "-y" "%U" "-Q --depends"
+
+[Desktop Action sync]
+Name=Sync pacman db
+Icon=configure
+TryExec=yaourt
+Exec=pkg-magic "-y" "%U" "-Syua"
+
+[Desktop Action optimize]
+Name=Optimize pacman db
+Icon=configure
+TryExec=pacman
+Exec=pkg-magic "-o" "%U"
+
+[Desktop Action query]
+Name=Query
+Icon=zoom-select
+TryExec=yaourt
+Exec=pkg-magic "-y" "%U" "-Q"
+
+[Desktop Action search_aur]
+Name=Search AUR
+Icon=zoom-select
+TryExec=yaourt
+Exec=pkg-magic "-y" "%U" "-Ss"
+
+[Desktop Action configure]
+Name=Configure AUR login
+Icon=configure
+TryExec=curl
+Exec=pkg-magic "-c"

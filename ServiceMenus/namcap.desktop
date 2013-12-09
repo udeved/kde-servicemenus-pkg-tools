@@ -5,7 +5,7 @@ MimeType=application/x-xz-pkg;application/x-pkgbuild;
 Actions=check;check_info;_SEPARATOR_;check_rules;check_rule_ex;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
-X-KDE-Submenu=Namcap
+X-KDE-Submenu=Pkg-tools
 
 [Desktop Action check]
 Name=Check

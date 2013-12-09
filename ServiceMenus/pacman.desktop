@@ -5,10 +5,10 @@ MimeType=application/x-xz-pkg;
 Actions=install_local;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
-X-KDE-Submenu=Pacman
+X-KDE-Submenu=Pkg-tools
 
 [Desktop Action install_local]
 Name=Install selected package(s)
 Icon=run-build-install
-TryExec=pacman
-Exec=pkg-magic "-p" "%U" "-U"
+TryExec=yaourt
+Exec=pkg-magic "-y" "%U" "-U"

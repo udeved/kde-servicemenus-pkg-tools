@@ -2,19 +2,13 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-gz-src;
-Actions=upload;_SEPARATOR_;configure;
+Actions=upload;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
-X-KDE-Submenu=AUR
+X-KDE-Submenu=Pkg-tools
 
 [Desktop Action upload]
-Name=Upload source package
+Name=Upload source package to AUR
 Icon=go-up
 TryExec=curl
-Exec=pkg-magic "-a" "%u"
-
-[Desktop Action configure]
-Name=Configure login
-Icon=configure
-TryExec=curl
-Exec=pkg-magic "-c"
+Exec=pkg-magic "-u" "%u"
