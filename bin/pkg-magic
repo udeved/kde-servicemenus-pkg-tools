@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+#set -e
 
 userbox(){
 	kdialog --inputbox "Enter username:"
@@ -287,7 +287,7 @@ cmd_gen(){
 	BIN[-f]=pkgfile
 	BIN[-y]=yaourt
 	BIN[-c]=configure
-	BIN[-u]=upload
+	BIN[-a]=upload
 
 	local CMD MISC EXT="tar.xz" IS_SU=0
 	case ${PARAM} in
@@ -330,15 +330,13 @@ cmd_gen(){
 	if [ ${IS_SU} -eq 1 ];then
 		CMD="sudo ${BIN[${PARAM}]} ${ARGS} ${MISC}"
 	else
-		CMD="${BIN[$PARAM]} ${ARGS} ${MISC}"
+		CMD="${BIN[${PARAM}]} ${ARGS} ${MISC}"
 	fi
 	echo ${CMD}
 }
 
-if [[ ${PARAM} == "-a" ]];then
-	upload
-elif [[ ${PARAM} == "-c" ]];then
-	configure
+if [[ ${PARAM} == "-a" ]] || [[ ${PARAM} == "-c" ]];then
+	$(cmd_gen)
 else
 	#popup "CMD" "$(cmd_gen)"
 	run_in_konsole "$(cmd_gen)"

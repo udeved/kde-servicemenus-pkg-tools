@@ -10,11 +10,11 @@ X-KDE-Submenu=AUR
 [Desktop Action upload]
 Name=Upload source package
 Icon=go-up
-Exec=pkg-magic "-a" "%u"
 TryExec=curl
+Exec=pkg-magic "-a" "%u"
 
 [Desktop Action configure]
 Name=Configure login
 Icon=configure
-Exec=pkg-magic "-c"
 TryExec=curl
+Exec=pkg-magic "-c"
