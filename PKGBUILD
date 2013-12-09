@@ -1,7 +1,7 @@
 # Maintainer: udeved <udeved@openrc4arch.site40.net>
 
 pkgname=kde-servicemenus-pkg-tools-git
-pkgver=0.r26.4ec4908
+pkgver=0.r28.4960c0a
 pkgrel=1
 pkgdesc="Kde servicemenu for makepkg, repo-add & repo-remove, namcap & aur upload."
 arch=('any')
@@ -24,17 +24,16 @@ package() {
 
 	install -Dm755 bin/pkg-magic $pkgdir/usr/bin/pkg-magic
 
-	for f in ServiceMenus/*;do
-		install -Dm644  $f $pkgdir/usr/share/kde4/services/$f
-	done
+# 	for f in ServiceMenus/*;do
+# 		install -Dm644  $f $pkgdir/usr/share/kde4/services/$f
+# 	done
 
-# 	install -Dm644  ServiceMenus/aur-upload.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/aur-upload.desktop
-#
-# 	install -Dm644  ServiceMenus/makepkg.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/makepkg.desktop
-#
-# 	install -Dm644  ServiceMenus/namcap.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/namcap.desktop
-#
-# 	install -Dm644  ServiceMenus/repo-action.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/repo-action.desktop
+	install -Dm644  ServiceMenus/aur-upload.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/aur-upload.desktop
+	install -Dm644  ServiceMenus/makepkg.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/makepkg.desktop
+	install -Dm644  ServiceMenus/namcap.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/namcap.desktop
+	install -Dm644  ServiceMenus/repo-action.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/repo-action.desktop
+	install -Dm644  ServiceMenus/pactree.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/pactree.desktop
+	install -Dm644  ServiceMenus/pkgfile.desktop $pkgdir/usr/share/kde4/services/ServiceMenus/pkgfile.desktop
 
 	for f in mime/application/*;do
 		install -Dm644 $f $pkgdir/usr/share/$f

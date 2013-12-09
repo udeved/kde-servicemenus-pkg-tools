@@ -1,14 +1,5 @@
 #!/bin/bash
 
-param=$1
-uri=$2
-args=$3
-action=$4
-type=$5
-
-config="$HOME/.config/aurlogin"
-aur_url="https://aur.archlinux.org"
-
 userbox(){
 	kdialog --inputbox "Enter username:"
 	local flag=$?
@@ -26,35 +17,35 @@ pwdbox(){
 }
 
 catbox(){
-	declare -A entry
-	entry[any]=0
-	entry[daemons]=2
-	entry[devel]=3
-	entry[editors]=4
-	entry[emulators]=5
-	entry[games]=6
-	entry[gnome]=7
-	entry[i18n]=8
-	entry[kde]=9
-	entry[kernels]=19
-	entry[lib]=10
-	entry[modules]=11
-	entry[multimedia]=12
-	entry[network]=13
-	entry[office]=14
-	entry[science]=15
-	entry[system]=16
-	entry[x11]=17
-	entry[xfce]=18
+	declare -A item
+	item[any]=0
+	item[daemons]=2
+	item[devel]=3
+	item[editors]=4
+	item[emulators]=5
+	item[games]=6
+	item[gnome]=7
+	item[i18n]=8
+	item[kde]=9
+	item[lib]=10
+	item[modules]=11
+	item[multimedia]=12
+	item[network]=13
+	item[office]=14
+	item[science]=15
+	item[system]=16
+	item[x11]=17
+	item[xfce]=18
+	item[kernels]=19
 
-	local select=$(kdialog --combobox "Select category"  "${!entry[@]}") flag=$?
+	local select=$(kdialog --combobox "Select category"  "${!item[@]}") flag=$?
 	if [ $flag -eq 1 ];then
 		exit
 	else
 		if [[ ! -z $select ]];then
-			echo "${entry[$select]}"
+			echo "${item[$select]}"
 		else
-			echo ${entry[any]}
+			echo ${item[any]}
 		fi
 	fi
 }
@@ -64,7 +55,7 @@ popup(){
 }
 
 ynbox(){
-	kdialog --warningcontinuecancel "${config} already exists. Overwrite?"
+	kdialog --warningcontinuecancel "${CONFIG} already exists. Overwrite?"
 	local flag=$?
 	if [ ${flag} -eq 0 ];then
 		configdlg
@@ -74,11 +65,11 @@ ynbox(){
 }
 
 writer(){
-	echo $1 >> "${config}"
+	echo $1 >> "${CONFIG}"
 }
 
 new_config(){
-	echo -n > ${config}
+	echo -n > ${CONFIG}
 }
 
 configdlg(){
@@ -97,7 +88,7 @@ configdlg(){
 }
 
 pkgbox(){
-	source ${uri}
+	source ${URI}
 	local i=0 item name switch=off
 	if [[ ! -z ${pkgbase} ]];then
 		for n in ${pkgname[*]};do
@@ -119,7 +110,8 @@ pkgbox(){
 }
 
 rulesbox(){
- 	local rules=('anyelf' 'array' 'badbackups' 'capsnamespkg' 'carch' 'checksums' 'directoryname' 'elfexecstack' 'elfpaths' 'elftextrel' 'emptydir' 'extravars' 'fhs-infopages' 'fhs-manpages' 'filenames' 'fileownership' 'giomodules' 'glibschemas' 'gnomemime' 'hardlinks' 'hicoloricons' 'infodirectory' 'infoinstall' 'invalidstartdir' 'javafiles' 'kdeprograms' 'libtool' 'license' 'licensepkg' 'lots-of-docs' 'mimedesktop' 'mimefiles' 'missingbackups' 'perllocal' 'permissions' 'pkgnameindesc' 'rpath' 'rubypaths' 'scrollkeeper' 'sfurl' 'shebangdepends' 'sodepends' 'splitpkgfunctions' 'splitpkgmakedeps' 'symlink' 'tags' 'urlpkg')
+	local rules=('anyelf' 'array' 'badbackups' 'capsnamespkg' 'carch' 'checksums' 'directoryname' 'elfexecstack' 'elfpaths' 'elftextrel' 'emptydir' 'extravars' 'fhs-infopages' 'fhs-manpages' 'filenames' 'fileownership' 'giomodules' 'glibschemas' 'gnomemime' 'hardlinks' 'hicoloricons' 'infodirectory' 'infoinstall' 'invalidstartdir' 'javafiles' 'kdeprograms' 'libtool' 'license' 'licensepkg' 'lots-of-docs' 'mimedesktop' 'mimefiles' 'missingbackups' 'perllocal' 'permissions' 'pkgnameindesc' 'rpath' 'rubypaths' 'scrollkeeper' 'sfurl' 'shebangdepends' 'sodepends' 'splitpkgfunctions' 'splitpkgmakedeps' 'symlink' 'tags' 'urlpkg')
+
 	local i=0 item rule switch=off
 	for n in ${rules[*]};do
  			item[$i]="$i $n $switch"
@@ -138,13 +130,23 @@ rulesbox(){
 	echo ${list}
 }
 
+optbox(){
+	local q=$(kdialog --inputbox "Enter query:") flag=$?
+	if [ $flag -eq 1 ];then
+		popup "Chancel" "No input."
+		exit
+	else
+		echo $q
+	fi
+}
+
 truncate(){
 	local fn=$1
 	echo ${fn%%-[0-9]*}
 }
 
 configure(){
-   	if [[ ! -f "${config}" ]]; then
+   	if [[ ! -f "${CONFIG}" ]]; then
 		configdlg
 	else
 		ynbox
@@ -152,8 +154,8 @@ configure(){
 }
 
 get_session(){
-	local user pwd  url="${aur_url}/login/" login session
-	[[ -f "${config}" ]] &&  source ${config}
+	local user pwd  url="${URL}/login/" login session
+	[[ -f "${CONFIG}" ]] &&  source ${CONFIG}
 	if [[ ! -z ${USR} ]] && [[ ! -z ${PWD} ]];then
 		user=${USR}
 		pwd=${PWD}
@@ -168,25 +170,23 @@ get_session(){
 
 submit(){
 	# $1: session
-	local submit sid category url="${aur_url}/submit/"
+	local submit sid category url="${URL}/submit/"
 	if [[ -z $1 ]];then
 		popup "Canceled AUR upload." "No session registered."
 		exit
-	else
-		popup "AUR Session" "$1"
 	fi
 	submit=$(curl -sSi -H 'Expect: ' -b $1 ${url})
 	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
 
-	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="$(catbox)" -F pfile=@${uri} -b $1 ${url} | tr -d '\r')
+	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="$(catbox)" -F pfile=@${URI} -b $1 ${url} | tr -d '\r')
 
 	echo "$(echo $submit)" > $wd/submit.log
 
-	pkg_url="${aur_url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
+	pkg_url="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 }
 
 upload(){
-	popup "AUR upload started." "$(basename $uri)"
+	popup "AUR upload started." "$(basename ${URI})"
 	submit "$(get_session)"
 	local html='<a href="'"${pkg_url}"'">'"${pkg_url}"'</a>'
 	popup "AUR upload finished." "${html}"
@@ -194,9 +194,9 @@ upload(){
 
 file_list(){
 	local fn reqfn flist
-	for i in ${uri[*]};do
+	for i in ${URI[*]};do
 		fn=$(basename $i)
-		if [ ${action} == "remove" ];then
+		if [[ ${PARAM} == "-Rr" ]];then
 			reqfn=$(truncate $fn)
 			flist+=" ${reqfn}"
 		else
@@ -206,96 +206,89 @@ file_list(){
 	echo ${flist}
 }
 
-optbox(){
-	local q=$(kdialog --inputbox "Enter query:")
-	#local flag=$?
-	#if [ $flag -eq 1 ];then
-		#popup "Chancel" "No input:"
-	#else
-		echo $q
-	#fi
+PARAM=$1
+URI=$2
+ARGS=$3
+OPTS=$4
+CONFIG="$HOME/.config/aurlogin"
+URL="https://aur.archlinux.org"
+
+get_workdir(){
+	local wd
+	for u in  ${URI[*]};do
+		wd=$(dirname $u)
+	done
+	echo $wd
 }
 
 run_in_konsole(){
-	konsole --noclose --hide-menubar --workdir "${wd}" -e $SHELL -c "$(cmd_gen)"
+	konsole --noclose --hide-menubar --workdir "$(get_workdir)" -e $SHELL -c "$(cmd_gen)"
 }
 
 cmd_gen(){
-	local bin cmd ext="tar.xz"
-	case ${param} in
+	declare -A BIN
+	BIN[-m]=makepkg
+	BIN[-n]=namcap
+	BIN[-Ra]=repo-add
+	BIN[-Rr]=repo-remove
+	BIN[-p]=pacman
+	BIN[-t]=pactree
+	BIN[-f]=pkgfile
+	BIN[-y]=yaourt
+	BIN[-c]=configure
+	BIN[-u]=upload
+
+	local CMD MISC EXT="tar.xz" IS_SU=0
+	case ${PARAM} in
+		"-Ra" | "-Rr")
+			REPO=$(basename $(get_workdir))
+			MISC="${REPO}.${OPTS}.${EXT} $(file_list)"
+		;;
 		"-m")
-			bin="makepkg"
-			for p in ${args[*]};do
+			for p in ${ARGS[*]};do
 				if [[ $p == "--pkg" ]];then
-					cmd="${bin} ${args} $(pkgbox)"
-				else
-					cmd="${bin} ${args}"
+					MISC=$(pkgbox)
 				fi
 			done
 		;;
-		"-n")
-			bin="namcap"
-			if [[ $args == "-r" ]] || [[ $args == "-e" ]];then
-				cmd="${bin} ${args} $(rulesbox) $uri"
-			else
-				cmd="${bin} ${args} $uri"
-			fi
-		;;
-		"-r")
-			bin="repo"
-			cmd="${bin}-${action} ${args} ${repo_name}.${type}.$ext $(file_list)"
-		;;
 		"-p")
-			bin="pacman"
-			cmd="${bin} ${args} $(file_list)"
+			MISC=$(file_list)
+			IS_SU=1
 		;;
 		"-t")
-			bin="pactree"
-			fn=$(basename $uri)
-			reqfn=$(truncate $fn)
-			cmd="${bin} ${args} ${reqfn}"
+			MISC=$(truncate $(basename ${URI}))
 		;;
-		"-f")
-			bin="pkgfile"
-			fn=$(basename $uri)
-			reqfn=$(truncate $fn)
-			if [[ $args == "-u" ]];then
-				cmd="sudo ${bin} ${args} ${reqfn}"
+		"-y")
+			MISC=$(optbox)
+		;;
+		"-n")
+			if [[ ${ARGS} == "-r" ]] || [[ ${ARGS} == "-e" ]];then
+				MISC="$(rulesbox) ${URI}"
 			else
-				cmd="${bin} ${args} ${reqfn}"
+				MISC=${URI}
 			fi
 		;;
-		"-y")
-			bin="yaourt"
-			cmd="${bin} ${args} $(optbox)"
+		"-f")
+			if [[ ${ARGS} == "-u" ]];then
+				IS_SU=1
+			else
+				MISC=$(truncate $(basename ${URI}))
+			fi
 		;;
 	esac
-	echo ${cmd}
+	if [ ${IS_SU} -eq 1 ];then
+		CMD="sudo ${BIN[${PARAM}]} ${ARGS} ${MISC}"
+	else
+		CMD="${BIN[$PARAM]} ${ARGS} ${MISC}"
+	fi
+	echo ${CMD}
 }
 
-main(){
-	case ${param} in
-		"-m" | "-t" | "-f" | "-n")
-			wd=$(dirname ${uri})
-			run_in_konsole
-		;;
-		"-r" | "-p")
-			for i in ${uri[*]};do
-				wd=$(dirname $i)
-				repo_name=$(basename ${wd})
-			done
-			run_in_konsole
-		;;
-		"-a")
-			upload
-		;;
-		"-c")
-			configure
-		;;
-		"-y")
-			run_in_konsole
-		;;
-	esac
-}
-
-main
+if [[ ${PARAM} == "-a" ]];then
+	upload
+elif [[ ${PARAM} == "-c" ]];then
+	configure
+else
+	#popup "CMD" "$(cmd_gen)"
+	run_in_konsole
+fi
