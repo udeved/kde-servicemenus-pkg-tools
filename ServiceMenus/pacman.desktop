@@ -10,5 +10,5 @@ X-KDE-Submenu=Pkg-tools
 [Desktop Action install_local]
 Name=Install selected package(s)
 Icon=run-build-install
-TryExec=yaourt
+#TryExec=yaourt
 Exec=pkg-magic "-y" "%U" "-U"

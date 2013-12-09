@@ -10,23 +10,23 @@ X-KDE-Submenu=Pkg-tools
 [Desktop Action check]
 Name=Check
 Icon=kbugbuster
-TryExec=namcap
+#TryExec=namcap
 Exec=pkg-magic "-n" "%u"
 
 [Desktop Action check_info]
 Name=Check (with info msgs)
 Icon=help-hint
-TryExec=namcap
+#TryExec=namcap
 Exec=pkg-magic "-n" "%u" "-i"
 
 [Desktop Action check_rules]
 Name=Only apply rules to the package
 Icon=help-hint
-TryExec=namcap
+#TryExec=namcap
 Exec=pkg-magic "-n" "%u" "-r"
 
 [Desktop Action check_rule_ex]
 Name=Don't apply rules to the package
 Icon=help-hint
-TryExec=namcap
+#TryExec=namcap
 Exec=pkg-magic "-n" "%u" "-e"

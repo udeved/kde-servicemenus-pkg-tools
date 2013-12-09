@@ -345,6 +345,7 @@ cmd_gen(){
 if [[ ${PARAM} == "-u" ]] || [[ ${PARAM} == "-c" ]];then
 	$(cmd_gen)
 else
-	#popup "CMD" "$(cmd_gen)"
-	run_in_konsole "$(cmd_gen)"
+	popup "CMD" "$(cmd_gen)"
+	#run_in_konsole "$(cmd_gen)"
 fi
+popup "Parm" "${PARAM}"

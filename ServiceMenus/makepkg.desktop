@@ -11,64 +11,64 @@ X-KDE-Submenu=Pkg-tools
 Name=Add checksum
 Icon=run-build-configure
 Exec=pkg-magic "-m" "%u" "-g >> $(basename "%f")"
-TryExec=makepkg
+#TryExec=makepkg
 
 [Desktop Action mk]
 Name=Make Package
 Icon=run-build
 Exec=pkg-magic "-m" "%u" "-sr"
-TryExec=makepkg
+#TryExec=makepkg
 
 [Desktop Action mk_nodeps]
 Name=Make package (ignore deps)
 Icon=debug-run
 Exec=pkg-magic "-m" "%u" "-d"
-TryExec=makepkg
+#TryExec=makepkg
 
 [Desktop Action mk_src]
 Name=Make source package
 Icon=run-build-file
 Exec=pkg-magic "-m" "%u" "-S"
-TryExec=makepkg
+#TryExec=makepkg
 
 [Desktop Action mk_sign]
 Name=Make signed package
 Icon=document-sign
 Exec=pkg-magic "-m" "%u" "-sr --sign"
-TryExec=makepkg
+#TryExec=makepkg
 
 [Desktop Action mk_install]
 Name=Make & install package
 Icon=run-build-install
 Exec=pkg-magic "-m" "%u" "-sri"
-TryExec=makepkg
+#TryExec=makepkg
 
 [Desktop Action mk_clean]
 Name=Clean workdir
 Icon=run-build-clean
 Exec=pkg-magic "-m" "%u" "-c"
-TryExec=makepkg
+#TryExec=makepkg
 
 [Desktop Action mk_repack]
 Name=Repackage without building
 Icon=system-software-update
 Exec=pkg-magic "-m" "%u" "-Rf"
-TryExec=makepkg
+#TryExec=makepkg
 
 [Desktop Action mk_nobuild]
 Name=Get and extract
 Icon=run-build-install-root
 Exec=pkg-magic "-m" "%u" "-o"
-TryExec=makepkg
+#TryExec=makepkg
 
 [Desktop Action mk_selected]
 Name=Make selected package(s) (split package)
 Icon=run-build
 Exec=pkg-magic "-m" "%u" "-sr --pkg"
-TryExec=makepkg
+#TryExec=makepkg
 
 [Desktop Action mk_selected_sign]
 Name=Make signed selected package(s) (split package)
 Icon=document-sign
 Exec=pkg-magic "-m" "%u" "-sr --sign --pkg"
-TryExec=makepkg
+#TryExec=makepkg

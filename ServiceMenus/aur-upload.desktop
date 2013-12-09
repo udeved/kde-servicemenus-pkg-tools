@@ -10,5 +10,5 @@ X-KDE-Submenu=Pkg-tools
 [Desktop Action upload]
 Name=Upload source package to AUR
 Icon=go-up
-TryExec=curl
+#TryExec=curl
 Exec=pkg-magic "-u" "%u"
