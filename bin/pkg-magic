@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 userbox(){
 	kdialog --inputbox "Enter username:"
 	local flag=$?
@@ -17,35 +19,35 @@ pwdbox(){
 }
 
 catbox(){
-	declare -A item
-	item[any]=0
-	item[daemons]=2
-	item[devel]=3
-	item[editors]=4
-	item[emulators]=5
-	item[games]=6
-	item[gnome]=7
-	item[i18n]=8
-	item[kde]=9
-	item[lib]=10
-	item[modules]=11
-	item[multimedia]=12
-	item[network]=13
-	item[office]=14
-	item[science]=15
-	item[system]=16
-	item[x11]=17
-	item[xfce]=18
-	item[kernels]=19
+	declare -A items
+	items[any]=0
+	items[daemons]=2
+	items[devel]=3
+	items[editors]=4
+	items[emulators]=5
+	items[games]=6
+	items[gnome]=7
+	items[i18n]=8
+	items[kde]=9
+	items[lib]=10
+	items[modules]=11
+	items[multimedia]=12
+	items[network]=13
+	items[office]=14
+	items[science]=15
+	items[system]=16
+	items[x11]=17
+	items[xfce]=18
+	items[kernels]=19
 
-	local select=$(kdialog --combobox "Select category"  "${!item[@]}") flag=$?
+	local select=$(kdialog --combobox "Select category"  "${!items[@]}") flag=$?
 	if [ $flag -eq 1 ];then
 		exit
 	else
 		if [[ ! -z $select ]];then
-			echo "${item[$select]}"
+			echo "${items[$select]}"
 		else
-			echo ${item[any]}
+			echo ${items[any]}
 		fi
 	fi
 }
@@ -89,45 +91,93 @@ configdlg(){
 
 pkgbox(){
 	source ${URI}
-	local i=0 item name switch=off
+	local i=0 items names switch=off
 	if [[ ! -z ${pkgbase} ]];then
 		for n in ${pkgname[*]};do
-			item[$i]="$i $n $switch"
-			name[$i]="$n"
+			items[$i]="$i $n $switch"
+			names[$i]="$n"
 			i=$((i+1))
 		done
 	fi
-	local select=$(kdialog --checklist "Select packages:" ${item[@]}) flag=$?
+	local select=$(kdialog --checklist "Select packages:" ${items[@]}) flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No packages selected."
 		exit
+	else
+		local list
+		for s in ${select//\"/};do
+			list="${list:-}${list:+,}${names[$s]}"
+		done
+		echo ${list}
 	fi
-	local list
-	for s in ${select//\"/};do
-		list="${list:-}${list:+,}${name[$s]}"
-	done
-	echo ${list}
+
 }
 
 rulesbox(){
-	local rules=('anyelf' 'array' 'badbackups' 'capsnamespkg' 'carch' 'checksums' 'directoryname' 'elfexecstack' 'elfpaths' 'elftextrel' 'emptydir' 'extravars' 'fhs-infopages' 'fhs-manpages' 'filenames' 'fileownership' 'giomodules' 'glibschemas' 'gnomemime' 'hardlinks' 'hicoloricons' 'infodirectory' 'infoinstall' 'invalidstartdir' 'javafiles' 'kdeprograms' 'libtool' 'license' 'licensepkg' 'lots-of-docs' 'mimedesktop' 'mimefiles' 'missingbackups' 'perllocal' 'permissions' 'pkgnameindesc' 'rpath' 'rubypaths' 'scrollkeeper' 'sfurl' 'shebangdepends' 'sodepends' 'splitpkgfunctions' 'splitpkgmakedeps' 'symlink' 'tags' 'urlpkg')
+	declare -A rules
+	rules[0]=anyelf
+	rules[1]=array
+	rules[2]=badbackups
+	rules[3]=capsnamespkg
+	rules[4]=carch
+	rules[5]=checksums
+	rules[6]=directoryname
+	rules[7]=elfexecstack
+	rules[8]=elfpaths
+	rules[9]=elftextrel
+	rules[10]=emptydir
+	rules[11]=extravars
+	rules[12]=fhs-infopages
+	rules[13]=fhs-manpages
+	rules[14]=filenames
+	rules[15]=fileownership
+	rules[16]=giomodules
+	rules[17]=glibschemas
+	rules[18]=gnomemime
+	rules[19]=hardlinks
+	rules[20]=hicoloricons
+	rules[21]=infodirectory
+	rules[22]=infoinstall
+	rules[23]=invalidstartdir
+	rules[24]=javafiles
+	rules[25]=kdeprograms
+	rules[26]=libtool
+	rules[27]=license
+	rules[28]=licensepkg
+	rules[29]=lots-of-docs
+	rules[30]=mimedesktop
+	rules[31]=mimefiles
+	rules[32]=missingbackups
+	rules[33]=perllocal
+	rules[34]=permissions
+	rules[35]=pkgnameindesc
+	rules[36]=rpath
+	rules[37]=rubypaths
+	rules[38]=scrollkeeper
+	rules[39]=sfurl
+	rules[40]=shebangdepends
+	rules[41]=sodepends
+	rules[42]=splitpkgfunctions
+	rules[43]=splitpkgmakedeps
+	rules[44]=symlink
+	rules[45]=tags
+	rules[46]=urlpkg
 
-	local i=0 item rule switch=off
-	for n in ${rules[*]};do
- 			item[$i]="$i $n $switch"
- 			rule[$i]="$n"
-			i=$((i+1))
+ 	local items switch=off
+	for (( i=0; i<${#rules[@]}; ++i));do
+		items[$i]="$i ${rules[$i]} ${switch}"
 	done
-	local select=$(kdialog --checklist "Select rules:" ${item[@]}) flag=$?
+ 	local select=$(kdialog --checklist "Select rules:" ${items[@]}) flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No rules selected."
-		exit
+		return
+	else
+	 	local list
+		for s in ${select//\"/};do
+			list="${list:-}${list:+,}${rules[$s]}"
+		done
+		echo ${list}
 	fi
-	local list
-	for s in ${select//\"/};do
-		list="${list:-}${list:+,}${rules[$s]}"
-	done
-	echo ${list}
 }
 
 optbox(){
@@ -193,17 +243,17 @@ upload(){
 }
 
 file_list(){
-	local fn reqfn flist
+	local fn reqfn list
 	for i in ${URI[*]};do
 		fn=$(basename $i)
 		if [[ ${PARAM} == "-Rr" ]];then
 			reqfn=$(truncate $fn)
-			flist+=" ${reqfn}"
+			list="${list:-}${list:+ }${reqfn}"
 		else
-			flist+=" ${fn}"
+			list="${list:-}${list:+ }${fn}"
 		fi
 	done
-	echo ${flist}
+	echo ${list}
 }
 
 PARAM=$1
@@ -222,7 +272,8 @@ get_workdir(){
 }
 
 run_in_konsole(){
-	konsole --noclose --hide-menubar --workdir "$(get_workdir)" -e $SHELL -c "$(cmd_gen)"
+	# $1: cmd
+	konsole --noclose --hide-menubar --workdir "$(get_workdir)" -e $SHELL -c "$1"
 }
 
 cmd_gen(){
@@ -241,7 +292,7 @@ cmd_gen(){
 	local CMD MISC EXT="tar.xz" IS_SU=0
 	case ${PARAM} in
 		"-Ra" | "-Rr")
-			REPO=$(basename $(get_workdir))
+			local REPO=$(basename $(get_workdir))
 			MISC="${REPO}.${OPTS}.${EXT} $(file_list)"
 		;;
 		"-m")
@@ -290,5 +341,5 @@ elif [[ ${PARAM} == "-c" ]];then
 	configure
 else
 	#popup "CMD" "$(cmd_gen)"
-	run_in_konsole
+	run_in_konsole "$(cmd_gen)"
 fi
