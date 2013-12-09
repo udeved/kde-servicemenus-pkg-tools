@@ -307,7 +307,7 @@ cmd_gen(){
 		"-y")
 			if [[ ${ARGS} == "-Syua" ]];then
 				is_su=1
-			if [[ ${ARGS} == "-U" ]];then
+			elif [[ ${ARGS} == "-U" ]];then
 				misc=$(file_list)
 				is_su=1
 			else
@@ -345,7 +345,6 @@ cmd_gen(){
 if [[ ${PARAM} == "-u" ]] || [[ ${PARAM} == "-c" ]];then
 	$(cmd_gen)
 else
-	popup "CMD" "$(cmd_gen)"
-	#run_in_konsole "$(cmd_gen)"
+	#popup "CMD" "$(cmd_gen)"
+	run_in_konsole "$(cmd_gen)"
 fi
-popup "Parm" "${PARAM}"
