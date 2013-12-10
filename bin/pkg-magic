@@ -244,7 +244,7 @@ selected_files(){
 	local fn reqfn list
 	for i in ${URI[*]};do
 		fn=$(basename $i)
-		if [[ ${PARAM} == "-r" ]];then
+		if [[ ${ACTION} == "-r" ]];then
 			reqfn=$(truncate $fn)
 			list="${list:-}${list:+ }${reqfn}"
 		else
@@ -254,7 +254,7 @@ selected_files(){
 	echo ${list}
 }
 
-PARAM=$1
+ACTION=$1
 URI=$2
 ARGS=$3
 OPTS=$4
@@ -280,18 +280,19 @@ run_in_konsole(){
 	konsole --noclose --hide-menubar --workdir "$(get_workdir)" -e $SHELL -c "$1"
 }
 
-gen_img(){
-	local img=$(truncate $(basename ${URI})) html
+img_gen(){
+	local cmd=$(echo $1) img ext=${OPTS}
+	for x in ${cmd};do
+		img=$x
+	done
 	if [[ ${ARGS} == "-gr" ]];then
-		img="${img}_revdeps.png"
+		img="${img}_revdeps.${ext}"
 	else
-		img="${img}_deps.png"
+		img="${img}_deps.${ext}"
 	fi
-	echo $($(cmd_gen)) | dot -Tpng > "${IMG_DIR}/${img}"
-	#html='<p><img src="'${IMG_DIR}/${img}'"></p>'
+	echo $(${cmd}) | dot -T ${ext} > "${IMG_DIR}/${img}"
 	html='<a href="'"${IMG_DIR}/${img}"'">'"${IMG_DIR}/${img}"'</a>'
 	popup "Image generated." "${html}"
-	#kdialog --msgbox "${html}"
 }
 
 cmd_gen(){
@@ -308,7 +309,7 @@ cmd_gen(){
 	bin[-o]=pacman-optimize
 
 	local cmd opts ext="tar.xz" is_su=0
-	case ${PARAM} in
+	case ${ACTION} in
 		"-a" | "-r")
 			local repo=$(basename $(get_workdir))
 			opts="${repo}.${OPTS}.${ext} $(selected_files)"
@@ -319,10 +320,18 @@ cmd_gen(){
 			fi
 		;;
 		"-t")
-			opts=$(truncate $(basename ${URI}))
+			if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
+				if [[ ${URI} == "-q" ]];then
+					opts=$(optbox)
+				else
+					opts=$(truncate $(basename ${URI}))
+				fi
+			else
+				opts=$(truncate $(basename ${URI}))
+			fi
 		;;
 		"-y")
-			if [[ ${ARGS} == "-Syua" ]];then
+			if [[ ${ARGS} == "-Sy" ]] || [[ ${ARGS} == "-Syy" ]] ;then
 				is_su=1
 			elif [[ ${ARGS} == "-U" ]];then
 				opts=$(selected_files)
@@ -352,9 +361,9 @@ cmd_gen(){
 		;;
 	esac
 	if [ ${is_su} -eq 1 ];then
-		cmd="sudo ${bin[${PARAM}]} ${ARGS} ${opts}"
+		cmd="sudo ${bin[${ACTION}]} ${ARGS} ${opts}"
 	else
-		cmd="${bin[${PARAM}]} ${ARGS} ${opts}"
+		cmd="${bin[${ACTION}]} ${ARGS} ${opts}"
 	fi
 	echo ${cmd}
 }
@@ -363,14 +372,14 @@ if [[ ! -d ${IMG_DIR} ]];then
 	mkdir -p ${IMG_DIR}
 fi
 
-if [[ ${PARAM} == "-u" ]] || [[ ${PARAM} == "-c" ]];then
+if [[ ${ACTION} == "-u" ]] || [[ ${ACTION} == "-c" ]];then
 	$(cmd_gen)
-elif [[ ${PARAM} == "-t" ]];then
-	if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
-		gen_img
-	else
-		run_in_konsole "$(cmd_gen)"
-	fi
+elif [[ ${ACTION} == "-t" ]];then
+ 	if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
+ 		img_gen "$(cmd_gen)"
+ 	else
+ 		run_in_konsole "$(cmd_gen)"
+ 	fi
 else
 	#popup "CMD" "$(cmd_gen)"
 	run_in_konsole "$(cmd_gen)"

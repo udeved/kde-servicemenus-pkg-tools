@@ -2,61 +2,70 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=inode/directory;
-Actions=search;search_aur;_SEPARATOR_;query;query_provides;query_depends;_SEPARATOR_;sync;optimize;update;_SEPARATOR_;configure;
+Actions=dep_graph;revdep_graph;search;search_aur;_SEPARATOR_;query;query_provides;query_depends;_SEPARATOR_;sync;sync_local;optimize;update;_SEPARATOR_;configure;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
+# Usage: pkg-magic $action $uri $args $opts
+
 [Desktop Action query_provides]
 Name=Search for provides
 Icon=zoom-select
-#TryExec=yaourt
-Exec=pkg-magic "-y" "%U" "-Q --provides"
+Exec=pkg-magic "-y" "" "-Q --provides"
 
 [Desktop Action query_depends]
 Name=Search for depends
 Icon=zoom-select
-#TryExec=yaourt
-Exec=pkg-magic "-y" "%U" "-Q --depends"
+Exec=pkg-magic "-y" "" "-Q --depends"
+
+[Desktop Action sync_local]
+Name=Sync local pacman DBs
+Icon=configure
+Exec=pkg-magic "-y" "" "-Sy"
 
 [Desktop Action sync]
-Name=Sync pacman db
+Name=Sync pacman DBs
 Icon=configure
-#TryExec=yaourt
-Exec=pkg-magic "-y" "%U" "-Syua"
+Exec=pkg-magic "-y" "" "-Syy"
 
 [Desktop Action optimize]
 Name=Optimize pacman db
 Icon=configure
-#TryExec=pacman
-Exec=pkg-magic "-o" "%U"
+Exec=pkg-magic "-o"
 
 [Desktop Action query]
-Name=Query
+Name=Query pacman DBs
 Icon=zoom-select
-#TryExec=yaourt
-Exec=pkg-magic "-y" "%U" "-Q"
+Exec=pkg-magic "-y" "" "-Q"
 
 [Desktop Action search_aur]
 Name=Search AUR
 Icon=zoom-select
-#TryExec=yaourt
-Exec=pkg-magic "-y" "%U" "-Ss"
+Exec=pkg-magic "-y" "" "-Ss"
 
 [Desktop Action configure]
 Name=Configure AUR login
 Icon=configure
-#TryExec=curl
 Exec=pkg-magic "-c"
 
 [Desktop Action search]
 Name=Search for packages containing the provided target
 Icon=zoom-select
-#TryExec=pkgfile
-Exec=pkg-magic "-f" "%u" "-s"
+Exec=pkg-magic "-f" "" "-s"
 
 [Desktop Action update]
 Name=Update the stored metadata files
 Icon=download
-#TryExec=pkgfile
-Exec=pkg-magic "-f" "%u" "-u"
+Exec=pkg-magic "-f" "" "-u"
+
+[Desktop Action dep_graph]
+Name=Generate dependency graph image
+Icon=zoom-select
+Exec=pkg-magic "-t" "-q" "-g" "png"
+
+[Desktop Action revdep_graph]
+Name=Generate reverse dependency graph image
+Icon=zoom-select
+Exec=pkg-magic "-t" "-q" "-gr" "png"
+

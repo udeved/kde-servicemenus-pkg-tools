@@ -11,38 +11,33 @@ X-KDE-Submenu=Pkg-tools
 Name=Show dependencies
 Icon=zoom-next
 Exec=pkg-magic "-t" "%u" "-c"
-#TryExec=pactree
 
 [Desktop Action show_revdep]
 Name=Show reverse dependencies
 Icon=zoom-previous
 Exec=pkg-magic "-t" "%u" "-cr"
-#TryExec=pactree
 
 [Desktop Action show_noduplicates]
 Name=Show dependencies with no duplicates
 Icon=zoom-select
 Exec=pkg-magic "-t" "%u" "-clu"
-#TryExec=pactree
 
 [Desktop Action show_dep_sync]
 Name=Show dependencies (sync DBs)
 Icon=zoom-next
 Exec=pkg-magic "-t" "%u" "-cs"
-#TryExec=pactree
 
 [Desktop Action show_revdep_sync]
 Name=Show reverse dependencies (sync DBs)
 Icon=zoom-previous
 Exec=pkg-magic "-t" "%u" "-crs"
-#TryExec=pactree
 
 [Desktop Action dep_graph]
 Name=Generate dependency graph image
 Icon=zoom-select
-Exec=pkg-magic "-t" "%u" "-g"
+Exec=pkg-magic "-t" "%u" "-g" "png"
 
 [Desktop Action revdep_graph]
 Name=Generate reverse dependency graph image
 Icon=zoom-select
-Exec=pkg-magic "-t" "%u" "-gr"
+Exec=pkg-magic "-t" "%u" "-gr" "png"
