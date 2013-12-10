@@ -8,5 +8,6 @@ kde-servicemenus-pkg-tools
 * pacman install local file(s)
 * local repo management
 * aur upload
-
-
+* pkgfile
+* pactree
+* yaourt search & query
