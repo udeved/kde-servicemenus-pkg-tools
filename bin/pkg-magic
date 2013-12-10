@@ -220,7 +220,7 @@ get_session(){
 
 submit(){
 	# $1: session
-	local submit sid category url="${URL}/submit/"
+	local submit sid url="${URL}/submit/"
 	if [[ -z $1 ]];then
 		popup "Canceled AUR upload." "No session registered."
 		exit
@@ -240,6 +240,8 @@ upload(){
 	popup "AUR upload finished." "${html}"
 }
 
+
+
 selected_files(){
 	local fn reqfn list
 	for i in ${URI[*]};do
@@ -253,19 +255,6 @@ selected_files(){
 	done
 	echo ${list}
 }
-
-ACTION=$1
-URI=$2
-ARGS=$3
-OPTS=$4
-
-[[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] && . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
-
-CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
-IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
-
-CONFIG=${CONFIG_DIR}/pkg-tools.conf
-URL="https://aur.archlinux.org"
 
 get_workdir(){
 	local wd
@@ -307,12 +296,13 @@ cmd_gen(){
 	bin[-c]=configure
 	bin[-u]=upload
 	bin[-o]=pacman-optimize
+	bin[-g]=pactree
 
 	local cmd opts ext="tar.xz" is_su=0
 	case ${ACTION} in
 		"-a" | "-r")
 			local repo=$(basename $(get_workdir))
-			opts="${repo}.${OPTS}.${ext} $(selected_files)"
+			opts="${repo}.${OPTS}.${ext} $URI"
 		;;
 		"-m")
 			if [[ ${OPTS} == "--pkg" ]];then
@@ -368,19 +358,52 @@ cmd_gen(){
 	echo ${cmd}
 }
 
-if [[ ! -d ${IMG_DIR} ]];then
-	mkdir -p ${IMG_DIR}
-fi
 
-if [[ ${ACTION} == "-u" ]] || [[ ${ACTION} == "-c" ]];then
-	$(cmd_gen)
-elif [[ ${ACTION} == "-t" ]];then
- 	if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
- 		img_gen "$(cmd_gen)"
- 	else
- 		run_in_konsole "$(cmd_gen)"
- 	fi
-else
-	#popup "CMD" "$(cmd_gen)"
-	run_in_konsole "$(cmd_gen)"
-fi
+
+
+###################################################################
+##########################main#####################################
+###################################################################
+
+
+URI=$1
+ACTION=$2
+ARGS=$3
+OPTS=$4
+
+CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
+
+IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
+
+CONFIG=${CONFIG_DIR}/pkg-tools.conf
+
+URL="https://aur.archlinux.org"
+
+
+[[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] && . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
+
+
+popup "CMD" "$(cmd_gen)"
+
+run_in_konsole "$(cmd_gen)"
+
+# if [[ $# -lt 5 ]];then
+# 	shift
+# fi
+#
+# if [[ ! -d ${IMG_DIR} ]];then
+# 	mkdir -p ${IMG_DIR}
+# fi
+#
+# if [[ ${ACTION} == "-u" ]] || [[ ${ACTION} == "-c" ]];then
+# 	$(cmd_gen)
+# elif [[ ${ACTION} == "-t" ]];then
+#  	if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
+#  		img_gen "$(cmd_gen)"
+#  	else
+#  		run_in_konsole "$(cmd_gen)"
+#  	fi
+# else
+# 	popup "CMD" "$(cmd_gen)"
+# 	#run_in_konsole "$(cmd_gen)"
+# fi

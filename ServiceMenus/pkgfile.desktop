@@ -7,8 +7,9 @@ X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
+# Usage: pkg-magic $uri $action $args $opts
+
 [Desktop Action list]
 Name=List contents of a package
 Icon=zoom-select
-#TryExec=pkgfile
-Exec=pkg-magic "-f" "%u" "-l"
+Exec=pkg-magic "%u" "-f" "-l"

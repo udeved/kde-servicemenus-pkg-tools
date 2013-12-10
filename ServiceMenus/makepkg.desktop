@@ -7,68 +7,59 @@ X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
+# Usage: pkg-magic $uri $action $args $opts
+
 [Desktop Action mk_md5]
 Name=Add checksum
 Icon=run-build-configure
-Exec=pkg-magic "-m" "%u" "-g >> $(basename "%f")"
-#TryExec=makepkg
+Exec=pkg-magic "%u" "-m" "-g >> $(basename "%f")"
 
 [Desktop Action mk]
 Name=Make Package
 Icon=run-build
-Exec=pkg-magic "-m" "%u" "-sr"
-#TryExec=makepkg
+Exec=pkg-magic "%u" "-m" "-sr"
 
 [Desktop Action mk_nodeps]
 Name=Make package (ignore deps)
 Icon=debug-run
-Exec=pkg-magic "-m" "%u" "-d"
-#TryExec=makepkg
+Exec=pkg-magic "%u" "-m" "-d"
 
 [Desktop Action mk_src]
 Name=Make source package
 Icon=run-build-file
-Exec=pkg-magic "-m" "%u" "-S"
-#TryExec=makepkg
+Exec=pkg-magic "%u" "-m" "-S"
 
 [Desktop Action mk_sign]
 Name=Make signed package
-Icon=document-sign
-Exec=pkg-magic "-m" "%u" "-sr --sign"
-#TryExec=makepkg
+Icon=view-certificate-sign
+Exec=pkg-magic "%u" "-m" "-sr --sign"
 
 [Desktop Action mk_install]
 Name=Make & install package
 Icon=run-build-install
-Exec=pkg-magic "-m" "%u" "-sri"
-#TryExec=makepkg
+Exec=pkg-magic "%u" "-m" "-sri"
 
 [Desktop Action mk_clean]
 Name=Clean workdir
 Icon=run-build-clean
-Exec=pkg-magic "-m" "%u" "-c"
-#TryExec=makepkg
+Exec=pkg-magic "%u" "-m" "-c"
 
 [Desktop Action mk_repack]
 Name=Repackage without building
-Icon=system-software-update
-Exec=pkg-magic "-m" "%u" "-Rf"
-#TryExec=makepkg
+Icon=debug-run-cursor
+Exec=pkg-magic "%u" "-m" "-Rf"
 
 [Desktop Action mk_nobuild]
 Name=Get and extract
 Icon=run-build-install-root
-Exec=pkg-magic "-m" "%u" "-o"
-#TryExec=makepkg
+Exec=pkg-magic "%u" "-m" "-o"
 
 [Desktop Action mk_selected]
 Name=Make selected package(s) (split package)
 Icon=run-build
-Exec=pkg-magic "-m" "%u" "-sr" "--pkg"
-#TryExec=makepkg
+Exec=pkg-magic "%u" "-m" "-sr" "--pkg"
 
 [Desktop Action mk_selected_sign]
 Name=Make signed selected package(s) (split package)
-Icon=document-sign
-Exec=pkg-magic "-m" "%u" "-sr --sign" "--pkg"
-#TryExec=makepkg
+Icon=view-certificate-sign
+Exec=pkg-magic "%u" "-m" "-sr --sign" "--pkg"

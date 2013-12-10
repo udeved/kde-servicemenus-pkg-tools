@@ -2,70 +2,69 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=inode/directory;
-Actions=dep_graph;revdep_graph;search;search_aur;_SEPARATOR_;query;query_provides;query_depends;_SEPARATOR_;sync;sync_local;optimize;update;_SEPARATOR_;configure;
+Actions=dep_graph;revdep_graph;_SEPARATOR_;search;_SEPARATOR_;query;query_provides;query_depends;_SEPARATOR_;search_aur;_SEPARATOR_;sync;sync_local;optimize;update;_SEPARATOR_;configure;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
-# Usage: pkg-magic $action $uri $args $opts
+# Usage: pkg-magic $uri $action $args $opts
 
 [Desktop Action query_provides]
 Name=Search for provides
-Icon=zoom-select
-Exec=pkg-magic "-y" "" "-Q --provides"
+Icon=edit-find-project
+Exec=pkg-magic "%u" "-y" "-Q" "--provides"
 
 [Desktop Action query_depends]
 Name=Search for depends
-Icon=zoom-select
-Exec=pkg-magic "-y" "" "-Q --depends"
+Icon=edit-find-project
+Exec=pkg-magic "%u" "-y" "-Q" "--depends"
 
 [Desktop Action sync_local]
 Name=Sync local pacman DBs
-Icon=configure
-Exec=pkg-magic "-y" "" "-Sy"
+Icon=svn-update
+Exec=pkg-magic "%u" "-y" "-Sy"
 
 [Desktop Action sync]
 Name=Sync pacman DBs
-Icon=configure
-Exec=pkg-magic "-y" "" "-Syy"
+Icon=svn-update
+Exec=pkg-magic "%u" "-y" "-Syy"
 
 [Desktop Action optimize]
 Name=Optimize pacman db
-Icon=configure
-Exec=pkg-magic "-o"
+Icon=system-run
+Exec=pkg-magic "%u" "-o"
 
 [Desktop Action query]
-Name=Query pacman DBs
-Icon=zoom-select
-Exec=pkg-magic "-y" "" "-Q"
+Name=Seach in pacman DBs
+Icon=system-search
+Exec=pkg-magic "%u" "-y" "-Q"
 
 [Desktop Action search_aur]
 Name=Search AUR
-Icon=zoom-select
-Exec=pkg-magic "-y" "" "-Ss"
+Icon=edit-find
+Exec=pkg-magic "%u" "-y" "-Ss"
 
 [Desktop Action configure]
 Name=Configure AUR login
-Icon=configure
-Exec=pkg-magic "-c"
+Icon=tools-wizard
+Exec=pkg-magic "%u" "-c"
 
 [Desktop Action search]
 Name=Search for packages containing the provided target
-Icon=zoom-select
-Exec=pkg-magic "-f" "" "-s"
+Icon=edit-find-project
+Exec=pkg-magic "%u" "-f" "-s"
 
 [Desktop Action update]
 Name=Update the stored metadata files
-Icon=download
-Exec=pkg-magic "-f" "" "-u"
+Icon=svn-update
+Exec=pkg-magic "%u" "-f" "-u"
 
 [Desktop Action dep_graph]
 Name=Generate dependency graph image
-Icon=zoom-select
-Exec=pkg-magic "-t" "-q" "-g" "png"
+Icon=office-chart-polar
+Exec=pkg-magic "%u" "-g" "-g" "png"
 
 [Desktop Action revdep_graph]
 Name=Generate reverse dependency graph image
-Icon=zoom-select
-Exec=pkg-magic "-t" "-q" "-gr" "png"
-
+Icon=office-chart-polar-stacked
+Exec=pkg-magic "%u" "-g" "-gr" "png"

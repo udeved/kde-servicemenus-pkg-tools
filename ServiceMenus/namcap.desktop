@@ -2,31 +2,29 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-xz-pkg;application/x-pkgbuild;
-Actions=check;check_info;_SEPARATOR_;check_rules;check_rule_ex;
+Actions=check;check_info;_SEPARATOR_;check_rules;check_rule_ex;_SEPARATOR_;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
+# Usage: pkg-magic $uri $action $args $opts
+
 [Desktop Action check]
 Name=Check
 Icon=kbugbuster
-#TryExec=namcap
-Exec=pkg-magic "-n" "%u"
+Exec=pkg-magic "%u" "-n"
 
 [Desktop Action check_info]
 Name=Check (with info msgs)
 Icon=help-hint
-#TryExec=namcap
-Exec=pkg-magic "-n" "%u" "-i"
+Exec=pkg-magic "%u" "-n" "-i"
 
 [Desktop Action check_rules]
 Name=Only apply rules to the package
 Icon=help-hint
-#TryExec=namcap
-Exec=pkg-magic "-n" "%u" "-r"
+Exec=pkg-magic "%u" "-n" "-r"
 
 [Desktop Action check_rule_ex]
 Name=Don't apply rules to the package
 Icon=help-hint
-#TryExec=namcap
-Exec=pkg-magic "-n" "%u" "-e"
+Exec=pkg-magic "%u" "-n" "-e"
