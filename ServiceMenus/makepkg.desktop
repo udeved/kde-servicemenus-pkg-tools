@@ -64,11 +64,11 @@ Exec=pkg-magic "-m" "%u" "-o"
 [Desktop Action mk_selected]
 Name=Make selected package(s) (split package)
 Icon=run-build
-Exec=pkg-magic "-m" "%u" "-sr --pkg"
+Exec=pkg-magic "-m" "%u" "-sr" "--pkg"
 #TryExec=makepkg
 
 [Desktop Action mk_selected_sign]
 Name=Make signed selected package(s) (split package)
 Icon=document-sign
-Exec=pkg-magic "-m" "%u" "-sr --sign --pkg"
+Exec=pkg-magic "-m" "%u" "-sr --sign" "--pkg"
 #TryExec=makepkg

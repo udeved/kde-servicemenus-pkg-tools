@@ -240,7 +240,7 @@ upload(){
 	popup "AUR upload finished." "${html}"
 }
 
-file_list(){
+selected_files(){
 	local fn reqfn list
 	for i in ${URI[*]};do
 		fn=$(basename $i)
@@ -258,7 +258,13 @@ PARAM=$1
 URI=$2
 ARGS=$3
 OPTS=$4
-CONFIG="$HOME/.config/aurlogin"
+
+[[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] && . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
+
+CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
+IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
+
+CONFIG=${CONFIG_DIR}/pkg-tools.conf
 URL="https://aur.archlinux.org"
 
 get_workdir(){
@@ -274,13 +280,26 @@ run_in_konsole(){
 	konsole --noclose --hide-menubar --workdir "$(get_workdir)" -e $SHELL -c "$1"
 }
 
+gen_img(){
+	local img=$(truncate $(basename ${URI})) html
+	if [[ ${ARGS} == "-gr" ]];then
+		img="${img}_revdeps.png"
+	else
+		img="${img}_deps.png"
+	fi
+	echo $($(cmd_gen)) | dot -Tpng > "${IMG_DIR}/${img}"
+	#html='<p><img src="'${IMG_DIR}/${img}'"></p>'
+	html='<a href="'"${IMG_DIR}/${img}"'">'"${IMG_DIR}/${img}"'</a>'
+	popup "Image generated." "${html}"
+	#kdialog --msgbox "${html}"
+}
+
 cmd_gen(){
 	declare -A bin
 	bin[-m]=makepkg
 	bin[-n]=namcap
 	bin[-r]=repo-add
 	bin[-a]=repo-remove
-	bin[-i]=yaourt
 	bin[-t]=pactree
 	bin[-f]=pkgfile
 	bin[-y]=yaourt
@@ -288,46 +307,44 @@ cmd_gen(){
 	bin[-u]=upload
 	bin[-o]=pacman-optimize
 
-	local cmd misc ext="tar.xz" is_su=0
+	local cmd opts ext="tar.xz" is_su=0
 	case ${PARAM} in
 		"-a" | "-r")
 			local repo=$(basename $(get_workdir))
-			misc="${repo}.${OPTS}.${ext} $(file_list)"
+			opts="${repo}.${OPTS}.${ext} $(selected_files)"
 		;;
 		"-m")
-			for p in ${ARGS[*]};do
-				if [[ $p == "--pkg" ]];then
-					misc=$(pkgbox)
-				fi
-			done
+			if [[ ${OPTS} == "--pkg" ]];then
+				opts="${OPTS} $(pkgbox)"
+			fi
 		;;
 		"-t")
-			misc=$(truncate $(basename ${URI}))
+			opts=$(truncate $(basename ${URI}))
 		;;
 		"-y")
 			if [[ ${ARGS} == "-Syua" ]];then
 				is_su=1
 			elif [[ ${ARGS} == "-U" ]];then
-				misc=$(file_list)
+				opts=$(selected_files)
 				is_su=1
 			else
-				misc=$(optbox)
+				opts=$(optbox)
 			fi
 		;;
 		"-n")
 			if [[ ${ARGS} == "-r" ]] || [[ ${ARGS} == "-e" ]];then
-				misc="$(rulesbox) ${URI}"
+				opts="$(rulesbox) ${URI}"
 			else
-				misc=${URI}
+				opts=${URI}
 			fi
 		;;
 		"-f")
 			if [[ ${ARGS} == "-u" ]];then
 				is_su=1
 			elif [[ ${ARGS} == "-s" ]];then
-				misc=$(optbox)
+				opts=$(optbox)
 			else
-				misc=$(truncate $(basename ${URI}))
+				opts=$(truncate $(basename ${URI}))
 			fi
 		;;
 		"-o")
@@ -335,15 +352,25 @@ cmd_gen(){
 		;;
 	esac
 	if [ ${is_su} -eq 1 ];then
-		cmd="sudo ${bin[${PARAM}]} ${ARGS} ${misc}"
+		cmd="sudo ${bin[${PARAM}]} ${ARGS} ${opts}"
 	else
-		cmd="${bin[${PARAM}]} ${ARGS} ${misc}"
+		cmd="${bin[${PARAM}]} ${ARGS} ${opts}"
 	fi
 	echo ${cmd}
 }
 
+if [[ ! -d ${IMG_DIR} ]];then
+	mkdir -p ${IMG_DIR}
+fi
+
 if [[ ${PARAM} == "-u" ]] || [[ ${PARAM} == "-c" ]];then
 	$(cmd_gen)
+elif [[ ${PARAM} == "-t" ]];then
+	if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
+		gen_img
+	else
+		run_in_konsole "$(cmd_gen)"
+	fi
 else
 	#popup "CMD" "$(cmd_gen)"
 	run_in_konsole "$(cmd_gen)"

@@ -2,8 +2,7 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-xz-pkg;
-Actions=show_dep;show_revdep;_SEPARATOR_;show_dep_sync;show_revdep_sync;_SEPARATOR_;show_noduplicates;
-#_SEPARATOR_;gen_graph;
+Actions=dep_graph;revdep_graph;_SEPARATOR_;show_dep;show_revdep;_SEPARATOR_;show_dep_sync;show_revdep_sync;_SEPARATOR_;show_noduplicates;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
@@ -38,7 +37,12 @@ Icon=zoom-previous
 Exec=pkg-magic "-t" "%u" "-crs"
 #TryExec=pactree
 
-# [Desktop Action gen_graph]
-# Name=Generate output for graphviz's dot
-# Icon=zoom-select
-# Exec=pkg-magic "-t" "%u" "-g"
+[Desktop Action dep_graph]
+Name=Generate dependency graph image
+Icon=zoom-select
+Exec=pkg-magic "-t" "%u" "-g"
+
+[Desktop Action revdep_graph]
+Name=Generate reverse dependency graph image
+Icon=zoom-select
+Exec=pkg-magic "-t" "%u" "-gr"
