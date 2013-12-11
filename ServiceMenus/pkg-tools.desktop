@@ -2,22 +2,52 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=inode/directory;
-Actions=dep_graph;revdep_graph;_SEPARATOR_;search;_SEPARATOR_;query;query_provides;query_depends;_SEPARATOR_;search_aur;_SEPARATOR_;sync;sync_local;optimize;update;_SEPARATOR_;configure;
+Actions=search;update;_SEPARATOR_;query;_SEPARATOR_;search_aur;_SEPARATOR_;sync_local;sync;_SEPARATOR_;optimize;_SEPARATOR_;configure;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
 # Usage: pkg-magic $uri $action $args $opts
 
-[Desktop Action query_provides]
-Name=Search for provides
+[Desktop Action search]
+Name=Search for packages containing the provided target
 Icon=edit-find-project
-Exec=pkg-magic "%u" "-y" "-Q" "--provides"
+Exec=pkg-magic "%u" "-f" "-s"
 
-[Desktop Action query_depends]
-Name=Search for depends
-Icon=edit-find-project
-Exec=pkg-magic "%u" "-y" "-Q" "--depends"
+[Desktop Action update]
+Name=Update the stored metadata files
+Icon=svn-update
+Exec=pkg-magic "%u" "-f" "-u"
+
+[Desktop Action query]
+Name=Query
+Icon=system-search
+Exec=pkg-magic "%u" "-y" "-Q"
+
+[Desktop Action search_aur]
+Name=Search AUR
+Icon=edit-find
+Exec=pkg-magic "%u" "-y" "-Ss"
+
+# [Desktop Action query_provides]
+# Name=Search for provides
+# Icon=edit-find-project
+# Exec=pkg-magic "%u" "-y" "-Q" "--provides"
+#
+# [Desktop Action query_depends]
+# Name=Search for depends
+# Icon=edit-find-project
+# Exec=pkg-magic "%u" "-y" "-Q" "--depends"
+
+# [Desktop Action query_conflicts]
+# Name=Search for conflicts
+# Icon=edit-find-project
+# Exec=pkg-magic "%u" "-y" "-Q" "--conflicts"
+
+# [Desktop Action query_replaces]
+# Name=Search for replaces
+# Icon=edit-find-project
+# Exec=pkg-magic "%u" "-y" "-Q" "--replaces"
 
 [Desktop Action sync_local]
 Name=Sync local pacman DBs
@@ -34,37 +64,8 @@ Name=Optimize pacman db
 Icon=system-run
 Exec=pkg-magic "%u" "-o"
 
-[Desktop Action query]
-Name=Seach in pacman DBs
-Icon=system-search
-Exec=pkg-magic "%u" "-y" "-Q"
-
-[Desktop Action search_aur]
-Name=Search AUR
-Icon=edit-find
-Exec=pkg-magic "%u" "-y" "-Ss"
-
 [Desktop Action configure]
 Name=Configure AUR login
 Icon=tools-wizard
 Exec=pkg-magic "%u" "-c"
 
-[Desktop Action search]
-Name=Search for packages containing the provided target
-Icon=edit-find-project
-Exec=pkg-magic "%u" "-f" "-s"
-
-[Desktop Action update]
-Name=Update the stored metadata files
-Icon=svn-update
-Exec=pkg-magic "%u" "-f" "-u"
-
-[Desktop Action dep_graph]
-Name=Generate dependency graph image
-Icon=office-chart-polar
-Exec=pkg-magic "%u" "-g" "-g" "png"
-
-[Desktop Action revdep_graph]
-Name=Generate reverse dependency graph image
-Icon=office-chart-polar-stacked
-Exec=pkg-magic "%u" "-g" "-gr" "png"

@@ -37,9 +37,19 @@ Exec=pkg-magic "%u" "-t" "-crs"
 [Desktop Action dep_graph]
 Name=Generate dependency graph image
 Icon=office-chart-polar
-Exec=pkg-magic "%u" "-t" "-g" "png"
+Exec=pkg-magic "%u" "-t" "-gs" "png"
 
 [Desktop Action revdep_graph]
 Name=Generate reverse dependency graph image
 Icon=office-chart-polar-stacked
-Exec=pkg-magic "%u" "-t" "-gr" "png"
+Exec=pkg-magic "%u" "-t" "-gsr" "png"
+
+[Desktop Action dep_graph]
+Name=Generate dependency graph image
+Icon=office-chart-polar
+Exec=pkg-magic "%u" "-t" "-gs" "png"
+
+[Desktop Action revdep_graph]
+Name=Generate reverse dependency graph image
+Icon=office-chart-polar-stacked
+Exec=pkg-magic "%u" "-t" "-gsr" "png"

@@ -242,6 +242,24 @@ upload(){
 
 
 
+###################################################################
+##########################main#####################################
+###################################################################
+
+
+URI=$1
+ACTION=$2
+ARGS=$3
+OPTS=$4
+
+CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
+
+IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
+
+CONFIG=${CONFIG_DIR}/pkg-tools.conf
+
+URL="https://aur.archlinux.org"
+
 selected_files(){
 	local fn reqfn list
 	for i in ${URI[*]};do
@@ -256,53 +274,29 @@ selected_files(){
 	echo ${list}
 }
 
-get_workdir(){
-	local wd
-	for u in  ${URI[*]};do
-		wd=$(dirname $u)
-	done
-	echo $wd
-}
-
 run_in_konsole(){
-	# $1: cmd
-	konsole --noclose --hide-menubar --workdir "$(get_workdir)" -e $SHELL -c "$1"
-}
-
-img_gen(){
-	local cmd=$(echo $1) img ext=${OPTS}
-	for x in ${cmd};do
-		img=$x
-	done
-	if [[ ${ARGS} == "-gr" ]];then
-		img="${img}_revdeps.${ext}"
-	else
-		img="${img}_deps.${ext}"
-	fi
-	echo $(${cmd}) | dot -T ${ext} > "${IMG_DIR}/${img}"
-	html='<a href="'"${IMG_DIR}/${img}"'">'"${IMG_DIR}/${img}"'</a>'
-	popup "Image generated." "${html}"
+	konsole --noclose --hide-menubar --workdir "${EXEC_DIR}" -e $SHELL -c "$1"
 }
 
 cmd_gen(){
 	declare -A bin
 	bin[-m]=makepkg
 	bin[-n]=namcap
-	bin[-r]=repo-add
-	bin[-a]=repo-remove
+	bin[-a]=repo-add
+	bin[-r]=repo-remove
 	bin[-t]=pactree
 	bin[-f]=pkgfile
 	bin[-y]=yaourt
 	bin[-c]=configure
 	bin[-u]=upload
 	bin[-o]=pacman-optimize
-	bin[-g]=pactree
+	bin[-tq]=pactree
 
 	local cmd opts ext="tar.xz" is_su=0
 	case ${ACTION} in
 		"-a" | "-r")
-			local repo=$(basename $(get_workdir))
-			opts="${repo}.${OPTS}.${ext} $URI"
+			local repo=$(basename ${EXEC_DIR})
+			opts="${repo}.${OPTS}.${ext} $(selected_files)"
 		;;
 		"-m")
 			if [[ ${OPTS} == "--pkg" ]];then
@@ -310,15 +304,9 @@ cmd_gen(){
 			fi
 		;;
 		"-t")
-			if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
-				if [[ ${URI} == "-q" ]];then
-					opts=$(optbox)
-				else
-					opts=$(truncate $(basename ${URI}))
-				fi
-			else
+			#if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
 				opts=$(truncate $(basename ${URI}))
-			fi
+			#fi
 		;;
 		"-y")
 			if [[ ${ARGS} == "-Sy" ]] || [[ ${ARGS} == "-Syy" ]] ;then
@@ -349,6 +337,9 @@ cmd_gen(){
 		"-o")
 			is_su=1
 		;;
+		"-tq")
+			opts=$(optbox)
+		;;
 	esac
 	if [ ${is_su} -eq 1 ];then
 		cmd="sudo ${bin[${ACTION}]} ${ARGS} ${opts}"
@@ -358,52 +349,38 @@ cmd_gen(){
 	echo ${cmd}
 }
 
-
-
-
-###################################################################
-##########################main#####################################
-###################################################################
-
-
-URI=$1
-ACTION=$2
-ARGS=$3
-OPTS=$4
-
-CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
-
-IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
-
-CONFIG=${CONFIG_DIR}/pkg-tools.conf
-
-URL="https://aur.archlinux.org"
-
-
 [[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] && . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
 
+EXEC_DIR=""
+for u in  ${URI[*]};do
+	EXEC_DIR=$(dirname $u)
+done
 
-popup "CMD" "$(cmd_gen)"
+if [[ ! -d ${IMG_DIR} ]];then
+	mkdir -p ${IMG_DIR}
+fi
 
-run_in_konsole "$(cmd_gen)"
-
-# if [[ $# -lt 5 ]];then
-# 	shift
-# fi
-#
-# if [[ ! -d ${IMG_DIR} ]];then
-# 	mkdir -p ${IMG_DIR}
-# fi
-#
-# if [[ ${ACTION} == "-u" ]] || [[ ${ACTION} == "-c" ]];then
-# 	$(cmd_gen)
-# elif [[ ${ACTION} == "-t" ]];then
-#  	if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
-#  		img_gen "$(cmd_gen)"
-#  	else
-#  		run_in_konsole "$(cmd_gen)"
-#  	fi
-# else
-# 	popup "CMD" "$(cmd_gen)"
-# 	#run_in_konsole "$(cmd_gen)"
-# fi
+case ${ACTION} in
+	"-u" | "-c")
+		$(cmd_gen)
+	;;
+	"-t")
+		local img
+		if [[ ${ARGS} == "-gsr" ]];then
+			img="$(basename ${URI})_revdeps.${OPTS}"
+			dot=$(echo $($(cmd_gen)))
+			echo  "$dot" | dot -T ${OPTS} > "${IMG_DIR}/${img}"
+			popup "Image generated" "${img}"
+		elif [[ ${ARGS} == "-gs" ]];then
+			img="$(basename ${URI})_deps.${OPTS}"
+			dot=$(echo $($(cmd_gen)))
+			echo  "$dot" | dot -T ${OPTS} > "${IMG_DIR}/${img}"
+			popup "Image generated" "${img}"
+		else
+			run_in_konsole "$(cmd_gen)"
+		fi
+	;;
+	*)
+		run_in_konsole "$(cmd_gen)"
+	;;
+esac
