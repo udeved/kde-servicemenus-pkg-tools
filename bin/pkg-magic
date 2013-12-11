@@ -104,13 +104,12 @@ pkgbox(){
 		popup "Chancel" "No packages selected."
 		exit
 	else
-		local list
-		for s in ${select//\"/};do
-			list="${list:-}${list:+,}${name[$s]}"
+		local list c='\"'
+		for s in ${select};do
+			list="${list:-}${list:+,}${name[${s//$c/}]}"
 		done
 		echo ${list}
 	fi
-
 }
 
 rulesbox(){
@@ -172,9 +171,9 @@ rulesbox(){
 		popup "Chancel" "No rules selected."
 		return
 	else
-	 	local list
-		for s in ${select//\"/};do
-			list="${list:-}${list:+,}${rule[$s]}"
+	 	local list c='\"'
+		for s in ${select};do
+			list="${list:-}${list:+,}${rule[${s//$c/}]}"
 		done
 		echo ${list}
 	fi
