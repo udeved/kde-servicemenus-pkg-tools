@@ -5,7 +5,7 @@ MimeType=inode/directory;
 Actions=test;_SEPARATOR_;sync_local;sync;_SEPARATOR_;update;_SEPARATOR_;optimize;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
-X-KDE-Submenu=Testing
+X-KDE-Submenu=Pkg-tools-su
 
 # Usage: pkg-magic $uri $action $args $opts
 
