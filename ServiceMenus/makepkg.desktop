@@ -15,7 +15,7 @@ Icon=run-build-configure
 Exec=pkg-magic "%u" "-m" "-g >> $(basename "%f")"
 
 [Desktop Action mk]
-Name=Make Package
+Name=Make package
 Icon=run-build
 Exec=pkg-magic "%u" "-m" "-sr"
 
@@ -55,11 +55,11 @@ Icon=run-build-install-root
 Exec=pkg-magic "%u" "-m" "-o"
 
 [Desktop Action mk_selected]
-Name=Make selected package(s) (split package)
+Name=Make selected (split package)
 Icon=run-build
 Exec=pkg-magic "%u" "-m" "-sr" "--pkg"
 
 [Desktop Action mk_selected_sign]
-Name=Make signed selected package(s) (split package)
+Name=Make signed selected (split package)
 Icon=view-certificate-sign
 Exec=pkg-magic "%u" "-m" "-sr --sign" "--pkg"

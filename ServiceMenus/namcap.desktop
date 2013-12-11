@@ -20,11 +20,11 @@ Icon=help-hint
 Exec=pkg-magic "%u" "-n" "-i"
 
 [Desktop Action check_rules]
-Name=Only apply rules to the package
+Name=Only apply rules
 Icon=help-hint
 Exec=pkg-magic "%u" "-n" "-r"
 
 [Desktop Action check_rule_ex]
-Name=Don't apply rules to the package
+Name=Don't apply rules
 Icon=help-hint
 Exec=pkg-magic "%u" "-n" "-e"

@@ -10,6 +10,6 @@ X-KDE-Submenu=Pkg-tools
 # Usage: pkg-magic $uri $action $args $opts
 
 [Desktop Action upload]
-Name=Upload source package to AUR
+Name=Upload to AUR
 Icon=go-up
 Exec=pkg-magic "%u" "-u"

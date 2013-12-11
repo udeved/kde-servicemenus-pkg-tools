@@ -10,31 +10,31 @@ X-KDE-Submenu=Repo
 # Usage: pkg-magic $uri $action $args $opts
 
 [Desktop Action add]
-Name=Add selected package(s) to pkg db
+Name=Add selected (db)
 Icon=list-add
 Exec=pkg-magic "%U" "-a" "" "db"
 
 [Desktop Action remove]
-Name=Remove selected package(s) from pkg db
+Name=Remove selected (db)
 Icon=list-remove
 Exec=pkg-magic "%U" "-r" "" "db"
 
 [Desktop Action add_signed]
-Name=Add selected package(s) to signed pkg db
+Name=Add selected (signed db)
 Icon=list-add
 Exec=pkg-magic "%U" "-a" "-s "db"
 
 [Desktop Action remove_signed]
-Name=Remove selected package(s) from signed pkg db
+Name=Remove selected (signed db)
 Icon=list-remove
 Exec=pkg-magic "%U" "-r" "-s" "db"
 
 [Desktop Action add_files]
-Name=Add selected package(s) to files db
+Name=Add selected (files)
 Icon=list-add
 Exec=pkg-magic "%U" "-a" "-f" "files"
 
 [Desktop Action remove_files]
-Name=Remove selected package(s) from files db
+Name=Remove selected  (files)
 Icon=list-remove
 Exec=pkg-magic "%U" "-r" "-f" "files"

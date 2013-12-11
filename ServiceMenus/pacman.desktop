@@ -10,6 +10,6 @@ X-KDE-Submenu=Pkg-tools
 # Usage: pkg-magic $uri $action $args $opts
 
 [Desktop Action install_local]
-Name=Install selected package(s)
+Name=Install selected
 Icon=run-build-install
 Exec=pkg-magic "%U" "-y" "-U"

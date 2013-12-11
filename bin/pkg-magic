@@ -286,9 +286,7 @@ cmd_gen(){
 			fi
 		;;
 		"-t")
-			#if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
-				opts=$(pkgname)
-			#fi
+			opts=$(pkgname)
 		;;
 		"-y")
 			if [[ ${ARGS} == "-Sy" ]] || [[ ${ARGS} == "-Syy" ]] ;then
@@ -319,9 +317,6 @@ cmd_gen(){
 		"-o")
 			is_su=1
 		;;
-		"-tq")
-			opts=$(optbox)
-		;;
 	esac
 	if [ ${is_su} -eq 1 ];then
 		cmd="sudo ${bin[${ACTION}]} ${ARGS} ${opts}"
@@ -337,17 +332,23 @@ get_got(){
 
 write_image(){
 	local fn
-	if [[ ${ARGS} == "-gsr" ]];then
-		fn="$(pkgname)_revdeps.${OPTS}"
-	else
-		fn="$(pkgname)_deps.${OPTS}"
-	fi
+	case ${ARGS} in
+		"-g" | "-gs")
+			fn="$(pkgname)_deps.${OPTS}"
+		;;
+		"-gr" | "-grs")
+			fn="$(pkgname)_revdeps.${OPTS}"
+		;;
+		"-glu" | "-glus")
+			fn="$(pkgname)_nodup.${OPTS}"
+		;;
+	esac
 	echo  "$(get_got)" | dot -T ${OPTS} > "${IMG_DIR}/${fn}"
 	popup "Image generated" "$(get_link "${IMG_DIR}/${fn}")"
 }
 
 get_link(){
-	html='<a href="'"$1"'">'"$1"'</a>'
+	local html='<a href="'"$1"'">'"$1"'</a>'
 	echo ${html}
 }
 
@@ -388,7 +389,7 @@ case ${ACTION} in
 	;;
 	"-t")
 		case $ARGS in
-			"-gs" | "-gsr")
+			"-g" | "-gr" | "-gs" | "-grs" | "-glu" | "-glus")
 				write_image
 			;;
 			*)

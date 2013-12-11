@@ -10,12 +10,12 @@ X-KDE-Submenu=Pkg-tools
 # Usage: pkg-magic $uri $action $args $opts
 
 [Desktop Action search]
-Name=Search for packages containing the provided target
+Name=Search for packages containing
 Icon=edit-find-project
 Exec=pkg-magic "%u" "-f" "-s"
 
 [Desktop Action update]
-Name=Update the stored metadata files
+Name=Update metadata files
 Icon=svn-update
 Exec=pkg-magic "%u" "-f" "-u"
 
@@ -50,17 +50,17 @@ Exec=pkg-magic "%u" "-y" "-Ss"
 # Exec=pkg-magic "%u" "-y" "-Q" "--replaces"
 
 [Desktop Action sync_local]
-Name=Sync local pacman DBs
+Name=Sync local repos
 Icon=svn-update
 Exec=pkg-magic "%u" "-y" "-Sy"
 
 [Desktop Action sync]
-Name=Sync pacman DBs
+Name=Sync repos
 Icon=svn-update
 Exec=pkg-magic "%u" "-y" "-Syy"
 
 [Desktop Action optimize]
-Name=Optimize pacman db
+Name=Optimize db
 Icon=system-run
 Exec=pkg-magic "%u" "-o"
 
