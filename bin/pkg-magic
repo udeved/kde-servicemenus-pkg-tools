@@ -230,43 +230,22 @@ submit(){
 
 	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="$(catbox)" -F pfile=@${URI} -b $1 ${url} | tr -d '\r')
 
-	pkg_url="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
+	PKG_URL="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 }
 
 upload(){
-	popup "AUR upload started." "$(basename ${URI})"
+	popup "AUR upload started." "$(pkgname)"
 	submit "$(get_session)"
-	local html='<a href="'"${pkg_url}"'">'"${pkg_url}"'</a>'
-	popup "AUR upload finished." "${html}"
+	popup "AUR upload finished." "$(get_link ${PKG_URL})"
 }
 
-
-
-###################################################################
-##########################main#####################################
-###################################################################
-
-
-URI=$1
-ACTION=$2
-ARGS=$3
-OPTS=$4
-
-CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
-
-IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
-
-CONFIG=${CONFIG_DIR}/pkg-tools.conf
-
-URL="https://aur.archlinux.org"
-
 selected_files(){
-	local fn reqfn list
+	local fn rfn list
 	for i in ${URI[*]};do
 		fn=$(basename $i)
 		if [[ ${ACTION} == "-r" ]];then
-			reqfn=$(truncate $fn)
-			list="${list:-}${list:+ }${reqfn}"
+			rfn=$(truncate $fn)
+			list="${list:-}${list:+ }${rfn}"
 		else
 			list="${list:-}${list:+ }${fn}"
 		fi
@@ -276,6 +255,10 @@ selected_files(){
 
 run_in_konsole(){
 	konsole --noclose --hide-menubar --workdir "${EXEC_DIR}" -e $SHELL -c "$1"
+}
+
+pkgname(){
+	echo $(truncate $(basename ${URI}))
 }
 
 cmd_gen(){
@@ -290,7 +273,6 @@ cmd_gen(){
 	bin[-c]=configure
 	bin[-u]=upload
 	bin[-o]=pacman-optimize
-	bin[-tq]=pactree
 
 	local cmd opts ext="tar.xz" is_su=0
 	case ${ACTION} in
@@ -305,7 +287,7 @@ cmd_gen(){
 		;;
 		"-t")
 			#if [[ ${ARGS} == "-g" ]] || [[ ${ARGS} == "-gr" ]];then
-				opts=$(truncate $(basename ${URI}))
+				opts=$(pkgname)
 			#fi
 		;;
 		"-y")
@@ -331,7 +313,7 @@ cmd_gen(){
 			elif [[ ${ARGS} == "-s" ]];then
 				opts=$(optbox)
 			else
-				opts=$(truncate $(basename ${URI}))
+				opts=$(pkgname)
 			fi
 		;;
 		"-o")
@@ -349,9 +331,49 @@ cmd_gen(){
 	echo ${cmd}
 }
 
+get_got(){
+	echo $(echo $($(cmd_gen)))
+}
+
+write_image(){
+	local fn
+	if [[ ${ARGS} == "-gsr" ]];then
+		fn="$(pkgname)_revdeps.${OPTS}"
+	else
+		fn="$(pkgname)_deps.${OPTS}"
+	fi
+	echo  "$(get_got)" | dot -T ${OPTS} > "${IMG_DIR}/${fn}"
+	popup "Image generated" "$(get_link "${IMG_DIR}/${fn}")"
+}
+
+get_link(){
+	html='<a href="'"$1"'">'"$1"'</a>'
+	echo ${html}
+}
+
+###################################################################
+##########################main#####################################
+###################################################################
+
+URI=$1
+ACTION=$2
+ARGS=$3
+OPTS=$4
+
 [[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] && . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
 
+CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
+
+IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
+
+CONFIG=${CONFIG_DIR}/pkg-tools.conf
+
+URL="https://aur.archlinux.org"
+
+PKG_URL=""
+
 EXEC_DIR=""
+
 for u in  ${URI[*]};do
 	EXEC_DIR=$(dirname $u)
 done
@@ -365,20 +387,14 @@ case ${ACTION} in
 		$(cmd_gen)
 	;;
 	"-t")
-		local img
-		if [[ ${ARGS} == "-gsr" ]];then
-			img="$(basename ${URI})_revdeps.${OPTS}"
-			dot=$(echo $($(cmd_gen)))
-			echo  "$dot" | dot -T ${OPTS} > "${IMG_DIR}/${img}"
-			popup "Image generated" "${img}"
-		elif [[ ${ARGS} == "-gs" ]];then
-			img="$(basename ${URI})_deps.${OPTS}"
-			dot=$(echo $($(cmd_gen)))
-			echo  "$dot" | dot -T ${OPTS} > "${IMG_DIR}/${img}"
-			popup "Image generated" "${img}"
-		else
-			run_in_konsole "$(cmd_gen)"
-		fi
+		case $ARGS in
+			"-gs" | "-gsr")
+				write_image
+			;;
+			*)
+				run_in_konsole "$(cmd_gen)"
+			;;
+		esac
 	;;
 	*)
 		run_in_konsole "$(cmd_gen)"
