@@ -60,7 +60,7 @@ ynbox(){
 	kdialog --warningcontinuecancel "${CONFIG} already exists. Overwrite?"
 	local flag=$?
 	if [ ${flag} -eq 0 ];then
-		configdlg
+		config_dlg
 	else
 		exit
 	fi
@@ -74,10 +74,11 @@ new_config(){
 	echo -n > ${CONFIG}
 }
 
-configdlg(){
-	local user pwd
+config_dlg(){
+	local user pwd sumode
 	user=$(userbox)
 	pwd=$(pwdbox)
+	#sumode=$(su_mode_box)
 	if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
 		popup "Warning" "No config written."
 		exit
@@ -85,8 +86,19 @@ configdlg(){
 		new_config
 		writer "USR=${user}"
 		writer "PWD=${pwd}"
-		popup "Success" "Config written."
+		#writer "SUMODE=${sumode}"
+		popup "Info" "Config written."
 	fi
+}
+
+su_mode_box(){
+	local select=$(kdialog --combobox "Select su backend:" "kdesu" "kdesudo") flag=$?
+	if [ $flag -eq 1 ];then
+		echo "kdesu"
+		exit
+	else
+		echo ${select}
+ 	fi
 }
 
 pkgbox(){
@@ -196,7 +208,7 @@ truncate(){
 
 configure(){
 	if [[ ! -f "${CONFIG}" ]]; then
-		configdlg
+		config_dlg
 	else
 		ynbox
 	fi
@@ -204,7 +216,7 @@ configure(){
 
 get_session(){
 	local user pwd  url="${URL}/login/" login session
-	[[ -f "${CONFIG}" ]] &&  source ${CONFIG}
+	#[[ -f "${CONFIG}" ]] &&  source ${CONFIG}
 	if [[ ! -z ${USR} ]] && [[ ! -z ${PWD} ]];then
 		user=${USR}
 		pwd=${PWD}
@@ -330,7 +342,9 @@ get_got(){
 }
 
 write_image(){
-	local fn
+	local fn dotfile progress=`kdialog --progressbar "Intitializing image generation" 3`
+	qdbus ${progress} Set "" value 1
+	qdbus ${progress} setLabelText "Setting filename..."
 	case ${ARGS} in
 		"-g" | "-gs")
 			fn="$(pkgname)_deps.${OPTS}"
@@ -342,8 +356,17 @@ write_image(){
 			fn="$(pkgname)_nodup.${OPTS}"
 		;;
 	esac
-	echo  "$(get_got)" | dot -T ${OPTS} > "${IMG_DIR}/${fn}"
-	popup "Image generated" "$(get_link "${IMG_DIR}/${fn}")"
+	sleep 1
+	qdbus ${progress} Set "" value 2
+	qdbus ${progress} setLabelText "Getting dot description..."
+	dotfile=$(get_got)
+	sleep 1
+	qdbus ${progress} Set "" value 3
+	qdbus ${progress} setLabelText "Saving image..."
+	echo  "$dotfile" | dot -T ${OPTS} > "${IMG_DIR}/${fn}"
+	sleep 1
+	qdbus ${progress} close
+	popup "Image saved." "$(get_link "${IMG_DIR}/${fn}")"
 }
 
 get_link(){
@@ -382,6 +405,8 @@ if [[ ! -d ${IMG_DIR} ]];then
 	mkdir -p ${IMG_DIR}
 fi
 
+[[ -f "${CONFIG}" ]] &&  . ${CONFIG}
+
 case ${ACTION} in
 	"-u" | "-c")
 		$(cmd_gen)
@@ -396,9 +421,11 @@ case ${ACTION} in
 			;;
 		esac
 	;;
-	#"-r" | "-a")
-	#	cd $EXEC_DIR
-	#	popup "$(cmd_gen)" "$(eval $(cmd_gen))"
+	#"-X")
+		# testing slot
+		#local mode=$(su_mode_box)
+		#popup "Info" "$(cmd_gen)"
+
 	#;;
 	*)
 		#popup "cmd" "$(cmd_gen)"
