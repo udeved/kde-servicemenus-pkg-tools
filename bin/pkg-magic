@@ -162,11 +162,11 @@ rulesbox(){
 	rule[45]=tags
 	rule[46]=urlpkg
 
- 	local item switch=off
+	local item switch=off
 	for (( i=0; i<${#rule[@]}; ++i));do
 		item[$i]="$i ${rule[$i]} ${switch}"
 	done
- 	local select=$(kdialog --checklist "Select rules:" ${item[@]}) flag=$?
+	local select=$(kdialog --checklist "Select rules:" ${item[@]}) flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No rules selected."
 		return
@@ -195,7 +195,7 @@ truncate(){
 }
 
 configure(){
-   	if [[ ! -f "${CONFIG}" ]]; then
+	if [[ ! -f "${CONFIG}" ]]; then
 		configdlg
 	else
 		ynbox
