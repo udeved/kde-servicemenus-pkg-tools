@@ -386,16 +386,13 @@ OPTS=$4
 [[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] && . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
 
 CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
-
 IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
+EXEC_DIR=""
 
 CONFIG=${CONFIG_DIR}/pkg-tools.conf
 
 URL="https://aur.archlinux.org"
-
 PKG_URL=""
-
-EXEC_DIR=""
 
 for u in  ${URI[*]};do
 	EXEC_DIR=$(dirname $u)
@@ -421,14 +418,7 @@ case ${ACTION} in
 			;;
 		esac
 	;;
-	#"-X")
-		# testing slot
-		#local mode=$(su_mode_box)
-		#popup "Info" "$(cmd_gen)"
-
-	#;;
 	*)
-		#popup "cmd" "$(cmd_gen)"
 		run_in_konsole "$(cmd_gen)"
 	;;
 esac
