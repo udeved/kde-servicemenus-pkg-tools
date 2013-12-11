@@ -2,7 +2,7 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=inode/directory;
-Actions=search;update;_SEPARATOR_;query;_SEPARATOR_;search_aur;_SEPARATOR_;sync_local;sync;_SEPARATOR_;optimize;_SEPARATOR_;configure;
+Actions=search;_SEPARATOR_;query;_SEPARATOR_;query_provides;query_depends;query_conflicts;query_replaces;_SEPARATOR_;search_aur;_SEPARATOR_;configure;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
@@ -14,11 +14,6 @@ Name=Search for packages containing
 Icon=edit-find-project
 Exec=pkg-magic "%u" "-f" "-s"
 
-[Desktop Action update]
-Name=Update metadata files
-Icon=svn-update
-Exec=pkg-magic "%u" "-f" "-u"
-
 [Desktop Action query]
 Name=Query
 Icon=system-search
@@ -29,43 +24,27 @@ Name=Search AUR
 Icon=edit-find
 Exec=pkg-magic "%u" "-y" "-Ss"
 
-# [Desktop Action query_provides]
-# Name=Search for provides
-# Icon=edit-find-project
-# Exec=pkg-magic "%u" "-y" "-Q" "--provides"
-#
-# [Desktop Action query_depends]
-# Name=Search for depends
-# Icon=edit-find-project
-# Exec=pkg-magic "%u" "-y" "-Q" "--depends"
-
-# [Desktop Action query_conflicts]
-# Name=Search for conflicts
-# Icon=edit-find-project
-# Exec=pkg-magic "%u" "-y" "-Q" "--conflicts"
-
-# [Desktop Action query_replaces]
-# Name=Search for replaces
-# Icon=edit-find-project
-# Exec=pkg-magic "%u" "-y" "-Q" "--replaces"
-
-[Desktop Action sync_local]
-Name=Sync local repos
-Icon=svn-update
-Exec=pkg-magic "%u" "-y" "-Sy"
-
-[Desktop Action sync]
-Name=Sync repos
-Icon=svn-update
-Exec=pkg-magic "%u" "-y" "-Syy"
-
-[Desktop Action optimize]
-Name=Optimize db
-Icon=system-run
-Exec=pkg-magic "%u" "-o"
-
 [Desktop Action configure]
-Name=Configure AUR login
+Name=Configure pkg-tools
 Icon=tools-wizard
 Exec=pkg-magic "%u" "-c"
 
+[Desktop Action query_provides]
+Name=Search for provides
+Icon=edit-find-project
+Exec=pkg-magic "%u" "-y" "-Q" "--provides"
+
+[Desktop Action query_depends]
+Name=Search for depends
+Icon=edit-find-project
+Exec=pkg-magic "%u" "-y" "-Q" "--depends"
+
+[Desktop Action query_conflicts]
+Name=Search for conflicts
+Icon=edit-find-project
+Exec=pkg-magic "%u" "-y" "-Q" "--conflicts"
+
+[Desktop Action query_replaces]
+Name=Search for replaces
+Icon=edit-find-project
+Exec=pkg-magic "%u" "-y" "-Q" "--replaces"

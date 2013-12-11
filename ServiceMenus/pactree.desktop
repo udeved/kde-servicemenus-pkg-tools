@@ -2,7 +2,7 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-xz-pkg;
-Actions=dep;revdep;nodup;_SEPARATOR_;dep_sync;revdep_sync;nodup_sync;_SEPARATOR_;
+Actions=dep;revdep;nodup;_SEPARATOR_;dep_sync;revdep_sync;nodup_sync;_SEPARATOR_;install_local;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
@@ -26,15 +26,20 @@ Exec=pkg-magic "%u" "-t" "-clu"
 
 [Desktop Action dep_sync]
 Name=Show dependencies (sync DBs)
-Icon=svn-commit
+Icon=zoom-next
 Exec=pkg-magic "%u" "-t" "-cs"
 
 [Desktop Action revdep_sync]
 Name=Show reverse dependencies (sync DBs)
-Icon=svn-commit
+Icon=zoom-previous
 Exec=pkg-magic "%u" "-t" "-crs"
 
 [Desktop Action nodup_sync]
 Name=Show dependencies with no duplicates
 Icon=zoom-select
 Exec=pkg-magic "%u" "-t" "-clus"
+
+[Desktop Action install_local]
+Name=Install selected
+Icon=run-build-install
+Exec=pkg-magic "%U" "-y" "-U"

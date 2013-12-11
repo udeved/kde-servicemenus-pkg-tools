@@ -20,8 +20,8 @@ Icon=office-chart-polar-stacked
 Exec=pkg-magic "%u" "-t" "-gr" "png"
 
 [Desktop Action nodup]
-Name=Generate dependency with no duplicates graph
-Icon=office-chart-polar
+Name=Generate no duplicates dependency graph
+Icon=office-chart-area-focus-peak-node
 Exec=pkg-magic "%u" "-t" "-glu" "png"
 
 [Desktop Action dep_sync]
@@ -35,6 +35,6 @@ Icon=office-chart-polar-stacked
 Exec=pkg-magic "%u" "-t" "-grs" "png"
 
 [Desktop Action nodup_sync]
-Name=Generate dependency with no duplicates graph (sync DBs)
-Icon=office-chart-polar
+Name=Generate no duplicates dependency graph (sync DBs)
+Icon=office-chart-area-focus-peak-node
 Exec=pkg-magic "%u" "-t" "-glus" "png"
