@@ -22,7 +22,7 @@ Exec=pkg-magic "%U" "-r" "" "db"
 [Desktop Action add_signed]
 Name=Add selected (signed db)
 Icon=list-add
-Exec=pkg-magic "%U" "-a" "-s "db"
+Exec=pkg-magic "%U" "-a" "-s" "db"
 
 [Desktop Action remove_signed]
 Name=Remove selected (signed db)

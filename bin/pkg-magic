@@ -396,7 +396,12 @@ case ${ACTION} in
 			;;
 		esac
 	;;
+	#"-r" | "-a")
+	#	cd $EXEC_DIR
+	#	popup "$(cmd_gen)" "$(eval $(cmd_gen))"
+	#;;
 	*)
+		#popup "cmd" "$(cmd_gen)"
 		run_in_konsole "$(cmd_gen)"
 	;;
 esac
