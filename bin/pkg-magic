@@ -2,8 +2,12 @@
 
 #set -e
 
+###################################################################
+##########################KDIALOG##################################
+###################################################################
+
 userbox(){
-	kdialog --inputbox "Enter username:"
+	kdialog --title "AUR login" --inputbox "Enter username:"
 	local flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No username"
@@ -11,7 +15,7 @@ userbox(){
 }
 
 pwdbox(){
-	kdialog --password "Enter password:"
+	kdialog --title "AUR login" --password "Enter password:"
 	local flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No password"
@@ -40,7 +44,7 @@ catbox(){
 	item[xfce]=18
 	item[kernels]=19
 
-	local select=$(kdialog --combobox "Select category"  "${!item[@]}") flag=$?
+	local select=$(kdialog --title "Categories" --combobox "Select category"  "${!item[@]}") flag=$?
 	if [ $flag -eq 1 ];then
 		exit
 	else
@@ -57,21 +61,13 @@ popup(){
 }
 
 ynbox(){
-	kdialog --warningcontinuecancel "${CONFIG} already exists. Overwrite?"
+	kdialog --title "Warning" --warningcontinuecancel "${CONFIG} already exists. Overwrite?"
 	local flag=$?
 	if [ ${flag} -eq 0 ];then
 		config_dlg
 	else
 		exit
 	fi
-}
-
-writer(){
-	echo $1 >> "${CONFIG}"
-}
-
-new_config(){
-	echo -n > ${CONFIG}
 }
 
 config_dlg(){
@@ -87,12 +83,12 @@ config_dlg(){
 		writer "USR=${user}"
 		writer "PWD=${pwd}"
 		#writer "SUMODE=${sumode}"
-		popup "Info" "Config written."
+		popup "Info" "Config written. ${CONFIG}"
 	fi
 }
 
 su_mode_box(){
-	local select=$(kdialog --combobox "Select su backend:" "kdesu" "kdesudo") flag=$?
+	local select=$(kdialog --title "SU settings" --combobox "Select su frontend:" "kdesu" "kdesudo") flag=$?
 	if [ $flag -eq 1 ];then
 		echo "kdesu"
 		exit
@@ -111,7 +107,7 @@ pkgbox(){
 			i=$((i+1))
 		done
 	fi
-	local select=$(kdialog --checklist "Select packages:" ${item[@]}) flag=$?
+	local select=$(kdialog --title "Split package" --checklist "Select packages:" ${item[@]}) flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No packages selected."
 		exit
@@ -192,7 +188,7 @@ rulesbox(){
 }
 
 optbox(){
-	local q=$(kdialog --inputbox "Enter query or parameter:") flag=$?
+	local q=$(kdialog --title "Arguments" --inputbox "Enter parameters:") flag=$?
 	if [ $flag -eq 1 ];then
 		popup "Chancel" "No input."
 		exit
@@ -201,53 +197,91 @@ optbox(){
 	fi
 }
 
+progressbar(){
+	kdialog --title "Progress" --progressbar "Intitializing" $1
+}
+
+###################################################################
+##########################LIB######################################
+###################################################################
+
+writer(){
+	echo $1 >> "${CONFIG}"
+}
+
+new_config(){
+	echo -n > ${CONFIG}
+}
+
+pg_label(){
+	qdbus $1 setLabelText "$2"
+}
+
+pg_value(){
+	qdbus $1 Set "" value $2
+}
+
+pg_close(){
+	qdbus $1 close
+}
+
 truncate(){
 	local fn=$1
 	echo ${fn%%-[0-9]*}
 }
 
-configure(){
-	if [[ ! -f "${CONFIG}" ]]; then
-		config_dlg
-	else
-		ynbox
-	fi
-}
-
 get_session(){
-	local user pwd  url="${URL}/login/" login session
-	#[[ -f "${CONFIG}" ]] &&  source ${CONFIG}
+	local user pwd  url="${URL}/login/" login session progress
 	if [[ ! -z ${USR} ]] && [[ ! -z ${PWD} ]];then
+		progress=$(progressbar 3)
+		pg_value "${progress}" 1
+		pg_label "${progress}" 'Getting AUR user & password'
 		user=${USR}
 		pwd=${PWD}
+		sleep 0.25
 	else
 		user=$(userbox)
 		pwd=$(pwdbox)
+		progress=$(progressbar 3)
+		pg_value "${progress}" 1
+		pg_label "${progress}" 'Setting user & password'
+		sleep 0.25
 	fi
+	pg_value "${progress}" 2
+	pg_label "${progress}" 'Logging in'
 	login=$(curl -sSi -F user=${user} -F passwd=${pwd} -H 'Expect: ' ${url})
+	sleep 0.25
+	pg_value "${progress}" 3
+	pg_label "${progress}" 'Getting session'
 	session=$(echo "${login}" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
+	sleep 0.25
+	pg_close "${progress}"
 	echo ${session}
 }
 
 submit(){
 	# $1: session
-	local submit sid url="${URL}/submit/"
-	if [[ -z $1 ]];then
+	local submit sid url="${URL}/submit/" cat=$(catbox)
+	if [[ ! -z $1 ]];then
+		progress=$(progressbar 3)
+		pg_value "${progress}" 1
+		pg_label "${progress}" 'Setting session ID'
+		submit=$(curl -sSi -H 'Expect: ' -b $1 ${url})
+		sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
+		sleep 0.25
+		pg_value "${progress}" 2
+		pg_label "${progress}" 'Submitting'
+		submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${URI} -b $1 ${url} | tr -d '\r')
+		sleep 0.25
+		pg_value "${progress}" 3
+		pg_label "${progress}" 'Getting pkg url'
+		PKG_URL="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
+		sleep 0.25
+		pg_close "${progress}"
+	else
 		popup "Canceled AUR upload." "No session registered."
 		exit
 	fi
-	submit=$(curl -sSi -H 'Expect: ' -b $1 ${url})
-	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-
-	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="$(catbox)" -F pfile=@${URI} -b $1 ${url} | tr -d '\r')
-
-	PKG_URL="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
-}
-
-upload(){
-	popup "AUR upload started." "$(pkgname)"
-	submit "$(get_session)"
-	popup "AUR upload finished." "$(get_link ${PKG_URL})"
 }
 
 selected_files(){
@@ -264,12 +298,38 @@ selected_files(){
 	echo ${list}
 }
 
-run_in_konsole(){
-	konsole --noclose --hide-menubar --workdir "${EXEC_DIR}" -e $SHELL -c "$1"
-}
-
 pkgname(){
 	echo $(truncate $(basename ${URI}))
+}
+
+get_got(){
+	echo $(echo $($(cmd_gen)))
+}
+
+get_link(){
+	local html='<a href="'"$1"'">'"$1"'</a>'
+	echo ${html}
+}
+
+###################################################################
+##########################EXEC#####################################
+###################################################################
+
+configure(){
+	if [[ ! -f "${CONFIG}" ]]; then
+		config_dlg
+	else
+		ynbox
+	fi
+}
+
+upload(){
+	submit "$(get_session)"
+	popup "AUR upload finished." "$(get_link ${PKG_URL})"
+}
+
+run_in_konsole(){
+	konsole --noclose --hide-menubar --workdir "${EXEC_DIR}" -e $SHELL -c "$1"
 }
 
 cmd_gen(){
@@ -337,45 +397,36 @@ cmd_gen(){
 	echo ${cmd}
 }
 
-get_got(){
-	echo $(echo $($(cmd_gen)))
-}
-
 write_image(){
-	local fn dotfile progress=`kdialog --progressbar "Intitializing image generation" 3`
-	qdbus ${progress} Set "" value 1
-	qdbus ${progress} setLabelText "Setting filename..."
+	local fn dotfile progress=$(progressbar 3)
+	pg_value "${progress}" 1
+	pg_label "${progress}" 'Setting filename'
 	case ${ARGS} in
 		"-g" | "-gs")
-			fn="$(pkgname)_deps.${OPTS}"
+			fn="${IMG_DIR}/$(pkgname)_deps.${OPTS}"
 		;;
 		"-gr" | "-grs")
-			fn="$(pkgname)_revdeps.${OPTS}"
+			fn="${IMG_DIR}/$(pkgname)_revdeps.${OPTS}"
 		;;
 		"-glu" | "-glus")
-			fn="$(pkgname)_nodup.${OPTS}"
+			fn="${IMG_DIR}/$(pkgname)_nodup.${OPTS}"
 		;;
 	esac
 	sleep 1
-	qdbus ${progress} Set "" value 2
-	qdbus ${progress} setLabelText "Getting dot description..."
+	pg_value "${progress}" 2
+	pg_label "${progress}" 'Getting dot description'
 	dotfile=$(get_got)
 	sleep 1
-	qdbus ${progress} Set "" value 3
-	qdbus ${progress} setLabelText "Saving image..."
-	echo  "$dotfile" | dot -T ${OPTS} > "${IMG_DIR}/${fn}"
+	pg_value "${progress}" 3
+	pg_label "${progress}" 'Generating image'
+	echo  "$dotfile" | dot -T ${OPTS} > "${fn}"
 	sleep 1
-	qdbus ${progress} close
-	popup "Image saved." "$(get_link "${IMG_DIR}/${fn}")"
-}
-
-get_link(){
-	local html='<a href="'"$1"'">'"$1"'</a>'
-	echo ${html}
+	pg_close "${progress}"
+	popup "Image saved." "$(get_link "${fn}")"
 }
 
 ###################################################################
-##########################main#####################################
+##########################MAIN#####################################
 ###################################################################
 
 URI=$1
@@ -387,7 +438,7 @@ OPTS=$4
 
 CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
 IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
-EXEC_DIR=""
+EXEC_DIR="${HOME}"
 
 CONFIG=${CONFIG_DIR}/pkg-tools.conf
 
