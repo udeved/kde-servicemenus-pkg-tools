@@ -74,16 +74,16 @@ config_dlg(){
 	local user pwd sumode
 	user=$(userbox)
 	pwd=$(pwdbox)
-	#sumode=$(su_mode_box)
-	if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
+	sumode=$(su_mode_box)
+	if [[ -z ${user} ]] && [[ -z ${pwd} ]] || [[ -z ${sumode} ]];then
 		popup "Warning" "No config written."
 		exit
 	else
 		new_config
 		writer "USR=${user}"
 		writer "PWD=${pwd}"
-		#writer "SUMODE=${sumode}"
-		popup "Info" "Config written. ${CONFIG}"
+		writer "SUMODE=${sumode}"
+		popup "Pkg-tools" "Config written. ${CONFIG}"
 	fi
 }
 
@@ -315,6 +315,19 @@ get_link(){
 ##########################EXEC#####################################
 ###################################################################
 
+run_su_cmd(){
+	local progress=$(progressbar 2)
+	pg_value "${progress}" 1
+	pg_label "${progress}" "$(echo $1)"
+	local
+	echo  $($1)
+	sleep 0.5
+	pg_value "${progress}" 2
+	pg_label "${progress}" "Finished."
+	sleep 0.5
+	pg_close "${progress}"
+}
+
 configure(){
 	if [[ ! -f "${CONFIG}" ]]; then
 		config_dlg
@@ -345,7 +358,7 @@ cmd_gen(){
 	bin[-u]=upload
 	bin[-o]=pacman-optimize
 
-	local cmd opts ext="tar.xz" is_su=0
+	local cmd opts ext="tar.xz"
 	case ${ACTION} in
 		"-a" | "-r")
 			local repo=$(basename ${EXEC_DIR})
@@ -390,7 +403,7 @@ cmd_gen(){
 		;;
 	esac
 	if [ ${is_su} -eq 1 ];then
-		cmd="sudo ${bin[${ACTION}]} ${ARGS} ${opts}"
+		cmd="${SUMODE} ${bin[${ACTION}]} ${ARGS} ${opts}"
 	else
 		cmd="${bin[${ACTION}]} ${ARGS} ${opts}"
 	fi
@@ -453,7 +466,13 @@ if [[ ! -d ${IMG_DIR} ]];then
 	mkdir -p ${IMG_DIR}
 fi
 
-[[ -f "${CONFIG}" ]] &&  . ${CONFIG}
+if [[ ! -f ${CONFIG} ]];then
+	config_dlg
+else
+	. ${CONFIG}
+fi
+
+#[[ -f "${CONFIG}" ]] &&  . ${CONFIG}
 
 case ${ACTION} in
 	"-u" | "-c")
@@ -463,6 +482,29 @@ case ${ACTION} in
 		case $ARGS in
 			"-g" | "-gr" | "-gs" | "-grs" | "-glu" | "-glus")
 				write_image
+			;;
+			*)
+				run_in_konsole "$(cmd_gen)"
+			;;
+		esac
+	;;
+	"-y")
+		case $ARGS in
+			"-Sy" | "-Syy")
+				run_su_cmd "$(cmd_gen)"
+			;;
+			*)
+				run_in_konsole "$(cmd_gen)"
+			;;
+		esac
+	;;
+	"-o")
+		run_su_cmd "$(cmd_gen)"
+	;;
+	"-f")
+		case $ARGS in
+			"-u")
+				run_su_cmd "$(cmd_gen)"
 			;;
 			*)
 				run_in_konsole "$(cmd_gen)"

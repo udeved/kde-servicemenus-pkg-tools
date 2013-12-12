@@ -2,31 +2,26 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=inode/directory;
-Actions=test;_SEPARATOR_;sync_local;sync;_SEPARATOR_;update;_SEPARATOR_;optimize;
+Actions=sync_local;_SEPARATOR_;sync;_SEPARATOR_;update;_SEPARATOR_;optimize;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools-su
 
 # Usage: pkg-magic $uri $action $args $opts
 
-[Desktop Action test]
-Name=testing
-Icon=tools-wizard
-Exec=pkg-magic "%u" "-X"
-
 [Desktop Action sync]
 Name=Sync repos
-Icon=svn-update
+Icon=object-rotate-left
 Exec=pkg-magic "%u" "-y" "-Syy"
 
 [Desktop Action sync_local]
 Name=Sync local repos
-Icon=svn-update
+Icon=object-rotate-right
 Exec=pkg-magic "%u" "-y" "-Sy"
 
 [Desktop Action update]
 Name=Update metadata files
-Icon=svn-update
+Icon=system-software-update
 Exec=pkg-magic "%u" "-f" "-u"
 
 [Desktop Action optimize]
