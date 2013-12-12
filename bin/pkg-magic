@@ -232,26 +232,20 @@ truncate(){
 
 get_session(){
 	local user pwd  url="${URL}/login/" login session progress
-	if [[ ! -z ${USR} ]] && [[ ! -z ${PWD} ]];then
-		progress=$(progressbar 3)
-		pg_value "${progress}" 1
-		pg_label "${progress}" 'Getting AUR user & password'
-		user=${USR}
-		pwd=${PWD}
-		sleep 0.25
-	else
-		user=$(userbox)
-		pwd=$(pwdbox)
-		progress=$(progressbar 3)
-		pg_value "${progress}" 1
-		pg_label "${progress}" 'Setting user & password'
-		sleep 0.25
-	fi
+	progress=$(progressbar 4)
+	pg_value "${progress}" 1
+	pg_label "${progress}" 'Getting AUR user'
+	user=${USR}
+	sleep 0.25
 	pg_value "${progress}" 2
+	pg_label "${progress}" 'Getting AUR password'
+	pwd=${PWD}
+	sleep 0.25
+	pg_value "${progress}" 3
 	pg_label "${progress}" 'Logging in'
 	login=$(curl -sSi -F user=${user} -F passwd=${pwd} -H 'Expect: ' ${url})
 	sleep 0.25
-	pg_value "${progress}" 3
+	pg_value "${progress}" 4
 	pg_label "${progress}" 'Getting session'
 	session=$(echo "${login}" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
 	sleep 0.25
@@ -467,12 +461,12 @@ if [[ ! -d ${IMG_DIR} ]];then
 fi
 
 if [[ ! -f ${CONFIG} ]];then
+	popup "Info" "Starting configure"
 	config_dlg
+	. ${CONFIG}
 else
 	. ${CONFIG}
 fi
-
-#[[ -f "${CONFIG}" ]] &&  . ${CONFIG}
 
 case ${ACTION} in
 	"-u" | "-c")
