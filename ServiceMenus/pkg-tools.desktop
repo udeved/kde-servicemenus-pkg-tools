@@ -24,27 +24,27 @@ Name=Search AUR
 Icon=edit-find
 Exec=pkg-magic "%u" "-y" "-Ss"
 
-[Desktop Action configure]
-Name=Configure pkg-tools
-Icon=tools-wizard
-Exec=pkg-magic "%u" "-c"
-
 [Desktop Action query_provides]
 Name=Search for provides
 Icon=edit-find-project
-Exec=pkg-magic "%u" "-y" "-Q" "--provides"
+Exec=pkg-magic "%u" "-y" "-S" "--provides"
 
 [Desktop Action query_depends]
 Name=Search for depends
 Icon=edit-find-project
-Exec=pkg-magic "%u" "-y" "-Q" "--depends"
+Exec=pkg-magic "%u" "-y" "-S" "--depends"
 
 [Desktop Action query_conflicts]
 Name=Search for conflicts
 Icon=edit-find-project
-Exec=pkg-magic "%u" "-y" "-Q" "--conflicts"
+Exec=pkg-magic "%u" "-y" "-S" "--conflicts"
 
 [Desktop Action query_replaces]
 Name=Search for replaces
 Icon=edit-find-project
-Exec=pkg-magic "%u" "-y" "-Q" "--replaces"
+Exec=pkg-magic "%u" "-y" "-S" "--replaces"
+
+[Desktop Action configure]
+Name=Configure pkg-tools
+Icon=tools-wizard
+Exec=pkg-magic "%u" "-c"

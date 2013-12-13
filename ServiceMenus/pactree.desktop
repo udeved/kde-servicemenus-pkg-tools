@@ -2,7 +2,7 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-xz-pkg;
-Actions=dep;revdep;nodup;_SEPARATOR_;dep_sync;revdep_sync;nodup_sync;_SEPARATOR_;install_local;
+Actions=dep;revdep;nodup;_SEPARATOR_;dep_sync;revdep_sync;nodup_sync;_SEPARATOR_;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
@@ -38,8 +38,3 @@ Exec=pkg-magic "%u" "-t" "-crs"
 Name=Show dependencies with no duplicates
 Icon=zoom-select
 Exec=pkg-magic "%u" "-t" "-clus"
-
-[Desktop Action install_local]
-Name=Install selected
-Icon=run-build-install
-Exec=pkg-magic "%U" "-y" "-U"

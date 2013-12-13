@@ -74,7 +74,7 @@ config_dlg(){
 	local user pwd sumode
 	user=$(userbox)
 	pwd=$(pwdbox)
-	sumode=$(su_mode_box)
+	#sumode=$(su_mode_box)
 	if [[ -z ${user} ]] && [[ -z ${pwd} ]] || [[ -z ${sumode} ]];then
 		popup "Warning" "No config written."
 		exit
@@ -82,20 +82,20 @@ config_dlg(){
 		new_config
 		writer "USR=${user}"
 		writer "PWD=${pwd}"
-		writer "SUMODE=${sumode}"
+		#writer "SUMODE=${sumode}"
 		popup "Pkg-tools" "Config written. ${CONFIG}"
 	fi
 }
 
-su_mode_box(){
-	local select=$(kdialog --title "SU settings" --combobox "Select su frontend:" "kdesu" "kdesudo") flag=$?
-	if [ $flag -eq 1 ];then
-		echo "kdesu"
-		exit
-	else
-		echo ${select}
- 	fi
-}
+# su_mode_box(){
+# 	local select=$(kdialog --title "SU settings" --combobox "Select su frontend:" "kdesu" "kdesudo") flag=$?
+# 	if [ $flag -eq 1 ];then
+# 		echo "kdesu"
+# 		exit
+# 	else
+# 		echo ${select}
+#  	fi
+# }
 
 pkgbox(){
 	source ${URI}
@@ -187,6 +187,31 @@ rulesbox(){
 	fi
 }
 
+optlist(){
+	declare -A param
+	param[0]=binaries
+	param[1]=directories
+	param[2]=glob
+	param[3]=ignorecase
+	param[4]=regex
+	local item switch=off
+	for (( i=0; i<${#param[@]}; ++i));do
+		item[$i]="$i ${param[$i]} ${switch}"
+	done
+
+	local select=$(kdialog --checklist "Select options:" ${item[@]}) flag=$?
+	if [ $flag -eq 1 ];then
+		popup "Chancel" "No options selected."
+		return
+	else
+	 	local list c='\"'
+		for s in ${select};do
+			list="${list:---}${list:+ --}${param[${s//$c/}]}"
+		done
+		echo ${list}
+	fi
+}
+
 optbox(){
 	local q=$(kdialog --title "Arguments" --inputbox "Enter parameters:") flag=$?
 	if [ $flag -eq 1 ];then
@@ -254,7 +279,6 @@ get_session(){
 }
 
 submit(){
-	# $1: session
 	local submit sid url="${URL}/submit/" cat=$(catbox)
 	if [[ ! -z $1 ]];then
 		progress=$(progressbar 3)
@@ -296,8 +320,8 @@ pkgname(){
 	echo $(truncate $(basename ${URI}))
 }
 
-get_got(){
-	echo $(echo $($(cmd_gen)))
+get_output(){
+	echo $(eval $1)
 }
 
 get_link(){
@@ -309,18 +333,31 @@ get_link(){
 ##########################EXEC#####################################
 ###################################################################
 
-run_su_cmd(){
-	local progress=$(progressbar 2)
-	pg_value "${progress}" 1
-	pg_label "${progress}" "$(echo $1)"
-	local
-	echo  $($1)
-	sleep 0.5
-	pg_value "${progress}" 2
-	pg_label "${progress}" "Finished."
-	sleep 0.5
-	pg_close "${progress}"
-}
+# repo_action(){
+# 	local list=( $(selected_files) )
+#  	local progress=$(progressbar ${#list[@]})
+# 	for (( i=0; i<${#list[@]}; ++i));do
+# 		pg_value "${progress}" $i
+# 		pg_label "${progress}" "${list[$i]}"
+# 		sleep 0.2
+# 	done
+# 	pg_close "${progress}"
+# 	cd $EXEC_DIR
+# 	eval $1
+# }
+
+# run_su_cmd(){
+# 	local progress=$(progressbar 2)
+# 	pg_value "${progress}" 1
+# 	pg_label "${progress}" "$(echo $1)"
+# 	local
+# 	echo  $($1)
+# 	sleep 0.5
+# 	pg_value "${progress}" 2
+# 	pg_label "${progress}" "Finished."
+# 	sleep 0.5
+# 	pg_close "${progress}"
+# }
 
 configure(){
 	if [[ ! -f "${CONFIG}" ]]; then
@@ -369,11 +406,8 @@ cmd_gen(){
 		"-y")
 			if [[ ${ARGS} == "-Sy" ]] || [[ ${ARGS} == "-Syy" ]] ;then
 				is_su=1
-			elif [[ ${ARGS} == "-U" ]];then
-				opts=$(selected_files)
-				is_su=1
 			else
-				opts=$(optbox)
+				opts="${OPTS} $(optbox)"
 			fi
 		;;
 		"-n")
@@ -396,8 +430,9 @@ cmd_gen(){
 			is_su=1
 		;;
 	esac
-	if [ ${is_su} -eq 1 ];then
-		cmd="${SUMODE} ${bin[${ACTION}]} ${ARGS} ${opts}"
+	if (( ${is_su} ));then
+# 		cmd="${SUMODE} ${bin[${ACTION}]} ${ARGS} ${opts}"
+		cmd="sudo ${bin[${ACTION}]} ${ARGS} ${opts}"
 	else
 		cmd="${bin[${ACTION}]} ${ARGS} ${opts}"
 	fi
@@ -422,7 +457,7 @@ write_image(){
 	sleep 1
 	pg_value "${progress}" 2
 	pg_label "${progress}" 'Getting dot description'
-	dotfile=$(get_got)
+	dotfile=$(get_output "$1")
 	sleep 1
 	pg_value "${progress}" 3
 	pg_label "${progress}" 'Generating image'
@@ -455,6 +490,7 @@ PKG_URL=""
 for u in  ${URI[*]};do
 	EXEC_DIR=$(dirname $u)
 done
+cd $EXEC_DIR
 
 if [[ ! -d ${IMG_DIR} ]];then
 	mkdir -p ${IMG_DIR}
@@ -475,30 +511,7 @@ case ${ACTION} in
 	"-t")
 		case $ARGS in
 			"-g" | "-gr" | "-gs" | "-grs" | "-glu" | "-glus")
-				write_image
-			;;
-			*)
-				run_in_konsole "$(cmd_gen)"
-			;;
-		esac
-	;;
-	"-y")
-		case $ARGS in
-			"-Sy" | "-Syy")
-				run_su_cmd "$(cmd_gen)"
-			;;
-			*)
-				run_in_konsole "$(cmd_gen)"
-			;;
-		esac
-	;;
-	"-o")
-		run_su_cmd "$(cmd_gen)"
-	;;
-	"-f")
-		case $ARGS in
-			"-u")
-				run_su_cmd "$(cmd_gen)"
+				write_image "$(cmd_gen)"
 			;;
 			*)
 				run_in_konsole "$(cmd_gen)"
@@ -506,6 +519,7 @@ case ${ACTION} in
 		esac
 	;;
 	*)
+		popup "CMD" "$(cmd_gen)"
 		run_in_konsole "$(cmd_gen)"
 	;;
 esac
