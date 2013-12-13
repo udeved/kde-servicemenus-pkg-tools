@@ -74,7 +74,6 @@ config_dlg(){
 	local user pwd sumode
 	user=$(userbox)
 	pwd=$(pwdbox)
-	#sumode=$(su_mode_box)
 	if [[ -z ${user} ]] && [[ -z ${pwd} ]] || [[ -z ${sumode} ]];then
 		popup "Warning" "No config written."
 		exit
@@ -82,20 +81,9 @@ config_dlg(){
 		new_config
 		writer "USR=${user}"
 		writer "PWD=${pwd}"
-		#writer "SUMODE=${sumode}"
 		popup "Pkg-tools" "Config written. ${CONFIG}"
 	fi
 }
-
-# su_mode_box(){
-# 	local select=$(kdialog --title "SU settings" --combobox "Select su frontend:" "kdesu" "kdesudo") flag=$?
-# 	if [ $flag -eq 1 ];then
-# 		echo "kdesu"
-# 		exit
-# 	else
-# 		echo ${select}
-#  	fi
-# }
 
 pkgbox(){
 	source ${URI}
@@ -320,7 +308,7 @@ pkgname(){
 	echo $(truncate $(basename ${URI}))
 }
 
-get_output(){
+cmd_out(){
 	echo $(eval $1)
 }
 
@@ -332,32 +320,6 @@ get_link(){
 ###################################################################
 ##########################EXEC#####################################
 ###################################################################
-
-# repo_action(){
-# 	local list=( $(selected_files) )
-#  	local progress=$(progressbar ${#list[@]})
-# 	for (( i=0; i<${#list[@]}; ++i));do
-# 		pg_value "${progress}" $i
-# 		pg_label "${progress}" "${list[$i]}"
-# 		sleep 0.2
-# 	done
-# 	pg_close "${progress}"
-# 	cd $EXEC_DIR
-# 	eval $1
-# }
-
-# run_su_cmd(){
-# 	local progress=$(progressbar 2)
-# 	pg_value "${progress}" 1
-# 	pg_label "${progress}" "$(echo $1)"
-# 	local
-# 	echo  $($1)
-# 	sleep 0.5
-# 	pg_value "${progress}" 2
-# 	pg_label "${progress}" "Finished."
-# 	sleep 0.5
-# 	pg_close "${progress}"
-# }
 
 configure(){
 	if [[ ! -f "${CONFIG}" ]]; then
@@ -431,7 +393,6 @@ cmd_gen(){
 		;;
 	esac
 	if (( ${is_su} ));then
-# 		cmd="${SUMODE} ${bin[${ACTION}]} ${ARGS} ${opts}"
 		cmd="sudo ${bin[${ACTION}]} ${ARGS} ${opts}"
 	else
 		cmd="${bin[${ACTION}]} ${ARGS} ${opts}"
@@ -457,7 +418,7 @@ write_image(){
 	sleep 1
 	pg_value "${progress}" 2
 	pg_label "${progress}" 'Getting dot description'
-	dotfile=$(get_output "$1")
+	dotfile=$(cmd_out "$1")
 	sleep 1
 	pg_value "${progress}" 3
 	pg_label "${progress}" 'Generating image'
@@ -519,7 +480,6 @@ case ${ACTION} in
 		esac
 	;;
 	*)
-		popup "CMD" "$(cmd_gen)"
 		run_in_konsole "$(cmd_gen)"
 	;;
 esac
