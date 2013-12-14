@@ -2,10 +2,10 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=inode/directory;
-Actions=sync_local;_SEPARATOR_;sync;_SEPARATOR_;update;_SEPARATOR_;optimize;
+Actions=sync_local;_SEPARATOR_;sync;_SEPARATOR_;update;_SEPARATOR_;optimize;_SEPARATOR_;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
-X-KDE-Submenu=Pkg-tools-su
+X-KDE-Submenu=Pkg-tools
 
 # Usage: pkg-magic $uri $action $args $opts
 
@@ -22,7 +22,7 @@ Exec=pkg-magic "%u" "-y" "-Sy"
 [Desktop Action update]
 Name=Update metadata files
 Icon=system-software-update
-Exec=pkg-magic "%u" "-f" "-u"
+Exec=pkg-magic "%u" "-f" "-uz" "xz"
 
 [Desktop Action optimize]
 Name=Optimize db
