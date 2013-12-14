@@ -538,6 +538,7 @@ case ${ACTION} in
 		esac
 	;;
 	*)
+		#popup "CMD" "$(cmd_gen)"
 		run_in_konsole "$(cmd_gen)"
 	;;
 esac
