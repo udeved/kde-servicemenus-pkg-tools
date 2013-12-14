@@ -47,32 +47,32 @@ popup(){
 	kdialog --title "$1" --passivepopup "$2"  10
 }
 
-ynbox(){
+ask_config_overwrite(){
 	kdialog --title "Warning" --warningcontinuecancel "${CONFIG} already exists. Overwrite?"
 	local flag=$?
 	if [ ${flag} -eq 0 ];then
-		config_dlg
+		config_wizzard
 	else
-		exit
+		exit 1
 	fi
 }
 
-config_dlg(){
+config_wizzard(){
 	local user pwd sumode imgdir
 	user=$(userbox)
 	pwd=$(pwdbox)
 	#sumode=$(su_mode_box)
 	#imgdir=$(dirbox)
 	if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
-		popup "Warning" "No config written."
+		popup "Pkg-tools" "No config created."
 		exit
 	else
 		new_config
-		writer "USR=${user}"
-		writer "PWD=${pwd}"
-		#writer "SU_MODE=${sumode}"
-		#writer "IMG_DIR=${imgdir}"
-		popup "Pkg-tools" "Config written. ${CONFIG}"
+		config_writer "USR=${user}"
+		config_writer "PWD=${pwd}"
+		#config_writer "SU_MODE=${sumode}"
+		#config_writer "IMG_DIR=${imgdir}"
+		popup "Pkg-tools" "${CONFIG} created."
 	fi
 }
 
@@ -157,7 +157,7 @@ rulesbox(){
 	for (( i=0; i<${#rule[@]}; ++i));do
 		item[$i]="$i ${rule[$i]} ${switch}"
 	done
-	local select=$(kdialog --checklist "Select rules:" ${item[@]}) #flag=$?
+	local select=$(kdialog --checklist "Select rules:" ${item[@]})
 	local list c='\"'
 	for s in ${select};do
 		list="${list:-}${list:+,}${rule[${s//$c/}]}"
@@ -176,7 +176,7 @@ optlist(){
 	for (( i=0; i<${#param[@]}; ++i));do
 		item[$i]="$i ${param[$i]} ${switch}"
 	done
-	local select=$(kdialog --radiolist "Select options:" ${item[@]}) #flag=$?
+	local select=$(kdialog --radiolist "Select options:" ${item[@]})
 	echo "--${param[${select}]}"
 }
 
@@ -199,7 +199,7 @@ repobox(){
 		item[$i]="$i ${repo[$i]} ${switch}"
 	done
 	local select
-	select=$(kdialog --title "Repos" --radiolist "Select repos" ${item[@]})
+	select=$(kdialog --title "Repos" --radiolist "Select repo:" ${item[@]})
 	echo ${repo[${select}]}
 }
 
@@ -207,7 +207,7 @@ repobox(){
 ##########################LIB######################################
 ###################################################################
 
-writer(){
+config_writer(){
 	echo $1 >> "${CONFIG}"
 }
 
@@ -255,30 +255,6 @@ get_session(){
 	echo ${session}
 }
 
-submit(){
-	local submit sid url="${URL}/submit/" cat=$(catbox)
-	if [[ ! -z $1 ]];then
-		progress=$(progressbar 3)
-		pg_value "${progress}" 1
-		pg_label "${progress}" 'Setting session ID'
-		submit=$(curl -sSi -H 'Expect: ' -b $1 ${url})
-		sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-		sleep 0.25
-		pg_value "${progress}" 2
-		pg_label "${progress}" 'Submitting'
-		submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${URI} -b $1 ${url} | tr -d '\r')
-		sleep 0.25
-		pg_value "${progress}" 3
-		pg_label "${progress}" 'Getting pkg url'
-		PKG_URL="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
-		sleep 0.25
-		pg_close "${progress}"
-	else
-		popup "Canceled AUR upload." "No session registered."
-		exit
-	fi
-}
-
 selected_files(){
 	local fn rfn list
 	for i in ${URI[*]};do
@@ -317,22 +293,23 @@ imgbox(){
 
 get_repos() {
 	local section repo
-    while read line; do
-        [[ $line =~ ^\ {0,}# ]] && continue
-        [[ -z "$line" ]] && continue
-            if [[ $line =~ ^\[.*?\] ]]; then
-                line=${line:1:$((${#line}-2))}
-                section=${line// /}
-                case ${section} in
-					"options")
-						continue
-					;;
-					*)
-						repo=${repo:-}${repo:+ }${section}
-					;;
-                esac
-            fi
-    done < "${PAC_CONF}"
+	while read line; do
+	local filter='^\ {0,}#'
+		[[ $line =~ "${filter}" ]] && continue
+		[[ -z "$line" ]] && continue
+		if [[ $line =~ ^\[.*?\] ]]; then
+			line=${line:1:$((${#line}-2))}
+			section=${line// /}
+			case ${section} in
+				"options")
+					continue
+				;;
+				*)
+					repo=${repo:-}${repo:+ }${section}
+				;;
+			esac
+		fi
+	done < "${PAC_CONF}"
 	echo ${repo}
 }
 
@@ -397,15 +374,35 @@ write_image(){
 
 configure(){
 	if [[ ! -f "${CONFIG}" ]]; then
-		config_dlg
+		config_wizzard
 	else
-		ynbox
+		ask_config_overwrite
 	fi
 }
 
 upload(){
-	submit "$(get_session)"
-	popup "AUR upload finished." "$(get_link ${PKG_URL})"
+	local session="$(get_session)" submit sid url="${URL}/submit/" cat=$(catbox)
+	if [[ ! -z ${session} ]];then
+		progress=$(progressbar 3)
+		pg_value "${progress}" 1
+		pg_label "${progress}" 'Setting session ID'
+		submit=$(curl -sSi -H 'Expect: ' -b ${session} ${url})
+		sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
+		sleep 0.25
+		pg_value "${progress}" 2
+		pg_label "${progress}" 'Submitting'
+		submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${URI} -b ${session} ${url} | tr -d '\r')
+		sleep 0.25
+		pg_value "${progress}" 3
+		pg_label "${progress}" 'Getting pkg url'
+		PKG_URL="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
+		sleep 0.25
+		pg_close "${progress}"
+		popup "AUR upload finished." "$(get_link ${PKG_URL})"
+	else
+		popup "Canceled AUR upload." "No session registered."
+		exit 1
+	fi
 }
 
 run_in_konsole(){
@@ -439,37 +436,43 @@ cmd_gen(){
 			opts=$(pkgname)
 		;;
 		"-y")
-			if [[ ${ARGS} == "-Sy" ]] || [[ ${ARGS} == "-Syy" ]] ;then
-				is_su=1
-			else
-				opts="${OPTS} $(optbox)"
-			fi
+			case ${ARGS} in
+				"-Sy" | "-Syy")
+					is_su=1
+				;;
+				*)
+					opts="${OPTS} $(optbox)"
+				;;
+			esac
 		;;
 		"-n")
-			if [[ ${ARGS} == "-r" ]] || [[ ${ARGS} == "-e" ]];then
-				opts="$(rulesbox) ${URI}"
-			else
-				opts=${URI}
-			fi
+			case ${ARGS} in
+				"-r" | "-e")
+					opts="$(rulesbox) ${URI}"
+				;;
+				*)
+					opts=${URI}
+				;;
+			esac
 		;;
 		"-f")
 			case ${ARGS} in
 				"-uz")
-				is_su=1
-				opts=${OPTS}
-			;;
-			"-s")
-				opts=$(optbox)
-			;;
-			"-sR")
-				opts="$(repobox) $(optbox)"
-			;;
- 			"-l")
-				opts=$(pkgname)
-			;;
- 			*)
- 				opts="$(optlist) $(optbox)"
- 			;;
+					is_su=1
+					opts=${OPTS}
+				;;
+				"-s")
+					opts=$(optbox)
+				;;
+				"-sR")
+					opts="$(repobox) $(optbox)"
+				;;
+				"-l")
+					opts=$(pkgname)
+				;;
+				*)
+					opts="$(optlist) $(optbox)"
+				;;
  			esac
 		;;
 		"-o")
@@ -477,7 +480,6 @@ cmd_gen(){
 		;;
 	esac
 	if (( ${is_su} ));then
-# 		cmd="${SU_MODE} ${bin[${ACTION}]} ${ARGS} ${opts}"
 		cmd="sudo ${bin[${ACTION}]} ${ARGS} ${opts}"
 	else
 		cmd="${bin[${ACTION}]} ${ARGS} ${opts}"
@@ -511,14 +513,11 @@ REPOS=$(get_repos)
 for u in  ${URI[*]};do
 	EXEC_DIR=$(dirname $u)
 done
-cd ${IMG_DIR}
 
-if [[ ! -d ${IMG_DIR} ]];then
-	mkdir -p ${IMG_DIR}
-fi
+[[ ! -d ${IMG_DIR} ]] && mkdir -p ${IMG_DIR}
 
 if [[ ! -f ${CONFIG} ]];then
-	popup "Info" "Starting configure" && config_dlg
+	popup "Info" "Starting pkg-tools configure" && config_dlg
 	. ${CONFIG}
 else
 	. ${CONFIG}
