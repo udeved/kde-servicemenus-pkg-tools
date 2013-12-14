@@ -8,18 +8,10 @@
 
 userbox(){
 	kdialog --title "AUR login" --inputbox "Enter username:"
-	local flag=$?
-	if [ $flag -eq 1 ];then
-		popup "Chancel" "No username"
-	fi
 }
 
 pwdbox(){
 	kdialog --title "AUR login" --password "Enter password:"
-	local flag=$?
-	if [ $flag -eq 1 ];then
-		popup "Chancel" "No password"
-	fi
 }
 
 catbox(){
@@ -43,16 +35,11 @@ catbox(){
 	item[x11]=17
 	item[xfce]=18
 	item[kernels]=19
-
-	local select=$(kdialog --title "Categories" --combobox "Select category"  "${!item[@]}") flag=$?
-	if [ $flag -eq 1 ];then
-		exit
+	local select=$(kdialog --title "Categories" --combobox "Select category"  "${!item[@]}")
+	if [[ ! -z $select ]];then
+		echo "${item[$select]}"
 	else
-		if [[ ! -z $select ]];then
-			echo "${item[$select]}"
-		else
-			echo ${item[any]}
-		fi
+		echo ${item[any]}
 	fi
 }
 
@@ -60,29 +47,43 @@ popup(){
 	kdialog --title "$1" --passivepopup "$2"  10
 }
 
-ynbox(){
+ask_config_overwrite(){
 	kdialog --title "Warning" --warningcontinuecancel "${CONFIG} already exists. Overwrite?"
 	local flag=$?
 	if [ ${flag} -eq 0 ];then
-		config_dlg
+		config_wizzard
 	else
-		exit
+		exit 1
 	fi
 }
 
-config_dlg(){
-	local user pwd sumode
+config_wizzard(){
+	local user pwd sumode imgdir
 	user=$(userbox)
 	pwd=$(pwdbox)
-	if [[ -z ${user} ]] && [[ -z ${pwd} ]] || [[ -z ${sumode} ]];then
-		popup "Warning" "No config written."
+	#sumode=$(su_mode_box)
+	#imgdir=$(dirbox)
+	if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
+		popup "Pkg-tools" "No config created."
 		exit
 	else
 		new_config
-		writer "USR=${user}"
-		writer "PWD=${pwd}"
-		popup "Pkg-tools" "Config written. ${CONFIG}"
+		config_writer "USR=${user}"
+		config_writer "PWD=${pwd}"
+		#config_writer "SU_MODE=${sumode}"
+		#config_writer "IMG_DIR=${imgdir}"
+		popup "Pkg-tools" "${CONFIG} created."
 	fi
+}
+
+su_mode_box(){
+	local select=$(kdialog --title "SU settings" --combobox "Select su frontend:" "kdesu" "kdesudo") flag=$?
+	if [ $flag -eq 1 ];then
+		echo "kdesu"
+		exit
+	else
+		echo ${select}
+ 	fi
 }
 
 pkgbox(){
@@ -95,17 +96,12 @@ pkgbox(){
 			i=$((i+1))
 		done
 	fi
-	local select=$(kdialog --title "Split package" --checklist "Select packages:" ${item[@]}) flag=$?
-	if [ $flag -eq 1 ];then
-		popup "Chancel" "No packages selected."
-		exit
-	else
-		local list c='\"'
-		for s in ${select};do
-			list="${list:-}${list:+,}${name[${s//$c/}]}"
-		done
-		echo ${list}
-	fi
+	local select=$(kdialog --title "Split package" --checklist "Select packages:" ${item[@]})
+	local list c='\"'
+	for s in ${select};do
+		list="${list:-}${list:+,}${name[${s//$c/}]}"
+	done
+	echo ${list}
 }
 
 rulesbox(){
@@ -157,22 +153,16 @@ rulesbox(){
 	rule[44]=symlink
 	rule[45]=tags
 	rule[46]=urlpkg
-
 	local item switch=off
 	for (( i=0; i<${#rule[@]}; ++i));do
 		item[$i]="$i ${rule[$i]} ${switch}"
 	done
-	local select=$(kdialog --checklist "Select rules:" ${item[@]}) flag=$?
-	if [ $flag -eq 1 ];then
-		popup "Chancel" "No rules selected."
-		return
-	else
-	 	local list c='\"'
-		for s in ${select};do
-			list="${list:-}${list:+,}${rule[${s//$c/}]}"
-		done
-		echo ${list}
-	fi
+	local select=$(kdialog --checklist "Select rules:" ${item[@]})
+	local list c='\"'
+	for s in ${select};do
+		list="${list:-}${list:+,}${rule[${s//$c/}]}"
+	done
+	echo ${list}
 }
 
 optlist(){
@@ -186,39 +176,38 @@ optlist(){
 	for (( i=0; i<${#param[@]}; ++i));do
 		item[$i]="$i ${param[$i]} ${switch}"
 	done
-
-	local select=$(kdialog --checklist "Select options:" ${item[@]}) flag=$?
-	if [ $flag -eq 1 ];then
-		popup "Chancel" "No options selected."
-		return
-	else
-	 	local list c='\"'
-		for s in ${select};do
-			list="${list:---}${list:+ --}${param[${s//$c/}]}"
-		done
-		echo ${list}
-	fi
+	local select=$(kdialog --radiolist "Select options:" ${item[@]})
+	echo "--${param[${select}]}"
 }
 
 optbox(){
-	local q=$(kdialog --title "Arguments" --inputbox "Enter parameters:") flag=$?
-	if [ $flag -eq 1 ];then
-		popup "Chancel" "No input."
-		exit
-	else
-		echo $q
-	fi
+	local p=$(kdialog --title "Arguments" --inputbox "Enter parameters:")
+	echo $p
 }
 
 progressbar(){
 	kdialog --title "Progress" --progressbar "Intitializing" $1
 }
 
+dirbox(){
+	kdialog --title "Select a folder for generated graphs" --getexistingdirectory $HOME
+}
+
+repobox(){
+	local item switch=off repo=( ${REPOS} )
+		for (( i=0; i<${#repo[@]}; ++i));do
+		item[$i]="$i ${repo[$i]} ${switch}"
+	done
+	local select
+	select=$(kdialog --title "Repos" --radiolist "Select repo:" ${item[@]})
+	echo ${repo[${select}]}
+}
+
 ###################################################################
 ##########################LIB######################################
 ###################################################################
 
-writer(){
+config_writer(){
 	echo $1 >> "${CONFIG}"
 }
 
@@ -266,30 +255,6 @@ get_session(){
 	echo ${session}
 }
 
-submit(){
-	local submit sid url="${URL}/submit/" cat=$(catbox)
-	if [[ ! -z $1 ]];then
-		progress=$(progressbar 3)
-		pg_value "${progress}" 1
-		pg_label "${progress}" 'Setting session ID'
-		submit=$(curl -sSi -H 'Expect: ' -b $1 ${url})
-		sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-		sleep 0.25
-		pg_value "${progress}" 2
-		pg_label "${progress}" 'Submitting'
-		submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${URI} -b $1 ${url} | tr -d '\r')
-		sleep 0.25
-		pg_value "${progress}" 3
-		pg_label "${progress}" 'Getting pkg url'
-		PKG_URL="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
-		sleep 0.25
-		pg_close "${progress}"
-	else
-		popup "Canceled AUR upload." "No session registered."
-		exit
-	fi
-}
-
 selected_files(){
 	local fn rfn list
 	for i in ${URI[*]};do
@@ -317,21 +282,127 @@ get_link(){
 	echo ${html}
 }
 
+get_image(){
+	local html='<p><img src="'"$1"'" alt="dependency graph"></p>'
+	echo ${html}
+}
+
+imgbox(){
+	kdialog --title "Imageviewer" --msgbox "$1"
+}
+
+get_repos() {
+	local section repo
+	while read line; do
+	local filter='^\ {0,}#'
+		[[ $line =~ "${filter}" ]] && continue
+		[[ -z "$line" ]] && continue
+		if [[ $line =~ ^\[.*?\] ]]; then
+			line=${line:1:$((${#line}-2))}
+			section=${line// /}
+			case ${section} in
+				"options")
+					continue
+				;;
+				*)
+					repo=${repo:-}${repo:+ }${section}
+				;;
+			esac
+		fi
+	done < "${PAC_CONF}"
+	echo ${repo}
+}
+
 ###################################################################
 ##########################EXEC#####################################
 ###################################################################
 
+repo_action(){
+	local list=( $(selected_files) )
+ 	local progress=$(progressbar ${#list[@]})
+	for (( i=0; i<${#list[@]}; ++i));do
+		pg_value "${progress}" $i
+		pg_label "${progress}" "${list[$i]}"
+		sleep 0.2
+	done
+	pg_close "${progress}"
+	cd $EXEC_DIR
+	eval $1
+}
+
+run_su_cmd(){
+	local progress=$(progressbar 2)
+	pg_value "${progress}" 1
+	pg_label "${progress}" "$(echo $1)"
+	local
+	echo  $($1)
+	sleep 0.5
+	pg_value "${progress}" 2
+	pg_label "${progress}" "Finished."
+	sleep 0.5
+	pg_close "${progress}"
+}
+
+write_image(){
+	local fn dotfile progress=$(progressbar 3)
+	pg_value "${progress}" 1
+	pg_label "${progress}" 'Setting filename'
+	case ${ARGS} in
+		"-g" | "-gs")
+			fn="${IMG_DIR}/$(pkgname)_deps.${OPTS}"
+		;;
+		"-gr" | "-grs")
+			fn="${IMG_DIR}/$(pkgname)_revdeps.${OPTS}"
+		;;
+		"-glu" | "-glus")
+			fn="${IMG_DIR}/$(pkgname)_nodup.${OPTS}"
+		;;
+	esac
+	sleep 0.5
+	pg_value "${progress}" 2
+	pg_label "${progress}" 'Getting dot description'
+	dotfile=$(cmd_out "$1")
+	sleep 0.5
+	pg_value "${progress}" 3
+	pg_label "${progress}" 'Generating image'
+	echo  "$dotfile" | dot -T ${OPTS} > "${fn}"
+	sleep 1
+	pg_close "${progress}"
+	popup "Image saved." "$(get_link "${fn}")"
+	#imgbox "$(get_image $fn)"
+}
+
 configure(){
 	if [[ ! -f "${CONFIG}" ]]; then
-		config_dlg
+		config_wizzard
 	else
-		ynbox
+		ask_config_overwrite
 	fi
 }
 
 upload(){
-	submit "$(get_session)"
-	popup "AUR upload finished." "$(get_link ${PKG_URL})"
+	local session="$(get_session)" submit sid url="${URL}/submit/" cat=$(catbox)
+	if [[ ! -z ${session} ]];then
+		progress=$(progressbar 3)
+		pg_value "${progress}" 1
+		pg_label "${progress}" 'Setting session ID'
+		submit=$(curl -sSi -H 'Expect: ' -b ${session} ${url})
+		sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
+		sleep 0.25
+		pg_value "${progress}" 2
+		pg_label "${progress}" 'Submitting'
+		submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${URI} -b ${session} ${url} | tr -d '\r')
+		sleep 0.25
+		pg_value "${progress}" 3
+		pg_label "${progress}" 'Getting pkg url'
+		PKG_URL="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
+		sleep 0.25
+		pg_close "${progress}"
+		popup "AUR upload finished." "$(get_link ${PKG_URL})"
+	else
+		popup "Canceled AUR upload." "No session registered."
+		exit 1
+	fi
 }
 
 run_in_konsole(){
@@ -350,7 +421,6 @@ cmd_gen(){
 	bin[-c]=configure
 	bin[-u]=upload
 	bin[-o]=pacman-optimize
-
 	local cmd opts ext="tar.xz"
 	case ${ACTION} in
 		"-a" | "-r")
@@ -366,27 +436,44 @@ cmd_gen(){
 			opts=$(pkgname)
 		;;
 		"-y")
-			if [[ ${ARGS} == "-Sy" ]] || [[ ${ARGS} == "-Syy" ]] ;then
-				is_su=1
-			else
-				opts="${OPTS} $(optbox)"
-			fi
+			case ${ARGS} in
+				"-Sy" | "-Syy")
+					is_su=1
+				;;
+				*)
+					opts="${OPTS} $(optbox)"
+				;;
+			esac
 		;;
 		"-n")
-			if [[ ${ARGS} == "-r" ]] || [[ ${ARGS} == "-e" ]];then
-				opts="$(rulesbox) ${URI}"
-			else
-				opts=${URI}
-			fi
+			case ${ARGS} in
+				"-r" | "-e")
+					opts="$(rulesbox) ${URI}"
+				;;
+				*)
+					opts=${URI}
+				;;
+			esac
 		;;
 		"-f")
-			if [[ ${ARGS} == "-u" ]];then
-				is_su=1
-			elif [[ ${ARGS} == "-s" ]];then
-				opts=$(optbox)
-			else
-				opts=$(pkgname)
-			fi
+			case ${ARGS} in
+				"-uz")
+					is_su=1
+					opts=${OPTS}
+				;;
+				"-s")
+					opts=$(optbox)
+				;;
+				"-sR")
+					opts="$(repobox) $(optbox)"
+				;;
+				"-l")
+					opts=$(pkgname)
+				;;
+				*)
+					opts="$(optlist) $(optbox)"
+				;;
+ 			esac
 		;;
 		"-o")
 			is_su=1
@@ -398,34 +485,6 @@ cmd_gen(){
 		cmd="${bin[${ACTION}]} ${ARGS} ${opts}"
 	fi
 	echo ${cmd}
-}
-
-write_image(){
-	local fn dotfile progress=$(progressbar 3)
-	pg_value "${progress}" 1
-	pg_label "${progress}" 'Setting filename'
-	case ${ARGS} in
-		"-g" | "-gs")
-			fn="${IMG_DIR}/$(pkgname)_deps.${OPTS}"
-		;;
-		"-gr" | "-grs")
-			fn="${IMG_DIR}/$(pkgname)_revdeps.${OPTS}"
-		;;
-		"-glu" | "-glus")
-			fn="${IMG_DIR}/$(pkgname)_nodup.${OPTS}"
-		;;
-	esac
-	sleep 1
-	pg_value "${progress}" 2
-	pg_label "${progress}" 'Getting dot description'
-	dotfile=$(cmd_out "$1")
-	sleep 1
-	pg_value "${progress}" 3
-	pg_label "${progress}" 'Generating image'
-	echo  "$dotfile" | dot -T ${OPTS} > "${fn}"
-	sleep 1
-	pg_close "${progress}"
-	popup "Image saved." "$(get_link "${fn}")"
 }
 
 ###################################################################
@@ -442,24 +501,23 @@ OPTS=$4
 CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
 IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
 EXEC_DIR="${HOME}"
+PAC_CONF=/etc/pacman.conf
 
 CONFIG=${CONFIG_DIR}/pkg-tools.conf
 
 URL="https://aur.archlinux.org"
 PKG_URL=""
 
+REPOS=$(get_repos)
+
 for u in  ${URI[*]};do
 	EXEC_DIR=$(dirname $u)
 done
-cd $EXEC_DIR
 
-if [[ ! -d ${IMG_DIR} ]];then
-	mkdir -p ${IMG_DIR}
-fi
+[[ ! -d ${IMG_DIR} ]] && mkdir -p ${IMG_DIR}
 
 if [[ ! -f ${CONFIG} ]];then
-	popup "Info" "Starting configure"
-	config_dlg
+	popup "Info" "Starting pkg-tools configure" && config_dlg
 	. ${CONFIG}
 else
 	. ${CONFIG}
