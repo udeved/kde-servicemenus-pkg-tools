@@ -44,7 +44,7 @@ catbox(){
 }
 
 popup(){
-	kdialog --title "$1" --passivepopup "$2"  10
+	kdialog --title "Pkg-tools" --passivepopup "$1"  10
 }
 
 ask_config_overwrite(){
@@ -64,7 +64,7 @@ config_wizzard(){
 	#sumode=$(su_mode_box)
 	#imgdir=$(dirbox)
 	if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
-		popup "Pkg-tools" "No config created."
+		popup "No config created."
 		exit
 	else
 		new_config
@@ -72,7 +72,7 @@ config_wizzard(){
 		config_writer "PWD=${pwd}"
 		#config_writer "SU_MODE=${sumode}"
 		#config_writer "IMG_DIR=${imgdir}"
-		popup "Pkg-tools" "${CONFIG} created."
+		popup "${CONFIG} created."
 	fi
 }
 
@@ -157,7 +157,7 @@ rulesbox(){
 	for (( i=0; i<${#rule[@]}; ++i));do
 		item[$i]="$i ${rule[$i]} ${switch}"
 	done
-	local select=$(kdialog --checklist "Select rules:" ${item[@]})
+	local select=$(kdialog --title "namcap rules" --checklist "Select rules:" ${item[@]})
 	local list c='\"'
 	for s in ${select};do
 		list="${list:-}${list:+,}${rule[${s//$c/}]}"
@@ -176,13 +176,12 @@ optlist(){
 	for (( i=0; i<${#param[@]}; ++i));do
 		item[$i]="$i ${param[$i]} ${switch}"
 	done
-	local select=$(kdialog --radiolist "Select options:" ${item[@]})
+	local select=$(kdialog --title "pkgfile" --radiolist "Select option:" ${item[@]})
 	echo "--${param[${select}]}"
 }
 
 optbox(){
-	local p=$(kdialog --title "Arguments" --inputbox "Enter parameters:")
-	echo $p
+	kdialog --title "Parameters" --inputbox "Enter pkgname and/or arg:"
 }
 
 progressbar(){
@@ -368,7 +367,7 @@ write_image(){
 	echo  "$dotfile" | dot -T ${OPTS} > "${fn}"
 	sleep 1
 	pg_close "${progress}"
-	popup "Image saved." "$(get_link "${fn}")"
+	popup "$(get_link "${fn}")"
 	#imgbox "$(get_image $fn)"
 }
 
@@ -398,9 +397,9 @@ upload(){
 		PKG_URL="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 		sleep 0.25
 		pg_close "${progress}"
-		popup "AUR upload finished." "$(get_link ${PKG_URL})"
+		popup "$(get_link ${PKG_URL})"
 	else
-		popup "Canceled AUR upload." "No session registered."
+		popup "No session registered."
 		exit 1
 	fi
 }
@@ -440,8 +439,12 @@ cmd_gen(){
 				"-Sy" | "-Syy")
 					is_su=1
 				;;
+				"-Ss" | "-Q")
+					opts="${OPTS} $(optbox)"
+				;;
 				*)
 					opts="${OPTS} $(optbox)"
+					is_su=1
 				;;
 			esac
 		;;
@@ -491,10 +494,15 @@ cmd_gen(){
 ##########################MAIN#####################################
 ###################################################################
 
+
+
 URI=$1
 ACTION=$2
 ARGS=$3
 OPTS=$4
+
+exec 1>&2
+exec > $HOME/pkg-tools.log
 
 [[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] && . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
 
@@ -517,7 +525,7 @@ done
 [[ ! -d ${IMG_DIR} ]] && mkdir -p ${IMG_DIR}
 
 if [[ ! -f ${CONFIG} ]];then
-	popup "Info" "Starting pkg-tools configure" && config_dlg
+	popup "Starting config wizzard" && config_wizzard
 	. ${CONFIG}
 else
 	. ${CONFIG}
@@ -538,7 +546,7 @@ case ${ACTION} in
 		esac
 	;;
 	*)
-		#popup "CMD" "$(cmd_gen)"
+		#popup "$(cmd_gen)"
 		run_in_konsole "$(cmd_gen)"
 	;;
 esac
