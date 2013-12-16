@@ -501,9 +501,6 @@ ACTION=$2
 ARGS=$3
 OPTS=$4
 
-exec 1>&2
-exec > $HOME/pkg-tools.log
-
 [[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] && . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
 
 CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
