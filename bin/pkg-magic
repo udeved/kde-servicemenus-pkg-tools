@@ -37,7 +37,7 @@ catbox(){
 	item[kernels]=19
 	local select=$(kdialog --title "Categories" --combobox "Select category"  "${!item[@]}")
 	if [[ ! -z $select ]];then
-		echo "${item[$select]}"
+		echo ${item[$select]}
 	else
 		echo ${item[any]}
 	fi
