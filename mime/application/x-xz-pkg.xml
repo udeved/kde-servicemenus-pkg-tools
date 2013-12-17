@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-xz-pkg">
-  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
-  <icon name="package-x-generic"/>
-  <glob-deleteall/>
-  <glob pattern="*.pkg.tar.xz"/>
+	<comment>Arch linux package</comment>
+	<sub-class-of type="application/x-xz-compressed-tar"/>
+	<generic-icon name="package-x-generic"/>
+	<glob pattern="*.pkg.tar.xz"/>
 </mime-type>

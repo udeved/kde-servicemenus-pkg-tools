@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mime-type xmlns="http://www.freedesktop.org/standards/shared-mime-info" type="application/x-pkgbuild">
-  <!--Created automatically by update-mime-database. DO NOT EDIT!-->
-  <icon name="application-x-m4"/>
-  <glob-deleteall/>
-  <glob pattern="PKGBUILD"/>
+	<comment>Arch linux pkgbuild</comment>
+	<sub-class-of type="text/plain"/>
+	<generic-icon name="application-x-m4"/>
+	<glob pattern="PKGBUILD"/>
 </mime-type>
