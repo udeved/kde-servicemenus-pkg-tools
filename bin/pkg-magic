@@ -39,7 +39,9 @@ catbox(){
 	if [[ ! -z $select ]];then
 		echo ${item[$select]}
 	else
-		echo ${item[any]}
+		popup "Pkg-tools" "AUR upload aborted. No category selected"
+		exit 1
+		#echo ${item[any]}
 	fi
 }
 
@@ -334,7 +336,7 @@ run_su_cmd(){
 	pg_value "${progress}" 1
 	pg_label "${progress}" "$(echo $1)"
 	local
-	echo  $($1)
+	#echo  $($1)
 	sleep 0.5
 	pg_value "${progress}" 2
 	pg_label "${progress}" "Finished."
@@ -380,7 +382,9 @@ configure(){
 }
 
 upload(){
-	local session="$(get_session)" submit sid url="${URL}/submit/" cat=$(catbox)
+	local session="$(get_session)" submit sid url="${URL}/submit/" cat
+
+	cat=$(catbox)
 	if [[ ! -z ${session} ]];then
 		progress=$(progressbar 3)
 		pg_value "${progress}" 1
