@@ -14,6 +14,16 @@ pwdbox(){
 	kdialog --title "AUR login" --password "Enter password:"
 }
 
+logbox(){
+	kdialog --title "Makepkg options" --yesno "enable logging?"
+	local flag=$?
+	if [ ${flag} -eq 0 ];then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
 catbox(){
 	declare -A item
 	item[any]=0
@@ -41,7 +51,6 @@ catbox(){
 	else
 		popup "Pkg-tools" "AUR upload aborted. No category selected"
 		exit 1
-		#echo ${item[any]}
 	fi
 }
 
@@ -60,33 +69,31 @@ ask_config_overwrite(){
 }
 
 config_wizzard(){
-	local user pwd sumode imgdir
+	local user pwd is_log
 	user=$(userbox)
 	pwd=$(pwdbox)
-	#sumode=$(su_mode_box)
-	#imgdir=$(dirbox)
-	if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
+	is_log=$(echo $(logbox))
+	if [[ -z ${user} ]] && [[ -z ${pwd} ]] && [[ -z ${is_log} ]];then
 		popup "No config created."
 		exit
 	else
 		new_config
 		config_writer "USR=${user}"
 		config_writer "PWD=${pwd}"
-		#config_writer "SU_MODE=${sumode}"
-		#config_writer "IMG_DIR=${imgdir}"
+		config_writer "IS_LOG=${is_log}"
 		popup "${CONFIG} created."
 	fi
 }
 
-su_mode_box(){
-	local select=$(kdialog --title "SU settings" --combobox "Select su frontend:" "kdesu" "kdesudo") flag=$?
-	if [ $flag -eq 1 ];then
-		echo "kdesu"
-		exit
-	else
-		echo ${select}
- 	fi
-}
+# su_mode_box(){
+# 	local select=$(kdialog --title "SU settings" --combobox "Select su frontend:" "kdesu" "kdesudo") flag=$?
+# 	if [ $flag -eq 1 ];then
+# 		echo "kdesu"
+# 		exit
+# 	else
+# 		echo ${select}
+#  	fi
+# }
 
 pkgbox(){
 	source ${URI}
@@ -326,23 +333,23 @@ repo_action(){
 		pg_label "${progress}" "${list[$i]}"
 		sleep 0.2
 	done
-	pg_close "${progress}"
 	cd $EXEC_DIR
 	eval $1
-}
-
-run_su_cmd(){
-	local progress=$(progressbar 2)
-	pg_value "${progress}" 1
-	pg_label "${progress}" "$(echo $1)"
-	local
-	#echo  $($1)
-	sleep 0.5
-	pg_value "${progress}" 2
-	pg_label "${progress}" "Finished."
-	sleep 0.5
 	pg_close "${progress}"
 }
+
+# run_su_cmd(){
+# 	local progress=$(progressbar 2)
+# 	pg_value "${progress}" 1
+# 	pg_label "${progress}" "$(echo $1)"
+# 	local
+# 	#echo  $($1)
+# 	sleep 0.5
+# 	pg_value "${progress}" 2
+# 	pg_label "${progress}" "Finished."
+# 	sleep 0.5
+# 	pg_close "${progress}"
+# }
 
 write_image(){
 	local fn dotfile progress=$(progressbar 3)
@@ -431,6 +438,9 @@ cmd_gen(){
 			opts="${repo}.${OPTS}.${ext} $(selected_files)"
 		;;
 		"-m")
+			if (( ${IS_LOG} ));then
+				ARGS=${ARGS}"L"
+			fi
 			if [[ ${OPTS} == "--pkg" ]];then
 				opts="${OPTS} $(pkgbox)"
 			fi
@@ -511,6 +521,7 @@ CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
 IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
 EXEC_DIR="${HOME}"
 PAC_CONF=/etc/pacman.conf
+IS_LOG=0
 
 CONFIG=${CONFIG_DIR}/pkg-tools.conf
 
@@ -532,6 +543,7 @@ else
 	. ${CONFIG}
 fi
 
+
 case ${ACTION} in
 	"-u" | "-c")
 		$(cmd_gen)
@@ -546,7 +558,11 @@ case ${ACTION} in
 			;;
 		esac
 	;;
-	*)
+# 	"-a" | "-r")
+# 		#popup "$(cmd_gen)"
+# 		repo_action "$(cmd_gen)"
+# 	;;
+ 	*)
 		#popup "$(cmd_gen)"
 		run_in_konsole "$(cmd_gen)"
 	;;
