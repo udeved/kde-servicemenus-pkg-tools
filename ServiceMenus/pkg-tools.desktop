@@ -2,57 +2,13 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=inode/directory;
-Actions=search;search_param;search_repo_param;_SEPARATOR_;query;_SEPARATOR_;query_provides;query_depends;query_conflicts;query_replaces;_SEPARATOR_;search_aur;_SEPARATOR_;configure;
+Actions=_SEPARATOR_;configure;
+
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
 # Usage: pkg-magic $uri $action $args $opts
-
-[Desktop Action search]
-Name=Search for packages containing
-Icon=edit-find-project
-Exec=pkg-magic "%u" "-f"
-
-[Desktop Action search_param]
-Name=Only search for packages containing
-Icon=edit-find-project
-Exec=pkg-magic "%u" "-f" "-s"
-
-[Desktop Action search_repo_param]
-Name=Only search for packages in repo containing
-Icon=edit-find-project
-Exec=pkg-magic "%u" "-f" "-sR"
-
-[Desktop Action query]
-Name=Query
-Icon=system-search
-Exec=pkg-magic "%u" "-y" "-Q"
-
-[Desktop Action search_aur]
-Name=Search AUR
-Icon=edit-find
-Exec=pkg-magic "%u" "-y" "-Ss"
-
-[Desktop Action query_provides]
-Name=Search for provides
-Icon=edit-find-project
-Exec=pkg-magic "%u" "-y" "-S" "--provides"
-
-[Desktop Action query_depends]
-Name=Search for depends
-Icon=edit-find-project
-Exec=pkg-magic "%u" "-y" "-S" "--depends"
-
-[Desktop Action query_conflicts]
-Name=Search for conflicts
-Icon=edit-find-project
-Exec=pkg-magic "%u" "-y" "-S" "--conflicts"
-
-[Desktop Action query_replaces]
-Name=Search for replaces
-Icon=edit-find-project
-Exec=pkg-magic "%u" "-y" "-S" "--replaces"
 
 [Desktop Action configure]
 Name=Configure pkg-tools

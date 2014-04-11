@@ -2,9 +2,7 @@
 
 #set -e
 
-###################################################################
 ##########################KDIALOG##################################
-###################################################################
 
 userbox(){
 	kdialog --title "AUR login" --inputbox "Enter username:"
@@ -12,16 +10,6 @@ userbox(){
 
 pwdbox(){
 	kdialog --title "AUR login" --password "Enter password:"
-}
-
-logbox(){
-	kdialog --title "Makepkg options" --yesno "enable logging?"
-	local flag=$?
-	if [ ${flag} -eq 0 ];then
-		echo 1
-	else
-		echo 0
-	fi
 }
 
 catbox(){
@@ -84,16 +72,6 @@ config_wizzard(){
 		popup "${CONFIG} created."
 	fi
 }
-
-# su_mode_box(){
-# 	local select=$(kdialog --title "SU settings" --combobox "Select su frontend:" "kdesu" "kdesudo") flag=$?
-# 	if [ $flag -eq 1 ];then
-# 		echo "kdesu"
-# 		exit
-# 	else
-# 		echo ${select}
-#  	fi
-# }
 
 pkgbox(){
 	source ${URI}
@@ -211,9 +189,17 @@ repobox(){
 	echo ${repo[${select}]}
 }
 
-###################################################################
+logbox(){
+	kdialog --title "Makepkg options" --yesno "enable logging?"
+	local flag=$?
+	if [ ${flag} -eq 0 ];then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
 ##########################LIB######################################
-###################################################################
 
 config_writer(){
 	echo $1 >> "${CONFIG}"
@@ -321,35 +307,23 @@ get_repos() {
 	echo ${repo}
 }
 
-###################################################################
-##########################EXEC#####################################
-###################################################################
+##########################Actions#####################################
 
 repo_action(){
 	local list=( $(selected_files) )
  	local progress=$(progressbar ${#list[@]})
+ 	
 	for (( i=0; i<${#list[@]}; ++i));do
 		pg_value "${progress}" $i
 		pg_label "${progress}" "${list[$i]}"
 		sleep 0.2
 	done
-	cd $EXEC_DIR
-	eval $1
+	#cd $EXEC_DIR
+	#eval $1
+	$1
 	pg_close "${progress}"
+	
 }
-
-# run_su_cmd(){
-# 	local progress=$(progressbar 2)
-# 	pg_value "${progress}" 1
-# 	pg_label "${progress}" "$(echo $1)"
-# 	local
-# 	#echo  $($1)
-# 	sleep 0.5
-# 	pg_value "${progress}" 2
-# 	pg_label "${progress}" "Finished."
-# 	sleep 0.5
-# 	pg_close "${progress}"
-# }
 
 write_image(){
 	local fn dotfile progress=$(progressbar 3)
@@ -377,7 +351,6 @@ write_image(){
 	sleep 1
 	pg_close "${progress}"
 	popup "$(get_link "${fn}")"
-	#imgbox "$(get_image $fn)"
 }
 
 configure(){
@@ -427,19 +400,23 @@ cmd_gen(){
 	bin[-r]=repo-remove
 	bin[-t]=pactree
 	bin[-f]=pkgfile
-	bin[-y]=yaourt
 	bin[-c]=configure
 	bin[-u]=upload
 	bin[-o]=pacman-optimize
-	local cmd opts ext="tar.xz"
+
+	local cmd opts ext="tar.xz" is_su=0 repo_dir
 	case ${ACTION} in
 		"-a" | "-r")
-			local repo=$(basename ${EXEC_DIR})
-			opts="${repo}.${OPTS}.${ext} $(selected_files)"
+			repo_dir=$(basename ${EXEC_DIR})
+			opts="${repo_dir}.${OPTS}.${ext} $(selected_files)"
 		;;
 		"-m")
 			if (( ${IS_LOG} ));then
-				ARGS=${ARGS}"L"
+				if [[ ${ARGS} == "-g" ]];then
+					ARGS=${ARGS}
+				else
+					ARGS=${ARGS}"L"
+				fi
 			fi
 			if [[ ${OPTS} == "--pkg" ]];then
 				opts="${OPTS} $(pkgbox)"
@@ -447,20 +424,6 @@ cmd_gen(){
 		;;
 		"-t")
 			opts=$(pkgname)
-		;;
-		"-y")
-			case ${ARGS} in
-				"-Sy" | "-Syy")
-					is_su=1
-				;;
-				"-Ss" | "-Q")
-					opts="${OPTS} $(optbox)"
-				;;
-				*)
-					opts="${OPTS} $(optbox)"
-					is_su=1
-				;;
-			esac
 		;;
 		"-n")
 			case ${ARGS} in
@@ -504,11 +467,7 @@ cmd_gen(){
 	echo ${cmd}
 }
 
-###################################################################
 ##########################MAIN#####################################
-###################################################################
-
-
 
 URI=$1
 ACTION=$2
@@ -518,7 +477,7 @@ OPTS=$4
 [[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] && . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
 
 CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
-IMG_DIR=${XDG_PICTURES_DIR:-~/graphs}
+IMG_DIR=${XDG_PICTURES_DIR:-~/pactree_graphs}
 EXEC_DIR="${HOME}"
 PAC_CONF=/etc/pacman.conf
 IS_LOG=0
@@ -558,12 +517,23 @@ case ${ACTION} in
 			;;
 		esac
 	;;
+	"-m")
+		case $ARGS in
+			"-g")
+				cd ${EXEC_DIR}
+				$(cmd_gen) >> $(basename ${URI})
+			;;
+			*)
+				run_in_konsole "$(cmd_gen)"
+			;;
+		esac
+	;;	
 # 	"-a" | "-r")
-# 		#popup "$(cmd_gen)"
-# 		repo_action "$(cmd_gen)"
+# 		cd $EXEC_DIR
+# 		#repo_action $(cmd_gen)
+# 		cmd_out "$(cmd_gen)" > $HOME/projects/kde-servicemenus-pkg-tools/pt.log 2>&1
 # 	;;
  	*)
-		#popup "$(cmd_gen)"
 		run_in_konsole "$(cmd_gen)"
 	;;
 esac
