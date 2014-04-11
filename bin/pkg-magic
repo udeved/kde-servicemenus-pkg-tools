@@ -403,6 +403,7 @@ cmd_gen(){
 	bin[-c]=configure
 	bin[-u]=upload
 	bin[-o]=pacman-optimize
+	bin[-p]=pacman
 
 	local cmd opts ext="tar.xz" is_su=0 repo_dir
 	case ${ACTION} in
@@ -455,7 +456,7 @@ cmd_gen(){
 				;;
  			esac
 		;;
-		"-o")
+		"-o" | "-p")
 			is_su=1
 		;;
 	esac

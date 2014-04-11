@@ -12,12 +12,12 @@ X-KDE-Submenu=Pkg-tools
 [Desktop Action sync]
 Name=Sync repos
 Icon=object-rotate-left
-Exec=pkg-magic "%u" "-y" "-Syy"
+Exec=pkg-magic "%u" "-p" "-Syy"
 
 [Desktop Action sync_local]
 Name=Sync local repos
 Icon=object-rotate-right
-Exec=pkg-magic "%u" "-y" "-Sy"
+Exec=pkg-magic "%u" "-p" "-Sy"
 
 [Desktop Action update]
 Name=Update metadata files

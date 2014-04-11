@@ -1,13 +1,13 @@
 # Maintainer: udeved <udeved@openrc4arch.site40.net>
 
 pkgname=kde-servicemenus-pkg-tools-git
-pkgver=0.r67.fa4f37d
+pkgver=0.r72.41684f2
 pkgrel=1
-pkgdesc="Kde servicemenu for makepkg, repo-add & repo-remove, namcap & aur upload."
+pkgdesc="Kde servicemenu for makepkg, pkgfile, pactree, repo-add & repo-remove, namcap & aur upload."
 arch=('any')
 url="https://github.com/udeved/kde-servicemenus-pkg-tools"
 license=('GPL2')
-depends=('kdebase-kdialog')
+depends=('kdebase-kdialog' 'namcap' 'graphviz' 'pkgfile' 'sudo')
 makedepends=('git')
 conflicts=('kde-servicemenus-pkg-tools')
 install=pkg-tools.install
