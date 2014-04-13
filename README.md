@@ -5,9 +5,9 @@ kde-servicemenus-pkg-tools
 
 * makepkg
 * namcap
-* pacman install local file(s)
 * local repo management
 * aur upload
 * pkgfile
 * pactree
-* yaourt search & query
+
+#####local repo management currently does not support $arch subdirectories.#####
