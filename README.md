@@ -10,4 +10,4 @@ kde-servicemenus-pkg-tools
 * pkgfile
 * pactree
 
-#####local repo management currently does not support $arch subdirectories.#####
+#####local repo management currently does not support $arch subdirectories, and the repodb will be named $arch instead of repo dir#####
