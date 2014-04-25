@@ -20,22 +20,22 @@ Icon=run-build
 Exec=pkg-magic "%u" "-m" "-sr"
 
 [Desktop Action mk_nodeps]
-Name=Make package (ignore deps)
+Name=Make package ignore deps
 Icon=debug-run
 Exec=pkg-magic "%u" "-m" "-d"
 
 [Desktop Action mk_src]
-Name=Make source package
+Name=Make package source
 Icon=run-build-file
 Exec=pkg-magic "%u" "-m" "-S"
 
 [Desktop Action mk_sign]
-Name=Make signed package
+Name=Make package signed
 Icon=view-certificate-sign
 Exec=pkg-magic "%u" "-m" "-sr --sign"
 
 [Desktop Action mk_install]
-Name=Make & install package
+Name=Make package & install
 Icon=run-build-install
 Exec=pkg-magic "%u" "-m" "-sri"
 

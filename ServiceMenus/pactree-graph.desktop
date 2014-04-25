@@ -10,31 +10,31 @@ X-KDE-Submenu=Pkg-tools
 # Usage: pkg-magic $uri $action $args $opts
 
 [Desktop Action dep]
-Name=Generate dependency graph
+Name=Dependency graph
 Icon=office-chart-polar
 Exec=pkg-magic "%u" "-t" "-g" "png"
 
 [Desktop Action revdep]
-Name=Generate reverse dependency graph
+Name=Dependency graph reverse
 Icon=office-chart-polar-stacked
 Exec=pkg-magic "%u" "-t" "-gr" "png"
 
 [Desktop Action nodup]
-Name=Generate no duplicates dependency graph
+Name=Dependency graph no duplicates
 Icon=office-chart-area-focus-peak-node
 Exec=pkg-magic "%u" "-t" "-glu" "png"
 
 [Desktop Action dep_sync]
-Name=Generate dependency graph (sync DBs)
+Name=Dependency graph (sync DBs)
 Icon=office-chart-polar
 Exec=pkg-magic "%u" "-t" "-gs" "png"
 
 [Desktop Action revdep_sync]
-Name=Generate reverse dependency graph (sync DBs)
+Name=Dependency graph reverse (sync DBs)
 Icon=office-chart-polar-stacked
 Exec=pkg-magic "%u" "-t" "-grs" "png"
 
 [Desktop Action nodup_sync]
-Name=Generate no duplicates dependency graph (sync DBs)
+Name=Dependency graph no duplicates (sync DBs)
 Icon=office-chart-area-focus-peak-node
 Exec=pkg-magic "%u" "-t" "-glus" "png"
