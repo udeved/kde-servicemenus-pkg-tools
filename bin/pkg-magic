@@ -309,21 +309,21 @@ get_repos() {
 
 ##########################Actions#####################################
 
-repo_action(){
-	local list=( $(selected_files) )
- 	local progress=$(progressbar ${#list[@]})
- 	
-	for (( i=0; i<${#list[@]}; ++i));do
-		pg_value "${progress}" $i
-		pg_label "${progress}" "${list[$i]}"
-		sleep 0.2
-	done
-	#cd $EXEC_DIR
-	#eval $1
-	$1
-	pg_close "${progress}"
-	
-}
+# repo_action(){
+# 	local list=( $(selected_files) )
+#  	local progress=$(progressbar ${#list[@]})
+#
+# 	for (( i=0; i<${#list[@]}; ++i));do
+# 		pg_value "${progress}" $i
+# 		pg_label "${progress}" "${list[$i]}"
+# 		sleep 0.2
+# 	done
+# 	#cd $EXEC_DIR
+# 	#eval $1
+# 	$1
+# 	pg_close "${progress}"
+#
+# }
 
 write_image(){
 	local fn dotfile progress=$(progressbar 3)
@@ -392,6 +392,8 @@ run_in_konsole(){
 	konsole --noclose --hide-menubar --workdir "${EXEC_DIR}" -e $SHELL -c "$1"
 }
 
+
+
 cmd_gen(){
 	declare -A bin
 	bin[-m]=makepkg
@@ -405,11 +407,17 @@ cmd_gen(){
 	bin[-o]=pacman-optimize
 	bin[-p]=pacman
 
-	local cmd opts ext="tar.xz" is_su=0 repo_dir
+	local cmd opts ext="tar.xz" is_su=0
 	case ${ACTION} in
 		"-a" | "-r")
-			repo_dir=$(basename ${EXEC_DIR})
-			opts="${repo_dir}.${OPTS}.${ext} $(selected_files)"
+			REPO_DIR=$(basename ${EXEC_DIR})
+			if [[ ${REPO_DIR} == "i686" ]] || [[ ${REPO_DIR} == "x86_64" ]];then
+				REPO=$(basename $(dirname ${EXEC_DIR}))
+				opts="${EXEC_DIR}/${REPO}.${OPTS}.${ext} $(selected_files)"
+			else
+				REPO_DIR=$(basename ${EXEC_DIR})
+				opts="${REPO_DIR}.${OPTS}.${ext} $(selected_files)"
+			fi
 		;;
 		"-m")
 			if (( ${IS_LOG} ));then
@@ -502,7 +510,7 @@ if [[ ! -f ${CONFIG} ]];then
 else
 	. ${CONFIG}
 fi
-
+REPO_DIR=""
 
 case ${ACTION} in
 	"-u" | "-c")
@@ -528,12 +536,7 @@ case ${ACTION} in
 				run_in_konsole "$(cmd_gen)"
 			;;
 		esac
-	;;	
-# 	"-a" | "-r")
-# 		cd $EXEC_DIR
-# 		#repo_action $(cmd_gen)
-# 		cmd_out "$(cmd_gen)" > $HOME/projects/kde-servicemenus-pkg-tools/pt.log 2>&1
-# 	;;
+	;;
  	*)
 		run_in_konsole "$(cmd_gen)"
 	;;
