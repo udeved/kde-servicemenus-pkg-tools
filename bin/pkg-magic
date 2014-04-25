@@ -175,10 +175,6 @@ progressbar(){
 	kdialog --title "Progress" --progressbar "Intitializing" $1
 }
 
-dirbox(){
-	kdialog --title "Select a folder for generated graphs" --getexistingdirectory $HOME
-}
-
 repobox(){
 	local item switch=off repo=( ${REPOS} )
 		for (( i=0; i<${#repo[@]}; ++i));do
@@ -276,15 +272,6 @@ get_link(){
 	echo ${html}
 }
 
-get_image(){
-	local html='<p><img src="'"$1"'" alt="dependency graph"></p>'
-	echo ${html}
-}
-
-imgbox(){
-	kdialog --title "Imageviewer" --msgbox "$1"
-}
-
 get_repos() {
 	local section repo
 	while read line; do
@@ -362,7 +349,7 @@ configure(){
 }
 
 upload(){
-	local session="$(get_session)" submit sid url="${URL}/submit/" cat
+	local session="$(get_session)" submit sid url="${URL}/submit/" cat pkg_url
 
 	cat=$(catbox)
 	if [[ ! -z ${session} ]];then
@@ -378,10 +365,10 @@ upload(){
 		sleep 0.25
 		pg_value "${progress}" 3
 		pg_label "${progress}" 'Getting pkg url'
-		PKG_URL="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
+		pkg_url="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 		sleep 0.25
 		pg_close "${progress}"
-		popup "$(get_link ${PKG_URL})"
+		popup "$(get_link ${pkg_url})"
 	else
 		popup "No session registered."
 		exit 1
@@ -391,8 +378,6 @@ upload(){
 run_in_konsole(){
 	konsole --noclose --hide-menubar --workdir "${EXEC_DIR}" -e $SHELL -c "$1"
 }
-
-
 
 cmd_gen(){
 	declare -A bin
@@ -410,14 +395,17 @@ cmd_gen(){
 	local cmd opts ext="tar.xz" is_su=0
 	case ${ACTION} in
 		"-a" | "-r")
-			REPO_DIR=$(basename ${EXEC_DIR})
-			if [[ ${REPO_DIR} == "i686" ]] || [[ ${REPO_DIR} == "x86_64" ]] || [[ ${REPO_DIR} == "any" ]];then
-				REPO=$(basename $(dirname ${EXEC_DIR}))
-				opts="${EXEC_DIR}/${REPO}.${OPTS}.${ext} $(selected_files)"
-			else
-				REPO_DIR=$(basename ${EXEC_DIR})
-				opts="${REPO_DIR}.${OPTS}.${ext} $(selected_files)"
-			fi
+			local repo_dir=$(basename ${EXEC_DIR})
+			case ${repo_dir} in
+				"i686" | "x86_64" | "any")
+					local repo=$(basename $(dirname ${EXEC_DIR}))
+					opts="${EXEC_DIR}/${repo}.${OPTS}.${ext} $(selected_files)"
+				;;
+				*)
+					repo_dir=$(basename ${EXEC_DIR})
+					opts="${repo_dir}.${OPTS}.${ext} $(selected_files)"
+				;;
+			esac
 		;;
 		"-m")
 			if (( ${IS_LOG} ));then
@@ -490,12 +478,8 @@ IMG_DIR=${XDG_PICTURES_DIR:-~/pactree_graphs}
 EXEC_DIR="${HOME}"
 PAC_CONF=/etc/pacman.conf
 IS_LOG=0
-
 CONFIG=${CONFIG_DIR}/pkg-tools.conf
-
 URL="https://aur.archlinux.org"
-PKG_URL=""
-
 REPOS=$(get_repos)
 
 for u in  ${URI[*]};do
@@ -510,7 +494,6 @@ if [[ ! -f ${CONFIG} ]];then
 else
 	. ${CONFIG}
 fi
-REPO_DIR=""
 
 case ${ACTION} in
 	"-u" | "-c")
