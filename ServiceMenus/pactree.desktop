@@ -35,6 +35,6 @@ Icon=zoom-previous
 Exec=pkg-magic "%u" "-t" "-crs"
 
 [Desktop Action nodup_sync]
-Name=Show dependencies with no duplicates
+Name=Show dependencies no duplicates (sync DBs)
 Icon=zoom-select
 Exec=pkg-magic "%u" "-t" "-clus"
