@@ -411,7 +411,7 @@ cmd_gen(){
 	case ${ACTION} in
 		"-a" | "-r")
 			REPO_DIR=$(basename ${EXEC_DIR})
-			if [[ ${REPO_DIR} == "i686" ]] || [[ ${REPO_DIR} == "x86_64" ]];then
+			if [[ ${REPO_DIR} == "i686" ]] || [[ ${REPO_DIR} == "x86_64" ]] || [[ ${REPO_DIR} == "any" ]];then
 				REPO=$(basename $(dirname ${EXEC_DIR}))
 				opts="${EXEC_DIR}/${REPO}.${OPTS}.${ext} $(selected_files)"
 			else
