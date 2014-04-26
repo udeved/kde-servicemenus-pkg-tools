@@ -40,9 +40,9 @@ Icon=run-build-install
 Exec=pkg-magic "%u" "-m" "-sri"
 
 [Desktop Action mk_clean]
-Name=Clean workdir
+Name=Make package & clean
 Icon=run-build-clean
-Exec=pkg-magic "%u" "-m" "-c"
+Exec=pkg-magic "%u" "-m" "-src"
 
 [Desktop Action mk_repack]
 Name=Repackage without building
