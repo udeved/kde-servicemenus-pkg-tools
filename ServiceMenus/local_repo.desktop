@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=inode/directory;
+Actions=mk_repo;_SEPARATOR_;
+
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+X-KDE-Submenu=Repo
+
+# Usage: pkg-magic $uri $action $args $opts
+
+[Desktop Action mk_repo]
+Name=Create local repo structure
+Icon=tools-wizard
+Exec=pkg-magic "%u" "-x"

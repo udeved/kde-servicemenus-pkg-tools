@@ -2,7 +2,7 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-xz-pkg;
-Actions=add;remove;_SEPARATOR_;add_signed;remove_signed;_SEPARATOR_;add_files;remove_files;
+Actions=add;remove;_SEPARATOR_;add_signed;remove_signed;_SEPARATOR_;add_files;remove_files;_SEPARATOR_;mk_repo;mk_repo_signed;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Repo
@@ -38,3 +38,13 @@ Exec=pkg-magic "%U" "-a" "-f" "files"
 Name=Remove selected  (files)
 Icon=list-remove
 Exec=pkg-magic "%U" "-r" "-f" "files"
+
+[Desktop Action mk_repo]
+Name=Create local repo
+Icon=folder-new
+Exec=pkg-magic "%U" "-x" "" "db"
+
+[Desktop Action mk_repo_signed]
+Name=Create local repo signed
+Icon=folder-new
+Exec=pkg-magic "%U" "-x" "-s" "db"

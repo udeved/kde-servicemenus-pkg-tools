@@ -15,11 +15,17 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
 #
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ##########################KDIALOG##################################
 
 userbox(){
 	kdialog --title "AUR login" --inputbox "Enter username:"
+}
+
+namebox(){
+	kdialog --title "Local repo" --inputbox "Enter name:"
 }
 
 pwdbox(){
@@ -405,21 +411,31 @@ cmd_gen(){
 	bin[-u]=upload
 	bin[-o]=pacman-optimize
 	bin[-p]=pacman
+	bin[-x]=repo-add
 
 	local cmd opts ext="tar.xz" is_su=0
 	case ${ACTION} in
-		"-a" | "-r")
-			local repo_dir=$(basename ${EXEC_DIR})
-			case ${repo_dir} in
-				"i686" | "x86_64" | "any")
-					local repo=$(basename $(dirname ${EXEC_DIR}))
-					opts="${EXEC_DIR}/${repo}.${OPTS}.${ext} $(selected_files)"
-				;;
-				*)
-					repo_dir=$(basename ${EXEC_DIR})
-					opts="${repo_dir}.${OPTS}.${ext} $(selected_files)"
-				;;
-			esac
+		"-a" | "-r" | "-x")
+			if [[ ${ACTION} == "-x" ]];then
+				local repo_name=$(namebox) arch=$(uname -m)
+				mkdir -p ${EXEC_DIR}/${repo_name}/${arch}
+				for f in $(selected_files);do
+					ln -s ${EXEC_DIR}/${f} ${EXEC_DIR}/${repo_name}/${arch}/${f}
+				done
+				opts="${EXEC_DIR}/${repo_name}/$arch/${repo_name}.${OPTS}.${ext} $(selected_files)"
+			else
+				local repo_dir=$(basename ${EXEC_DIR})
+				case ${repo_dir} in
+					"i686" | "x86_64" | "any")
+						local repo=$(basename $(dirname ${EXEC_DIR}))
+						opts="${EXEC_DIR}/${repo}.${OPTS}.${ext} $(selected_files)"
+					;;
+					*)
+						repo_dir=$(basename ${EXEC_DIR})
+						opts="${repo_dir}.${OPTS}.${ext} $(selected_files)"
+					;;
+				esac
+			fi
 		;;
 		"-m")
 			if (( ${IS_LOG} ));then
@@ -526,8 +542,7 @@ case ${ACTION} in
 	"-m")
 		case $ARGS in
 			"-g")
-				cd ${EXEC_DIR}
-				$(cmd_gen) >> $(basename ${URI})
+				run_in_konsole "$(cmd_gen) >> $(basename ${URI})"
 			;;
 			*)
 				run_in_konsole "$(cmd_gen)"
