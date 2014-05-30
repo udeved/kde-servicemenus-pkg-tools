@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/x-pkgbuild;
+Actions=mk_aur;_SEPARATOR_;
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+X-KDE-Submenu=Pkg-tools
+
+# Usage: pkg-magic $uri $action $args $opts
+
+[Desktop Action mk_aur]
+Name=Make aurball
+Icon=run-build-file
+Exec=pkg-magic "%u" "-M" ""

@@ -197,7 +197,7 @@ progressbar(){
 
 repobox(){
 	local item switch=off repo=( ${REPOS} )
-		for (( i=0; i<${#repo[@]}; ++i));do
+	for (( i=0; i<${#repo[@]}; ++i));do
 		item[$i]="$i ${repo[$i]} ${switch}"
 	done
 	local select
@@ -412,6 +412,7 @@ cmd_gen(){
 	bin[-o]=pacman-optimize
 	bin[-p]=pacman
 	bin[-x]=repo-add
+	bin[-M]=mkaurball
 
 	local cmd opts ext="tar.xz" is_su=0
 	case ${ACTION} in
@@ -448,6 +449,9 @@ cmd_gen(){
 			if [[ ${OPTS} == "--pkg" ]];then
 				opts="${OPTS} $(pkgbox)"
 			fi
+		;;
+		"-M")
+		  ARGS=${ARGS}
 		;;
 		"-t")
 			opts=$(pkgname)
