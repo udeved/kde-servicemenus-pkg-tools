@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 #
 #
 #   pkg-magic - controlling script for kde-servicemenus-pkg-tools
@@ -18,542 +18,80 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-##########################KDIALOG##################################
+shopt -s nullglob
 
-userbox(){
-	kdialog --title "AUR login" --inputbox "Enter username:"
-}
 
-namebox(){
-	kdialog --title "Local repo" --inputbox "Enter name:"
-}
+ACTION='A:n:m:af:rf'
+uri=
 
-pwdbox(){
-	kdialog --title "AUR login" --password "Enter password:"
-}
+is_makepkg=false
+is_repo_add=false
+is_repo_remove=false
+is_files=false
+dbtype='db'
+repo_param=''
+is_namcap=false
+is_aurball=false
 
-catbox(){
-	declare -A item
-	item[any]=0
-	item[daemons]=2
-	item[devel]=3
-	item[editors]=4
-	item[emulators]=5
-	item[games]=6
-	item[gnome]=7
-	item[i18n]=8
-	item[kde]=9
-	item[lib]=10
-	item[modules]=11
-	item[multimedia]=12
-	item[network]=13
-	item[office]=14
-	item[science]=15
-	item[system]=16
-	item[x11]=17
-	item[xfce]=18
-	item[kernels]=19
-	local select=$(kdialog --title "Categories" --combobox "Select category"  "${!item[@]}")
-	if [[ ! -z $select ]];then
-		echo ${item[$select]}
-	else
-		popup "Pkg-tools" "AUR upload aborted. No category selected"
-		exit 1
-	fi
-}
-
-popup(){
-	kdialog --title "Pkg-tools" --passivepopup "$1"  10
-}
-
-ask_config_overwrite(){
-	kdialog --title "Warning" --warningcontinuecancel "${CONFIG} already exists. Overwrite?"
-	local flag=$?
-	if [ ${flag} -eq 0 ];then
-		config_wizzard
-	else
-		exit 1
-	fi
-}
-
-config_wizzard(){
-	local user pwd is_log
-	user=$(userbox)
-	pwd=$(pwdbox)
-	is_log=$(echo $(logbox))
-	if [[ -z ${user} ]] && [[ -z ${pwd} ]] && [[ -z ${is_log} ]];then
-		popup "No config created."
-		exit
-	else
-		new_config
-		config_writer "USR=${user}"
-		config_writer "PWD=${pwd}"
-		config_writer "IS_LOG=${is_log}"
-		popup "${CONFIG} created."
-	fi
-}
-
-pkgbox(){
-	source ${URI}
-	local i=0 item name switch=off
-	if [[ ! -z ${pkgbase} ]];then
-		for n in ${pkgname[*]};do
-			item[$i]="$i $n $switch"
-			name[$i]="$n"
-			i=$((i+1))
-		done
-	fi
-	local select=$(kdialog --title "Split package" --checklist "Select packages:" ${item[@]})
-	local list c='\"'
-	for s in ${select};do
-		list="${list:-}${list:+,}${name[${s//$c/}]}"
-	done
-	echo ${list}
-}
-
-rulesbox(){
-	declare -A rule
-	rule[0]=anyelf
-	rule[1]=array
-	rule[2]=badbackups
-	rule[3]=capsnamespkg
-	rule[4]=carch
-	rule[5]=checksums
-	rule[6]=directoryname
-	rule[7]=elfexecstack
-	rule[8]=elfpaths
-	rule[9]=elftextrel
-	rule[10]=emptydir
-	rule[11]=extravars
-	rule[12]=fhs-infopages
-	rule[13]=fhs-manpages
-	rule[14]=filenames
-	rule[15]=fileownership
-	rule[16]=giomodules
-	rule[17]=glibschemas
-	rule[18]=gnomemime
-	rule[19]=hardlinks
-	rule[20]=hicoloricons
-	rule[21]=infodirectory
-	rule[22]=infoinstall
-	rule[23]=invalidstartdir
-	rule[24]=javafiles
-	rule[25]=kdeprograms
-	rule[26]=libtool
-	rule[27]=license
-	rule[28]=licensepkg
-	rule[29]=lots-of-docs
-	rule[30]=mimedesktop
-	rule[31]=mimefiles
-	rule[32]=missingbackups
-	rule[33]=perllocal
-	rule[34]=permissions
-	rule[35]=pkgnameindesc
-	rule[36]=rpath
-	rule[37]=rubypaths
-	rule[38]=scrollkeeper
-	rule[39]=sfurl
-	rule[40]=shebangdepends
-	rule[41]=sodepends
-	rule[42]=splitpkgfunctions
-	rule[43]=splitpkgmakedeps
-	rule[44]=symlink
-	rule[45]=tags
-	rule[46]=urlpkg
-	local item switch=off
-	for (( i=0; i<${#rule[@]}; ++i));do
-		item[$i]="$i ${rule[$i]} ${switch}"
-	done
-	local select=$(kdialog --title "namcap rules" --checklist "Select rules:" ${item[@]})
-	local list c='\"'
-	for s in ${select};do
-		list="${list:-}${list:+,}${rule[${s//$c/}]}"
-	done
-	echo ${list}
-}
-
-optlist(){
-	declare -A param
-	param[0]=binaries
-	param[1]=directories
-	param[2]=glob
-	param[3]=ignorecase
-	param[4]=regex
-	local item switch=off
-	for (( i=0; i<${#param[@]}; ++i));do
-		item[$i]="$i ${param[$i]} ${switch}"
-	done
-	local select=$(kdialog --title "pkgfile" --radiolist "Select option:" ${item[@]})
-	echo "--${param[${select}]}"
-}
-
-optbox(){
-	kdialog --title "Parameters" --inputbox "Enter pkgname and/or arg:"
-}
-
-progressbar(){
-	kdialog --title "Progress" --progressbar "Intitializing" $1
-}
-
-repobox(){
-	local item switch=off repo=( ${REPOS} )
-	for (( i=0; i<${#repo[@]}; ++i));do
-		item[$i]="$i ${repo[$i]} ${switch}"
-	done
-	local select
-	select=$(kdialog --title "Repos" --radiolist "Select repo:" ${item[@]})
-	echo ${repo[${select}]}
-}
-
-logbox(){
-	kdialog --title "Makepkg options" --yesno "enable logging?"
-	local flag=$?
-	if [ ${flag} -eq 0 ];then
-		echo 1
-	else
-		echo 0
-	fi
-}
-
-##########################LIB######################################
-
-config_writer(){
-	echo $1 >> "${CONFIG}"
-}
-
-new_config(){
-	echo -n > ${CONFIG}
-}
-
-pg_label(){
-	qdbus $1 setLabelText "$2"
-}
-
-pg_value(){
-	qdbus $1 Set "" value $2
-}
-
-pg_close(){
-	qdbus $1 close
-}
-
-truncate(){
-	local fn=$1
-	echo ${fn%%-[0-9]*}
-}
-
-get_session(){
-	local user pwd  url="${URL}/login/" login session progress
-	progress=$(progressbar 4)
-	pg_value "${progress}" 1
-	pg_label "${progress}" 'Getting AUR user'
-	user=${USR}
-	sleep 0.25
-	pg_value "${progress}" 2
-	pg_label "${progress}" 'Getting AUR password'
-	pwd=${PWD}
-	sleep 0.25
-	pg_value "${progress}" 3
-	pg_label "${progress}" 'Logging in'
-	login=$(curl -sSi -F user=${user} -F passwd=${pwd} -H 'Expect: ' ${url})
-	sleep 0.25
-	pg_value "${progress}" 4
-	pg_label "${progress}" 'Getting session'
-	session=$(echo "${login}" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
-	sleep 0.25
-	pg_close "${progress}"
-	echo ${session}
-}
-
-selected_files(){
-	local fn rfn list
-	for i in ${URI[*]};do
-		fn=$(basename $i)
-		if [[ ${ACTION} == "-r" ]];then
-			rfn=$(truncate $fn)
-			list="${list:-}${list:+ }${rfn}"
-		else
-			list="${list:-}${list:+ }${fn}"
-		fi
-	done
-	echo ${list}
-}
-
-pkgname(){
-	echo $(truncate $(basename ${URI}))
-}
-
-cmd_out(){
-	echo $(eval $1)
-}
-
-get_link(){
-	local html='<a href="'"$1"'">'"$1"'</a>'
-	echo ${html}
-}
-
-get_repos() {
-	local section repo
-	while read line; do
-	local filter='^\ {0,}#'
-		[[ $line =~ "${filter}" ]] && continue
-		[[ -z "$line" ]] && continue
-		if [[ $line =~ ^\[.*?\] ]]; then
-			line=${line:1:$((${#line}-2))}
-			section=${line// /}
-			case ${section} in
-				"options")
-					continue
-				;;
-				*)
-					repo=${repo:-}${repo:+ }${section}
-				;;
-			esac
-		fi
-	done < "${PAC_CONF}"
-	echo ${repo}
-}
-
-##########################Actions#####################################
-
-# repo_action(){
-# 	local list=( $(selected_files) )
-#  	local progress=$(progressbar ${#list[@]})
-#
-# 	for (( i=0; i<${#list[@]}; ++i));do
-# 		pg_value "${progress}" $i
-# 		pg_label "${progress}" "${list[$i]}"
-# 		sleep 0.2
-# 	done
-# 	#cd $EXEC_DIR
-# 	#eval $1
-# 	$1
-# 	pg_close "${progress}"
-#
-# }
-
-write_image(){
-	local fn dotfile progress=$(progressbar 3)
-	pg_value "${progress}" 1
-	pg_label "${progress}" 'Setting filename'
-	case ${ARGS} in
-		"-g" | "-gs")
-			fn="${IMG_DIR}/$(pkgname)_deps.${OPTS}"
-		;;
-		"-gr" | "-grs")
-			fn="${IMG_DIR}/$(pkgname)_revdeps.${OPTS}"
-		;;
-		"-glu" | "-glus")
-			fn="${IMG_DIR}/$(pkgname)_nodup.${OPTS}"
-		;;
-	esac
-	sleep 0.5
-	pg_value "${progress}" 2
-	pg_label "${progress}" 'Getting dot description'
-	dotfile=$(cmd_out "$1")
-	sleep 0.5
-	pg_value "${progress}" 3
-	pg_label "${progress}" 'Generating image'
-	echo  "$dotfile" | dot -T ${OPTS} > "${fn}"
-	sleep 1
-	pg_close "${progress}"
-	popup "$(get_link "${fn}")"
-}
-
-configure(){
-	if [[ ! -f "${CONFIG}" ]]; then
-		config_wizzard
-	else
-		ask_config_overwrite
-	fi
-}
-
-upload(){
-	local session="$(get_session)" submit sid url="${URL}/submit/" cat pkg_url
-
-	cat=$(catbox)
-	if [[ ! -z ${session} ]];then
-		progress=$(progressbar 3)
-		pg_value "${progress}" 1
-		pg_label "${progress}" 'Setting session ID'
-		submit=$(curl -sSi -H 'Expect: ' -b ${session} ${url})
-		sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-		sleep 0.25
-		pg_value "${progress}" 2
-		pg_label "${progress}" 'Submitting'
-		submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${URI} -b ${session} ${url} | tr -d '\r')
-		sleep 0.25
-		pg_value "${progress}" 3
-		pg_label "${progress}" 'Getting pkg url'
-		pkg_url="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
-		sleep 0.25
-		pg_close "${progress}"
-		popup "$(get_link ${pkg_url})"
-	else
-		popup "No session registered."
-		exit 1
-	fi
-}
-
-run_in_konsole(){
-	konsole --noclose --hide-menubar --workdir "${EXEC_DIR}" -e $SHELL -c "$1"
-}
-
-cmd_gen(){
-	declare -A bin
-	bin[-m]=makepkg
-	bin[-n]=namcap
-	bin[-a]=repo-add
-	bin[-r]=repo-remove
-	bin[-t]=pactree
-	bin[-f]=pkgfile
-	bin[-c]=configure
-	bin[-u]=upload
-	bin[-o]=pacman-optimize
-	bin[-p]=pacman
-	bin[-x]=repo-add
-	bin[-M]=mkaurball
-
-	local cmd opts ext="tar.xz" is_su=0
-	case ${ACTION} in
-		"-a" | "-r" | "-x")
-			if [[ ${ACTION} == "-x" ]];then
-				local repo_name=$(namebox) arch=$(uname -m)
-				mkdir -p ${EXEC_DIR}/${repo_name}/${arch}
-				for f in $(selected_files);do
-					ln -s ${EXEC_DIR}/${f} ${EXEC_DIR}/${repo_name}/${arch}/${f}
-				done
-				opts="${EXEC_DIR}/${repo_name}/$arch/${repo_name}.${OPTS}.${ext} $(selected_files)"
-			else
-				local repo_dir=$(basename ${EXEC_DIR})
-				case ${repo_dir} in
-					"i686" | "x86_64" | "any")
-						local repo=$(basename $(dirname ${EXEC_DIR}))
-						opts="${EXEC_DIR}/${repo}.${OPTS}.${ext} $(selected_files)"
-					;;
-					*)
-						repo_dir=$(basename ${EXEC_DIR})
-						opts="${repo_dir}.${OPTS}.${ext} $(selected_files)"
-					;;
-				esac
-			fi
-		;;
-		"-m")
-			if (( ${IS_LOG} ));then
-				if [[ ${ARGS} == "-g" ]];then
-					ARGS=${ARGS}
-				else
-					ARGS=${ARGS}"L"
-				fi
-			fi
-			if [[ ${OPTS} == "--pkg" ]];then
-				opts="${OPTS} $(pkgbox)"
-			fi
-		;;
-		"-M")
-		  ARGS=${ARGS}
-		;;
-		"-t")
-			opts=$(pkgname)
-		;;
-		"-n")
-			case ${ARGS} in
-				"-r" | "-e")
-					opts="$(rulesbox) ${URI}"
-				;;
-				*)
-					opts=${URI}
-				;;
-			esac
-		;;
-		"-f")
-			case ${ARGS} in
-				"-uz")
-					is_su=1
-					opts=${OPTS}
-				;;
-				"-s")
-					opts=$(optbox)
-				;;
-				"-sR")
-					opts="$(repobox) $(optbox)"
-				;;
-				"-l")
-					opts=$(pkgname)
-				;;
-				*)
-					opts="$(optlist) $(optbox)"
-				;;
- 			esac
-		;;
-		"-o" | "-p")
-			is_su=1
-		;;
-	esac
-	if (( ${is_su} ));then
-		cmd="sudo ${bin[${ACTION}]} ${ARGS} ${opts}"
-	else
-		cmd="${bin[${ACTION}]} ${ARGS} ${opts}"
-	fi
-	echo ${cmd}
-}
-
-##########################MAIN#####################################
-
-URI=$1
-ACTION=$2
-ARGS=$3
-OPTS=$4
-
-[[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]] && . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
-
-CONFIG_DIR=${XDG_CONFIG_HOME:-~/.config}
-IMG_DIR=${XDG_PICTURES_DIR:-~/pactree_graphs}
-EXEC_DIR="${HOME}"
-PAC_CONF=/etc/pacman.conf
-IS_LOG=0
-CONFIG=${CONFIG_DIR}/pkg-tools.conf
-URL="https://aur.archlinux.org"
-REPOS=$(get_repos)
-
-for u in  ${URI[*]};do
-	EXEC_DIR=$(dirname $u)
+while getopts "$ACTION" arg;do
+    case ${arg} in
+	m)
+	    is_makepkg=true
+	;;
+	a)
+	    is_repo_add=true
+	;;
+	r)
+	    is_repo_remove=true
+	;;
+	f)
+	    is_files=true
+	    dbtype=files
+	    repo_param='-f'
+	;;
+	n)
+	    is_namcap=true
+	    uri="${OPTARG}"
+	;;
+	A)
+	    is_aurball=true
+	;;
+    esac
 done
 
-[[ ! -d ${IMG_DIR} ]] && mkdir -p ${IMG_DIR}
+OPTS=("${*:$OPTIND}")
 
-if [[ ! -f ${CONFIG} ]];then
-	popup "Starting config wizzard" && config_wizzard
-	. ${CONFIG}
-else
-	. ${CONFIG}
+if ${is_makepkg}; then
+    cmd="makepkg $OPTS"
+    konsole --noclose --hide-menubar --workdir "$(pwd)" -e $SHELL -c "$cmd"
 fi
 
-case ${ACTION} in
-	"-u" | "-c")
-		$(cmd_gen)
-	;;
-	"-t")
-		case $ARGS in
-			"-g" | "-gr" | "-gs" | "-grs" | "-glu" | "-glus")
-				write_image "$(cmd_gen)"
-			;;
-			*)
-				run_in_konsole "$(cmd_gen)"
-			;;
-		esac
-	;;
-	"-m")
-		case $ARGS in
-			"-g")
-				run_in_konsole "$(cmd_gen) >> $(basename ${URI})"
-			;;
-			*)
-				run_in_konsole "$(cmd_gen)"
-			;;
-		esac
-	;;
- 	*)
-		run_in_konsole "$(cmd_gen)"
-	;;
-esac
+if ${is_aurball}; then
+    cmd="mkaurball"
+    konsole --noclose --hide-menubar --workdir "$(pwd)" -e $SHELL -c "$cmd"
+fi
+
+if ${is_repo_add};then
+    repo=$(pwd)
+    name=${repo##*/}
+    cmd="repo-add $repo_param $repo/$name.$dbtype.tar.xz $OPTS"
+    konsole --noclose --hide-menubar --workdir "$repo" -e $SHELL -c "$cmd"
+fi
+
+if ${is_repo_remove};then
+    repo=$(pwd)
+    name=${repo##*/}
+    selected=( $OPTS )
+    for u in ${selected[@]};do
+	temp=${u##*/}
+	pn=${temp%%-[0-9]*}
+	list+=($pn)
+    done
+    cmd="repo-remove $repo_param $repo/$name.$dbtype.tar.xz ${list[@]}"
+    konsole --noclose --hide-menubar --workdir "$repo" -e $SHELL -c "$cmd"
+fi
+
+if ${is_namcap}; then
+    cmd="namcap $OPTS $uri"
+    konsole --noclose --hide-menubar --workdir "$repo" -e $SHELL -c "$cmd"
+fi

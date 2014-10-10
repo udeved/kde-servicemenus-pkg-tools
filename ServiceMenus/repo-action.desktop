@@ -1,50 +1,19 @@
-[Desktop Entry]
-Type=Service
-ServiceTypes=KonqPopupMenu/Plugin
-MimeType=application/x-xz-pkg;
-Actions=add;remove;_SEPARATOR_;add_signed;remove_signed;_SEPARATOR_;add_files;remove_files;_SEPARATOR_;mk_repo;mk_repo_signed;
-X-KDE-Priority=TopLevel
-X-KDE-StartupNotify=false
-X-KDE-Submenu=Repo
-
-# Usage: pkg-magic $uri $action $args $opts
-
 [Desktop Action add]
 Name=Add selected (db)
 Icon=list-add
-Exec=pkg-magic "%U" "-a" "" "db"
+Exec=pkg-magic "-a" "%U"
 
 [Desktop Action remove]
 Name=Remove selected (db)
 Icon=list-remove
-Exec=pkg-magic "%U" "-r" "" "db"
-
-[Desktop Action add_signed]
-Name=Add selected (signed db)
-Icon=list-add
-Exec=pkg-magic "%U" "-a" "-s" "db"
-
-[Desktop Action remove_signed]
-Name=Remove selected (signed db)
-Icon=list-remove
-Exec=pkg-magic "%U" "-r" "-s" "db"
+Exec=pkg-magic "-r" "%U"
 
 [Desktop Action add_files]
 Name=Add selected (files)
 Icon=list-add
-Exec=pkg-magic "%U" "-a" "-f" "files"
+Exec=pkg-magic "-af" "%U"
 
 [Desktop Action remove_files]
 Name=Remove selected  (files)
 Icon=list-remove
-Exec=pkg-magic "%U" "-r" "-f" "files"
-
-[Desktop Action mk_repo]
-Name=Create local repo
-Icon=folder-new
-Exec=pkg-magic "%U" "-x" "" "db"
-
-[Desktop Action mk_repo_signed]
-Name=Create local repo signed
-Icon=folder-new
-Exec=pkg-magic "%U" "-x" "-s" "db"
+Exec=pkg-magic "-rf" "%U"

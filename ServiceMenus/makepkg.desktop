@@ -2,64 +2,52 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-pkgbuild;
-Actions=mk_md5;_SEPARATOR_;mk;mk_nodeps;mk_sign;mk_src;_SEPARATOR_;mk_install;_SEPARATOR_;mk_repack;mk_nobuild;_SEPARATOR_;mk_clean;_SEPARATOR_;mk_selected;mk_selected_sign;
+Actions=mk_md5;_SEPARATOR_;mk;mk_nodeps;mk_sign;mk_src;_SEPARATOR_;mk_install;_SEPARATOR_;mk_repack;mk_nobuild;_SEPARATOR_;mk_clean
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
-# Usage: pkg-magic $uri $action $args $opts
-
 [Desktop Action mk_md5]
 Name=Add checksum
 Icon=run-build-configure
-Exec=pkg-magic "%u" "-m" "-g"
+Exec=pkg-magic "-m" -- "-g >> %u"
 
 [Desktop Action mk]
 Name=Make package
 Icon=run-build
-Exec=pkg-magic "%u" "-m" "-sr"
+Exec=pkg-magic "-m" -- "-sr"
 
 [Desktop Action mk_nodeps]
 Name=Make package ignore deps
 Icon=debug-run
-Exec=pkg-magic "%u" "-m" "-d"
+Exec=pkg-magic "-m" -- "-d"
 
 [Desktop Action mk_src]
 Name=Make package source
 Icon=run-build-file
-Exec=pkg-magic "%u" "-m" "-S"
+Exec=pkg-magic "-A"
 
 [Desktop Action mk_sign]
 Name=Make package signed
 Icon=view-certificate-sign
-Exec=pkg-magic "%u" "-m" "-sr --sign"
+Exec=pkg-magic "-m" -- "-sr --sign"
 
 [Desktop Action mk_install]
 Name=Make package & install
 Icon=run-build-install
-Exec=pkg-magic "%u" "-m" "-sri"
+Exec=pkg-magic  "-m" -- "-sri"
 
 [Desktop Action mk_clean]
 Name=Make package & clean
 Icon=run-build-clean
-Exec=pkg-magic "%u" "-m" "-src"
+Exec=pkg-magic "-m" -- "-src"
 
 [Desktop Action mk_repack]
 Name=Repackage without building
 Icon=debug-run-cursor
-Exec=pkg-magic "%u" "-m" "-Rf"
+Exec=pkg-magic "-m" -- "-Rf"
 
 [Desktop Action mk_nobuild]
 Name=Get and extract
 Icon=run-build-install-root
-Exec=pkg-magic "%u" "-m" "-o"
-
-[Desktop Action mk_selected]
-Name=Make selected (split package)
-Icon=run-build
-Exec=pkg-magic "%u" "-m" "-sr" "--pkg"
-
-[Desktop Action mk_selected_sign]
-Name=Make signed selected (split package)
-Icon=view-certificate-sign
-Exec=pkg-magic "%u" "-m" "-sr --sign" "--pkg"
+Exec=pkg-magic "-m" -- "-o"
