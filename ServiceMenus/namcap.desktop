@@ -1,13 +1,13 @@
 [Desktop Entry]
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
-MimeType=application/x-pkgbuild;
-Actions=mk_aur
+MimeType=application/x-xz-pkg;application/x-pkgbuild;
+Actions=check;check_info;_SEPARATOR_;check_rules;check_rule_ex;_SEPARATOR_;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
-[Desktop Action mk_aur]
-Name=Make aurball
-Icon=run-build-file
-Exec=pkg-magic "-A"
+[Desktop Action check]
+Name=Check
+Icon=kbugbuster
+Exec=pkg-magic "-n" "%u" -- "-i"

@@ -21,7 +21,7 @@
 shopt -s nullglob
 
 
-ACTION='A:n:m:af:rf'
+actions='A:n:m:af:rf'
 uri=
 
 is_makepkg=false
@@ -32,8 +32,29 @@ dbtype='db'
 repo_param=''
 is_namcap=false
 is_aurball=false
+cmd=''
+rundir=$(pwd)
 
-while getopts "$ACTION" arg;do
+run(){
+    konsole --noclose --hide-menubar --workdir "$rundir" -e $SHELL -c "$cmd"
+}
+
+add_pkgs(){
+    local name=${rundir##*/}
+    cmd="repo-add ${repo_param} ${rundir}/${name}.${dbtype}.tar.xz $OPTS"
+}
+
+rm_pkgs(){
+    local name=${rundir##*/} selected=( $OPTS ) list=
+    for u in ${selected[@]};do
+	local temp=${u##*/}
+	local pn=${temp%%-[0-9]*}
+	list+=($pn)
+    done
+    cmd="repo-remove ${repo_param} ${rundir}/${name}.${dbtype}.tar.xz ${list[@]}"
+}
+
+while getopts "$actions" arg;do
     case ${arg} in
 	m)
 	    is_makepkg=true
@@ -63,35 +84,14 @@ OPTS=("${*:$OPTIND}")
 
 if ${is_makepkg}; then
     cmd="makepkg $OPTS"
-    konsole --noclose --hide-menubar --workdir "$(pwd)" -e $SHELL -c "$cmd"
-fi
-
-if ${is_aurball}; then
+elif ${is_aurball}; then
     cmd="mkaurball"
-    konsole --noclose --hide-menubar --workdir "$(pwd)" -e $SHELL -c "$cmd"
+elif ${is_repo_add};then
+    add_pkgs
+elif ${is_repo_remove};then
+    rm_pkgs
+elif ${is_namcap}; then
+    cmd="namcap $OPTS ${uri}"
 fi
 
-if ${is_repo_add};then
-    repo=$(pwd)
-    name=${repo##*/}
-    cmd="repo-add $repo_param $repo/$name.$dbtype.tar.xz $OPTS"
-    konsole --noclose --hide-menubar --workdir "$repo" -e $SHELL -c "$cmd"
-fi
-
-if ${is_repo_remove};then
-    repo=$(pwd)
-    name=${repo##*/}
-    selected=( $OPTS )
-    for u in ${selected[@]};do
-	temp=${u##*/}
-	pn=${temp%%-[0-9]*}
-	list+=($pn)
-    done
-    cmd="repo-remove $repo_param $repo/$name.$dbtype.tar.xz ${list[@]}"
-    konsole --noclose --hide-menubar --workdir "$repo" -e $SHELL -c "$cmd"
-fi
-
-if ${is_namcap}; then
-    cmd="namcap $OPTS $uri"
-    konsole --noclose --hide-menubar --workdir "$repo" -e $SHELL -c "$cmd"
-fi
+run

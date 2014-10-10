@@ -10,44 +10,44 @@ X-KDE-Submenu=Pkg-tools
 [Desktop Action mk_md5]
 Name=Add checksum
 Icon=run-build-configure
-Exec=pkg-magic "-m" -- "-g >> %u"
+Exec=pkg-magic "-m" "%u" -- "-g >> %u"
 
 [Desktop Action mk]
 Name=Make package
 Icon=run-build
-Exec=pkg-magic "-m" -- "-sr"
+Exec=pkg-magic "-m" "%u" -- "-sr"
 
 [Desktop Action mk_nodeps]
 Name=Make package ignore deps
 Icon=debug-run
-Exec=pkg-magic "-m" -- "-d"
+Exec=pkg-magic "-m" "%u" -- "-d"
 
 [Desktop Action mk_src]
 Name=Make package source
 Icon=run-build-file
-Exec=pkg-magic "-A"
+Exec=pkg-magic "-A" "%u"
 
 [Desktop Action mk_sign]
 Name=Make package signed
 Icon=view-certificate-sign
-Exec=pkg-magic "-m" -- "-sr --sign"
+Exec=pkg-magic "-m" "%u" -- "-sr --sign"
 
 [Desktop Action mk_install]
 Name=Make package & install
 Icon=run-build-install
-Exec=pkg-magic  "-m" -- "-sri"
+Exec=pkg-magic  "-m" "%u" -- "-sri"
 
 [Desktop Action mk_clean]
 Name=Make package & clean
 Icon=run-build-clean
-Exec=pkg-magic "-m" -- "-src"
+Exec=pkg-magic "-m" "%u" -- "-src"
 
 [Desktop Action mk_repack]
 Name=Repackage without building
 Icon=debug-run-cursor
-Exec=pkg-magic "-m" -- "-Rf"
+Exec=pkg-magic "-m" "%u" -- "-Rf"
 
 [Desktop Action mk_nobuild]
 Name=Get and extract
 Icon=run-build-install-root
-Exec=pkg-magic "-m" -- "-o"
+Exec=pkg-magic "-m" "%u" -- "-o"

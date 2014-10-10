@@ -1,3 +1,12 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/x-xz-pkg;
+Actions=add;remove;_SEPARATOR_;add_files;remove_files;
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+X-KDE-Submenu=Repo
+
 [Desktop Action add]
 Name=Add selected (db)
 Icon=list-add
