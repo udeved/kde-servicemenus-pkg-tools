@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=KonqPopupMenu/Plugin
+MimeType=inode/directory;
+Actions=_SEPARATOR_;configure;
+X-KDE-Priority=TopLevel
+X-KDE-StartupNotify=false
+X-KDE-Submenu=Pkg-tools
+
+[Desktop Action configure]
+Name=Configure pkg-tools
+Icon=tools-wizard
+Exec=pkg-magic "-c" "%u"
