@@ -20,12 +20,50 @@
 
 shopt -s nullglob
 
-run(){
-    konsole --noclose --hide-menubar --workdir "${rundir}" -e $SHELL -c "${cmd}"
+catbox(){
+    declare -A item
+    item[any]=0
+    item[daemons]=2
+    item[devel]=3
+    item[editors]=4
+    item[emulators]=5
+    item[games]=6
+    item[gnome]=7
+    item[i18n]=8
+    item[kde]=9
+    item[lib]=10
+    item[modules]=11
+    item[multimedia]=12
+    item[network]=13
+    item[office]=14
+    item[science]=15
+    item[system]=16
+    item[x11]=17
+    item[xfce]=18
+    item[kernels]=19
+    local select=$(kdialog --title "Categories" --combobox "Select category"  "${!item[@]}")
+    if [[ -n $select ]];then
+	echo ${item[$select]}
+    else
+	popup "Pkg-tools" "AUR upload aborted. No category selected"
+	exit 1
+    fi
+}
+
+userbox(){
+    kdialog --title "AUR login" --inputbox "Enter username:"
+}
+
+pwdbox(){
+    kdialog --title "AUR login" --password "Enter password:"
 }
 
 popup(){
     kdialog --title "Pkg-tools" --passivepopup "$1"  10
+}
+
+run(){
+    konsole --noclose --hide-menubar --workdir "${rundir}" -e $SHELL -c "${cmd}"
 }
 
 get_link(){
@@ -39,88 +77,49 @@ truncate(){
     echo $ret
 }
 
-catbox(){
-	declare -A item
-	item[any]=0
-	item[daemons]=2
-	item[devel]=3
-	item[editors]=4
-	item[emulators]=5
-	item[games]=6
-	item[gnome]=7
-	item[i18n]=8
-	item[kde]=9
-	item[lib]=10
-	item[modules]=11
-	item[multimedia]=12
-	item[network]=13
-	item[office]=14
-	item[science]=15
-	item[system]=16
-	item[x11]=17
-	item[xfce]=18
-	item[kernels]=19
-	local select=$(kdialog --title "Categories" --combobox "Select category"  "${!item[@]}")
-	if [[ -n $select ]];then
-		echo ${item[$select]}
-	else
-		popup "Pkg-tools" "AUR upload aborted. No category selected"
-		exit 1
-	fi
-}
-
-userbox(){
-	kdialog --title "AUR login" --inputbox "Enter username:"
-}
-
-pwdbox(){
-	kdialog --title "AUR login" --password "Enter password:"
-}
-
 configure(){
-	if [[ ! -f "${config}" ]]; then
-		config_wizzard
-	else
-		ask_config_overwrite
-	fi
+    if [[ ! -f "${config}" ]]; then
+	config_wizzard
+    else
+	ask_config_overwrite
+    fi
 }
 
 ask_config_overwrite(){
-	kdialog --title "Warning" --warningcontinuecancel "${config} already exists. Overwrite?"
-	local flag=$?
-	if [ ${flag} -eq 0 ];then
-		config_wizzard
-	else
-		exit 1
-	fi
+    kdialog --title "Warning" --warningcontinuecancel "${config} already exists. Overwrite?"
+    local flag=$?
+    if [ ${flag} -eq 0 ];then
+	config_wizzard
+    else
+	exit 1
+    fi
 }
 
 config_wizzard(){
-	local user pwd is_log
-	user=$(userbox)
-	pwd=$(pwdbox)
-	if [[ -z ${user} ]] && [[ -z ${pwd} ]] && [[ -z ${is_log} ]];then
-		popup "No config created."
-		exit
-	else
-		new_config
-		config_writer "USR=${user}"
-		config_writer "PWD=${pwd}"
-		popup "${config} created."
-	fi
+    local user pwd is_log
+    user=$(userbox)
+    pwd=$(pwdbox)
+    if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
+	popup "No config created."
+	exit
+    else
+	new_config
+	config_writer "USR=${user}"
+	config_writer "PWD=${pwd}"
+	popup "${config} created."
+    fi
 }
 
 config_writer(){
-	echo $1 >> "${config}"
+    echo $1 >> "${config}"
 }
 
 new_config(){
-	echo -n > ${config}
+    echo -n > ${config}
 }
 
 upload(){
     local user pwd login session submit sid cat pkgurl url="https://aur.archlinux.org"
-
     url="${url}/login/"
     user=${USR}
     pwd=${PWD}
@@ -130,14 +129,14 @@ upload(){
     url="${url}/submit/"
     cat=$(catbox)
     if [[ -n ${session} ]];then
-	    submit=$(curl -sSi -H 'Expect: ' -b ${session} ${url})
-	    sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-	    submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${uri} -b ${session} ${url})
-	    pkgurl="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
-	    popup "$(get_link ${pkgurl})"
+	submit=$(curl -sSi -H 'Expect: ' -b ${session} ${url})
+	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
+	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${uri} -b ${session} ${url})
+	pkgurl="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
+	popup "$(get_link ${pkgurl})"
     else
-	    popup "No session registered."
-	    exit 1
+	popup "No session registered."
+	exit 1
     fi
 }
 
@@ -176,7 +175,7 @@ rundir=$(pwd)
 
 actions='c:u:t:A:n:m:af:rf'
 
-while getopts "$actions" arg;do
+while getopts "${actions}" arg;do
     case ${arg} in
 	m)
 	    is_makepkg=true
@@ -216,27 +215,27 @@ done
 OPTS=("${*:$OPTIND}")
 
 if ${is_makepkg}; then
-    cmd="makepkg $OPTS"
+    cmd="makepkg ${OPTS}"
     run
 elif ${is_aurball}; then
-    cmd="mkaurball $OPTS"
+    cmd="mkaurball ${OPTS}"
     run
 elif ${is_namcap}; then
-    cmd="namcap $OPTS ${uri}"
+    cmd="namcap ${OPTS} ${uri}"
     run
 elif ${is_repo_add};then
     name=${rundir##*/}
-    cmd="repo-add ${repo_param} ${rundir}/${name}.${dbtype}.tar.xz $OPTS"
+    cmd="repo-add ${repo_param} ${rundir}/${name}.${dbtype}.tar.xz ${OPTS}"
     run
 elif ${is_repo_remove};then
-    name=${rundir##*/} selected=( $OPTS ) list=
+    name=${rundir##*/} selected=( ${OPTS} ) list=
     for u in ${selected[@]};do
 	list+=($(truncate $u))
     done
     cmd="repo-remove ${repo_param} ${rundir}/${name}.${dbtype}.tar.xz ${list[@]}"
     run
 elif ${is_pactree};then
-    pn=$(truncate $uri)
+    pn=$(truncate ${uri})
     for arg in ${*:$OPTIND};do
 	case ${arg} in
 	    "-g" | "-gs")
@@ -250,7 +249,7 @@ elif ${is_pactree};then
 	    ;;
 	esac
     done
-    echo "$(pactree $OPTS ${pn})" | dot -T png > "${fn}"
+    echo "$(pactree ${OPTS} ${pn})" | dot -T png > "${fn}"
     popup "$(get_link "${fn}")"
 elif ${is_aur}; then
     upload
