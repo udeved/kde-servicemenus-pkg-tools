@@ -96,7 +96,7 @@ ask_config_overwrite(){
 }
 
 config_wizzard(){
-    local user pwd is_log
+    local user pwd
     user=$(userbox)
     pwd=$(pwdbox)
     if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
@@ -125,17 +125,16 @@ upload(){
     pwd=${PWD}
     login=$(curl -sSi -F user=${user} -F passwd=${pwd} -H 'Expect: ' ${url})
     session=$(echo "${login}" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
-
     url="${url}/submit/"
     cat=$(catbox)
     if [[ -n ${session} ]];then
 	submit=$(curl -sSi -H 'Expect: ' -b ${session} ${url})
 	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
 	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${uri} -b ${session} ${url})
-	pkgurl="${URL}"$(echo "${submit}" | awk '/^Location: / {print $2}')
+	pkgurl="${url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 	popup "$(get_link ${pkgurl})"
     else
-	popup "No session registered."
+	popup "No session registered. Wrong user credentials?"
 	exit 1
     fi
 }
@@ -216,7 +215,7 @@ OPTS=("${*:$OPTIND}")
 
 if ${is_makepkg}; then
     if [[ ${OPTS} == "-g" ]];then
-	cmd="makepkg ${OPTS} >> $(basename ${uri})"
+	cmd="makepkg ${OPTS} >> ${uri##*/}"
     else
 	cmd="makepkg ${OPTS}"
     fi

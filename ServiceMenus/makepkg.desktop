@@ -2,7 +2,7 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-pkgbuild;
-Actions=mk_md5;_SEPARATOR_;mk;mk_nodeps;mk_sign;mk_src;_SEPARATOR_;mk_install;_SEPARATOR_;mk_repack;mk_nobuild;_SEPARATOR_;mk_clean
+Actions=mk_md5;_SEPARATOR_;mk;mk_sign;mk_src;_SEPARATOR_;mk_install;_SEPARATOR_;mk_repack;mk_nobuild;mk_nodeps;_SEPARATOR_;mk_clean;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools

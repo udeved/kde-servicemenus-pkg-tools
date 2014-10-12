@@ -2,12 +2,12 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-xz-pkg;application/x-pkgbuild;
-Actions=check;check_info;_SEPARATOR_;check_rules;check_rule_ex;_SEPARATOR_;
+Actions=check;_SEPARATOR_;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
 [Desktop Action check]
-Name=Check
+Name=Check with namcap
 Icon=kbugbuster
 Exec=pkg-magic "-n" "%u" -- "-i"
