@@ -10,7 +10,7 @@ X-KDE-Submenu=Pkg-tools
 [Desktop Action mk_md5]
 Name=Add checksum
 Icon=run-build-configure
-Exec=pkg-magic "-m" "%u" -- "-g >> %u"
+Exec=pkg-magic "-m" "%u" -- "-g"
 
 [Desktop Action mk]
 Name=Make package

@@ -215,7 +215,11 @@ done
 OPTS=("${*:$OPTIND}")
 
 if ${is_makepkg}; then
-    cmd="makepkg ${OPTS}"
+    if [[ ${OPTS} == "-g" ]];then
+	cmd="makepkg ${OPTS} >> $(basename ${uri})"
+    else
+	cmd="makepkg ${OPTS}"
+    fi
     run
 elif ${is_aurball}; then
     cmd="mkaurball ${OPTS}"
