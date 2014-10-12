@@ -119,27 +119,31 @@ new_config(){
 }
 
 aur_login(){
-    local user pwd login session submit url="https://aur.archlinux.org/login/"
+    local user pwd login session loginurl="${url}/login/"
     user=${USR}
     pwd=${PWD}
-    login=$(curl -sSi -F user=${user} -F passwd=${pwd} -H 'Expect: ' ${url})
+    login=$(curl -sSi -F user=${user} -F passwd=${pwd} -H 'Expect: ' ${loginurl})
     session=$(echo "${login}" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
-    echo ${session}
+    echo "${session}"
 }
 
 upload(){
-    local session=$(aur_login) url="https://aur.archlinux.org" submiturl="${url}/submit/" submit= sid= cat=$(catbox) pkgurl=
+    local session="$(aur_login)"
     if [[ -n ${session} ]];then
+	local submiturl="${url}/submit/" submit= sid=
 	submit=$(curl -sSi -H 'Expect: ' -b ${session} ${submiturl})
 	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
+	local cat=$(catbox)
 	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${uri} -b ${session} ${submiturl})
-	pkgurl="${url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
+	local pkgurl="${url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 	popup "$(get_link ${pkgurl})"
     else
 	popup "No session registered. Wrong user credentials?"
 	exit 1
     fi
 }
+
+url="https://aur.archlinux.org"
 
 configdir=${XDG_CONFIG_HOME:-~/.config}
 
