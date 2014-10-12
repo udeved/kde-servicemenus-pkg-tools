@@ -7,6 +7,5 @@ kde-servicemenus-pkg-tools
 * namcap
 * local repo management
 * aur upload
-* pkgfile
-* pactree
+* pactree graphs
 
