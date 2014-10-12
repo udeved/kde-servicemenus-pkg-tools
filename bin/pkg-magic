@@ -118,19 +118,21 @@ new_config(){
     echo -n > ${config}
 }
 
-upload(){
-    local user pwd login session submit sid cat pkgurl url="https://aur.archlinux.org"
-    url="${url}/login/"
+aur_login(){
+    local user pwd login session submit url="https://aur.archlinux.org/login/"
     user=${USR}
     pwd=${PWD}
     login=$(curl -sSi -F user=${user} -F passwd=${pwd} -H 'Expect: ' ${url})
     session=$(echo "${login}" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
-    url="${url}/submit/"
-    cat=$(catbox)
+    echo ${session}
+}
+
+upload(){
+    local session=$(aur_login) url="https://aur.archlinux.org" submiturl="${url}/submit/" submit= sid= cat=$(catbox) pkgurl=
     if [[ -n ${session} ]];then
-	submit=$(curl -sSi -H 'Expect: ' -b ${session} ${url})
+	submit=$(curl -sSi -H 'Expect: ' -b ${session} ${submiturl})
 	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${uri} -b ${session} ${url})
+	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${uri} -b ${session} ${submiturl})
 	pkgurl="${url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 	popup "$(get_link ${pkgurl})"
     else
