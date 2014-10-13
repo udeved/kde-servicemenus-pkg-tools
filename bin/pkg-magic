@@ -145,6 +145,10 @@ upload(){
 
 url="https://aur.archlinux.org"
 
+if [[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]]; then
+    . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
+fi
+
 configdir=${XDG_CONFIG_HOME:-~/.config}
 
 config=${configdir}/pkg-tools.conf
@@ -234,31 +238,56 @@ elif ${is_namcap}; then
     run
 elif ${is_repo_add};then
     name=${rundir##*/}
-    cmd="repo-add ${repo_param} ${rundir}/${name}.${dbtype}.tar.xz ${OPTS}"
+    case ${name} in
+	'x86_64' | 'i686' | 'any')
+	    rd=$(dirname ${rundir})
+	    rn=${rd##*/}
+	    rdb="${rn}.${dbtype}"
+	;;
+	*)
+	    rdb="${name}.${dbtype}"
+	;;
+    esac
+    ext="tar.xz"
+    cmd="repo-add ${repo_param} ${rundir}/${rdb}.${ext} ${OPTS}"
     run
 elif ${is_repo_remove};then
-    name=${rundir##*/} selected=( ${OPTS} ) list=
-    for u in ${selected[@]};do
+    name=${rundir##*/} list=
+    for u in ${OPTS[@]};do
 	list+=($(truncate $u))
     done
-    cmd="repo-remove ${repo_param} ${rundir}/${name}.${dbtype}.tar.xz ${list[@]}"
+    name=${rundir##*/}
+    case ${name} in
+	'x86_64' | 'i686' | 'any')
+	    rd=$(dirname ${rundir})
+	    rn=${rd##*/}
+	    rdb="${rn}.${dbtype}"
+	;;
+	*)
+	    rdb="${name}.${dbtype}"
+	;;
+    esac
+    ext="tar.xz"
+    cmd="repo-remove ${repo_param} ${rundir}/${rdb}.${ext} ${list[@]}"
     run
 elif ${is_pactree};then
     pn=$(truncate ${uri})
     for arg in ${*:$OPTIND};do
 	case ${arg} in
 	    "-g" | "-gs")
-		fn="${graphdir}/${pn}_deps.png"
+		img="${pn}_deps"
 	    ;;
 	    "-gr" | "-grs")
-		fn="${graphdir}/${pn}_revdeps.png"
+		img="${pn}_revdeps"
 	    ;;
 	    "-glu" | "-glus")
-		fn="${graphdir}/${pn}_nodup.png"
+		img="${pn}_nodup"
 	    ;;
 	esac
     done
-    echo "$(pactree ${OPTS} ${pn})" | dot -T png > "${fn}"
+    ext="png"
+    fn="${graphdir}/${img}.${ext}"
+    echo "$(pactree ${OPTS} ${pn})" | dot -T ${ext} > "${fn}"
     popup "$(get_link "${fn}")"
 elif ${is_aur}; then
     upload
