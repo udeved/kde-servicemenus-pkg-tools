@@ -188,6 +188,7 @@ while getopts "${actions}" arg;do
     case ${arg} in
 	m)
 	    is_makepkg=true
+	    uri="${OPTARG}"
 	;;
 	a)
 	    is_repo_add=true
@@ -225,7 +226,7 @@ OPTS=("${*:$OPTIND}")
 
 if ${is_makepkg}; then
     if [[ ${OPTS} == "-g" ]];then
-	cmd="makepkg ${OPTS} >> ${uri##*/}"
+	cmd="makepkg ${OPTS} >> ${uri}"
     else
 	cmd="makepkg ${OPTS}"
     fi
