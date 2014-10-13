@@ -134,7 +134,7 @@ upload(){
 	submit=$(curl -sSi -H 'Expect: ' -b ${session} ${submiturl})
 	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
 	local cat=$(catbox)
-	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${uri} -b ${session} ${submiturl})
+	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${uri} -b ${session} ${submiturl} | tr -d '\r')
 	local pkgurl="${url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
 	popup "$(get_link ${pkgurl})"
     else
