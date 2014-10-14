@@ -23,9 +23,12 @@ SERVICES = \
 
 all: $(BINPROGS)
 
+edit = sed -e "s|@version@|${V}|"
+
 %: %.in Makefile
 	@echo "GEN $@"
 	@$(RM) "$@"
+	@m4 -P $@.in | $(edit) >$@
 	@chmod a-w "$@"
 	@chmod +x "$@"
 

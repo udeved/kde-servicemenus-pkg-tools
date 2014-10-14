@@ -19,6 +19,8 @@
 
 shopt -s nullglob
 
+VERSION=@version@
+
 catbox(){
     declare -A item
     item[any]=0
