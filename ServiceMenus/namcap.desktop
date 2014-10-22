@@ -9,5 +9,5 @@ X-KDE-Submenu=Pkg-tools
 
 [Desktop Action check]
 Name=Check with namcap
-Icon=kbugbuster
+Icon=document-preview-archive
 Exec=pkg-magic "-n" "%u" -- "-i"

@@ -9,7 +9,7 @@ X-KDE-Submenu=Pkg-tools
 
 [Desktop Action mk_md5]
 Name=Add checksum
-Icon=run-build-configure
+Icon=preflight-verifier
 Exec=pkg-magic "-m" "%u" -- "-g"
 
 [Desktop Action mk]
@@ -19,7 +19,7 @@ Exec=pkg-magic "-m" "%u" -- "-sr"
 
 [Desktop Action mk_nodeps]
 Name=Make package ignore deps
-Icon=debug-run
+Icon=run-build-prune
 Exec=pkg-magic "-m" "%u" -- "-d"
 
 [Desktop Action mk_src]
@@ -29,7 +29,7 @@ Exec=pkg-magic "-A" "%u"
 
 [Desktop Action mk_sign]
 Name=Make package signed
-Icon=view-certificate-sign
+Icon=document-edit
 Exec=pkg-magic "-m" "%u" -- "-sr --sign"
 
 [Desktop Action mk_install]
@@ -44,10 +44,10 @@ Exec=pkg-magic "-m" "%u" -- "-src"
 
 [Desktop Action mk_repack]
 Name=Repackage without building
-Icon=debug-run-cursor
+Icon=run-build-configure
 Exec=pkg-magic "-m" "%u" -- "-Rf"
 
 [Desktop Action mk_nobuild]
 Name=Get and extract
-Icon=run-build-install-root
+Icon=archive-extract
 Exec=pkg-magic "-m" "%u" -- "-o"
