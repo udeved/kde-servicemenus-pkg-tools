@@ -2,12 +2,17 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-xz-pkg;application/x-pkgbuild;
-Actions=check;_SEPARATOR_;
+Actions=check;check_debug;_SEPARATOR_;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
 
 [Desktop Action check]
 Name=Check with namcap
+Icon=document-preview-archive
+Exec=pkg-magic "-n" "%u"
+
+[Desktop Action check_debug]
+Name=Check with namcap debug
 Icon=document-preview-archive
 Exec=pkg-magic "-n" "%u" -- "-i"

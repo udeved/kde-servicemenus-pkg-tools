@@ -36,33 +36,3 @@ Exec=pkg-magic "-t" "%u" -- "-grs"
 Name=Dependency graph no duplicates (sync DBs)
 Icon=office-chart-area-focus-peak-node
 Exec=pkg-magic "-t" "%u" -- "-glus"
-
-# [Desktop Action dep]
-# Name=Show dependencies
-# Icon=zoom-next
-# Exec=pkg-magic "-t" "%u" -- "-c"
-#
-# [Desktop Action revdep]
-# Name=Show reverse dependencies
-# Icon=zoom-previous
-# Exec=pkg-magic "-t" "%u" -- "-cr"
-#
-# [Desktop Action nodup]
-# Name=Show dependencies with no duplicates
-# Icon=zoom-select
-# Exec=pkg-magic "-t" "%u" -- "-clu"
-#
-# [Desktop Action dep_sync]
-# Name=Show dependencies (sync DBs)
-# Icon=zoom-next
-# Exec=pkg-magic "-t" "%u" -- "-cs"
-#
-# [Desktop Action revdep_sync]
-# Name=Show reverse dependencies (sync DBs)
-# Icon=zoom-previous
-# Exec=pkg-magic "-t" "%u" -- "-crs"
-#
-# [Desktop Action nodup_sync]
-# Name=Show dependencies no duplicates (sync DBs)
-# Icon=zoom-select
-# Exec=pkg-magic "-t" "%u" -- "-clus"
