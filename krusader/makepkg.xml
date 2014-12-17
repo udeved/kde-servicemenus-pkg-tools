@@ -15,7 +15,6 @@
   </mimetype>
   </availability>
  </action>
- </action>
  <action name="Make package" >
   <title>Make package</title>
   <tooltip>Make package</tooltip>
