@@ -9,6 +9,11 @@
   <category>repo-action</category>
   <description>Add selected (db)</description>
   <command>pkg-magic -a -u</command>
+  <availability>
+    <mimetype>
+      <show>application/x-xz-pkg</show>
+    </mimetype>
+  </availability>
  </action>
  <action name="Remove selected (db)" >
   <title>Remove selected (db)</title>
@@ -17,6 +22,11 @@
   <category>repo-action</category>
   <description>Remove selected (db)</description>
   <command>pkg-magic -r -u</command>
+  <availability>
+    <mimetype>
+      <show>application/x-xz-pkg</show>
+    </mimetype>
+  </availability>
  </action>
  <action name="Add selected (files)" >
   <title>Add selected (files)</title>
@@ -25,6 +35,11 @@
   <category>repo-action</category>
   <description>Add selected (files)</description>
   <command>pkg-magic -af -u</command>
+  <availability>
+    <mimetype>
+      <show>application/x-xz-pkg</show>
+    </mimetype>
+  </availability>
  </action>
  <action name="Remove selected  (files)" >
   <title>Remove selected  (files)</title>
@@ -33,6 +48,11 @@
   <category>repo-action</category>
   <description>Remove selected  (files)</description>
   <command>pkg-magic -rf -u</command>
+  <availability>
+    <mimetype>
+      <show>application/x-xz-pkg</show>
+    </mimetype>
+  </availability>
  </action>
 
 </KrusaderUserActions>

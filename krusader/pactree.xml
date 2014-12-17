@@ -9,6 +9,11 @@
   <category>pactree</category>
   <description>Dependency graph</description>
   <command>pkg-magic -t -u -- -g</command>
+    <availability>
+   <mimetype>
+    <show>application/x-xz-pkg</show>
+   </mimetype>
+  </availability>
  </action>
  <action name="Dependency graph reverse" >
   <title>Dependency graph reverse</title>
@@ -17,6 +22,11 @@
   <category>pactree</category>
   <description>Dependency graph reverse</description>
   <command>pkg-magic -t -u -- -gr</command>
+  <availability>
+   <mimetype>
+    <show>application/x-xz-pkg</show>
+   </mimetype>
+  </availability>
  </action>
  <action name="Dependency graph no duplicate" >
   <title>Dependency graph no duplicate</title>
@@ -25,6 +35,11 @@
   <category>pactree</category>
   <description>Dependency graph no duplicate</description>
   <command>pkg-magic -t -u -- -glu</command>
+  <availability>
+   <mimetype>
+    <show>application/x-xz-pkg</show>
+   </mimetype>
+  </availability>
  </action>
  <action name="Dependency graph (sync DBs)" >
   <title>Dependency graph (sync DBs)</title>
@@ -33,6 +48,11 @@
   <category>pactree</category>
   <description>Dependency graph (sync DBs)</description>
   <command>pkg-magic -t -u -- -gs</command>
+  <availability>
+   <mimetype>
+    <show>application/x-xz-pkg</show>
+   </mimetype>
+  </availability>
  </action>
  <action name="Dependency graph reverse (sync DBs)" >
   <title>Dependency graph reverse (sync DBs)</title>
@@ -41,6 +61,11 @@
   <category>pactree</category>
   <description>Dependency graph reverse (sync DBs)</description>
   <command>pkg-magic -t -u -- -grs</command>
+  <availability>
+   <mimetype>
+    <show>application/x-xz-pkg</show>
+   </mimetype>
+  </availability>
  </action>
  <action name="Dependency graph no duplicates (sync DBs)" >
   <title>Dependency graph no duplicates (sync DBs)</title>
@@ -49,6 +74,11 @@
   <category>pactree</category>
   <description>Dependency graph no duplicates (sync DBs)</description>
   <command>pkg-magic -t -u -- -glus</command>
+  <availability>
+   <mimetype>
+    <show>application/x-xz-pkg</show>
+   </mimetype>
+  </availability>
  </action>
 
 </KrusaderUserActions>	

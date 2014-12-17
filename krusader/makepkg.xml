@@ -8,7 +8,13 @@
   <icon>run-build-configure</icon>
   <category>makepkg</category>
   <description>Add checksum</description>
-  <command>pkg-magic -m -u -- -g</command>
+  <command>pkg-magic "-m" "%u" -- "-g"</command>
+  <availability>
+  <mimetype>
+  <show>application/x-pkgbuild</show>
+  </mimetype>
+  </availability>
+ </action>
  </action>
  <action name="Make package" >
   <title>Make package</title>
@@ -16,7 +22,12 @@
   <icon>run-build</icon>
   <category>makepkg</category>
   <description>Make package</description>
-  <command>pkg-magic -m -u -- -sr</command>
+  <command>pkg-magic "-m" "%u" -- "-sr"</command>
+  <availability>
+  <mimetype>
+  <show>application/x-pkgbuild</show>
+  </mimetype>
+  </availability>
  </action>
  <action name="Make package ignore deps" >
   <title>Make package ignore deps</title>
@@ -24,7 +35,12 @@
   <icon>debug-run</icon>
   <category>makepkg</category>
   <description>Make package ignore deps</description>
-  <command>pkg-magic -m -u -- -d</command>
+  <command>pkg-magic "-m" "%u" -- "-d"</command>
+  <availability>
+  <mimetype>
+  <show>application/x-pkgbuild</show>
+  </mimetype>
+  </availability>
  </action>
  <action name="Make package source" >
   <title>Make package source</title>
@@ -32,7 +48,12 @@
   <icon>run-build-file</icon>
   <category>makepkg</category>
   <description>Make package source</description>
-  <command>pkg-magic -A -u</command>
+  <command>pkg-magic "-A" "%u"</command>
+  <availability>
+  <mimetype>
+  <show>application/x-pkgbuild</show>
+  </mimetype>
+  </availability>
  </action>
  <action name="Make package signed" >
   <title>Make package signed</title>
@@ -40,7 +61,12 @@
   <icon>view-certificate-sign</icon>
   <category>makepkg</category>
   <description>Make package signed</description>
-  <command>pkg-magic -m -u -- -sr --sign</command>
+  <command>pkg-magic "-m" "%u" -- "-sr --sign"</command>
+  <availability>
+  <mimetype>
+  <show>application/x-pkgbuild</show>
+  </mimetype>
+  </availability>
  </action>
  <action name="Make package and install" >
   <title>Make package and install</title>
@@ -48,7 +74,12 @@
   <icon>run-build-install</icon>
   <category>makepkg</category>
   <description>Make package and install</description>
-  <command>pkg-magic  -m" -u -- -sri</command>
+  <command>pkg-magic  "-m" "%u" -- "-sri"</command>
+  <availability>
+  <mimetype>
+  <show>application/x-pkgbuild</show>
+  </mimetype>
+  </availability>
  </action>
  <action name="Make package and clean" >
   <title>Make package and clean</title>
@@ -56,7 +87,12 @@
   <icon>run-build-clean</icon>
   <category>makepkg</category>
   <description>Make package and clean</description>
-  <command>pkg-magic -m -u -- -src</command>
+  <command>pkg-magic "-m" "%u" -- "-src"</command>
+  <availability>
+  <mimetype>
+  <show>application/x-pkgbuild</show>
+  </mimetype>
+  </availability>
  </action>
  <action name="Repackage without building" >
   <title>Repackage without building</title>
@@ -64,7 +100,12 @@
   <icon>debug-run-cursor</icon>
   <category>makepkg</category>
   <description>Repackage without building</description>
-  <command>pkg-magic -m -u -- -Rf</command>
+  <command>pkg-magic "-m" "%u" -- "-Rf"</command>
+  <availability>
+  <mimetype>
+  <show>application/x-pkgbuild</show>
+  </mimetype>
+  </availability>
  </action>
  <action name="Get and extract" >
   <title>Get and extract</title>
@@ -72,7 +113,12 @@
   <icon>run-build-install-root</icon>
   <category>makepkg</category>
   <description>Get and extract</description>
-  <command>pkg-magic -m -u -- -o</command>
+  <command>pkg-magic "-m" "%u" -- "-o"</command>
+  <availability>
+  <mimetype>
+  <show>application/x-pkgbuild</show>
+  </mimetype>
+  </availability>
  </action>
 
 </KrusaderUserActions>	

@@ -2,13 +2,17 @@
 <!DOCTYPE KrusaderUserActions>
 <KrusaderUserActions>
 
- <action name="Upload to AUR" >
-  <title>Upload to AUR</title>
-  <tooltip>Upload to AUR</tooltip>
-  <icon>go-up</icon>
-  <category>aur-upload</category>
-  <description>Upload to AUR</description>
-  <command>pkg-magic -u -u</command>
- </action>
+    <action name="Upload to AUR">
+      <title>Upload to AUR</title>
+      <tooltip>Upload to AUR</tooltip>
+      <category>aur-upload</category>
+      <description>Upload to AUR</description>
+      <command>pkg-magic "-u" "%u"</command>
+      <availability>
+       <mimetype>
+        <show>application/x-gz-src</show>
+       </mimetype>
+      </availability>
+     </action>
 
 </KrusaderUserActions>	

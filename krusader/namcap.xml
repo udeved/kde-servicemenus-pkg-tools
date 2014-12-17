@@ -9,6 +9,12 @@
   <category>namcap</category>
   <description>Check with namcap</description>
   <command>pkg-magic -n -u -- -i</command>
+  <availability>
+   <mimetype>
+    <show>application/x-xz-pkg</show>
+    <show>application/x-pkgbuild</show>
+   </mimetype>
+  </availability>
  </action>
 
 </KrusaderUserActions>	
