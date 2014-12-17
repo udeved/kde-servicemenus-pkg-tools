@@ -8,7 +8,7 @@
   <icon>list-add</icon>
   <category>repo-action</category>
   <description>Add selected (db)</description>
-  <command>/usr/bin//usr/bin/pkg-magic -a -u</command>
+  <command>pkg-magic -a -u</command>
  </action>
  <action name="Remove selected (db)" >
   <title>Remove selected (db)</title>
@@ -16,7 +16,7 @@
   <icon>list-remove</icon>
   <category>repo-action</category>
   <description>Remove selected (db)</description>
-  <command>/usr/bin//usr/bin/pkg-magic -r -u</command>
+  <command>pkg-magic -r -u</command>
  </action>
  <action name="Add selected (files)" >
   <title>Add selected (files)</title>
@@ -24,7 +24,7 @@
   <icon>list-add</icon>
   <category>repo-action</category>
   <description>Add selected (files)</description>
-  <command>/usr/bin//usr/bin/pkg-magic -af -u</command>
+  <command>pkg-magic -af -u</command>
  </action>
  <action name="Remove selected  (files)" >
   <title>Remove selected  (files)</title>
@@ -32,7 +32,7 @@
   <icon>list-remove</icon>
   <category>repo-action</category>
   <description>Remove selected  (files)</description>
-  <command>/usr/bin//usr/bin/pkg-magic -rf -u</command>
+  <command>pkg-magic -rf -u</command>
  </action>
 
 </KrusaderUserActions>

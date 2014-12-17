@@ -8,7 +8,7 @@
   <icon>kbugbuster</icon>
   <category>namcap</category>
   <description>Check with namcap</description>
-  <command>/usr/bin/pkg-magic -n -u -- -i</command>
+  <command>pkg-magic -n -u -- -i</command>
  </action>
 
 </KrusaderUserActions>	

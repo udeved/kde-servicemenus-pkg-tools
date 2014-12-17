@@ -8,7 +8,7 @@
   <icon>tools-wizard</icon>
   <category>pactree</category>
   <description>Dependency graph</description>
-  <command>/usr/bin//usr/bin/pkg-magic -t -u -- -g</command>
+  <command>pkg-magic -t -u -- -g</command>
  </action>
  <action name="Dependency graph reverse" >
   <title>Dependency graph reverse</title>
@@ -16,7 +16,7 @@
   <icon>office-chart-polar-stacked</icon>
   <category>pactree</category>
   <description>Dependency graph reverse</description>
-  <command>/usr/bin//usr/bin/pkg-magic -t -u -- -gr</command>
+  <command>pkg-magic -t -u -- -gr</command>
  </action>
  <action name="Dependency graph no duplicate" >
   <title>Dependency graph no duplicate</title>
@@ -24,7 +24,7 @@
   <icon>office-chart-area-focus-peak-node</icon>
   <category>pactree</category>
   <description>Dependency graph no duplicate</description>
-  <command>/usr/bin/pkg-magic -t -u -- -glu</command>
+  <command>pkg-magic -t -u -- -glu</command>
  </action>
  <action name="Dependency graph (sync DBs)" >
   <title>Dependency graph (sync DBs)</title>
@@ -32,7 +32,7 @@
   <icon>office-chart-polar</icon>
   <category>pactree</category>
   <description>Dependency graph (sync DBs)</description>
-  <command>/usr/bin/pkg-magic -t -u -- -gs</command>
+  <command>pkg-magic -t -u -- -gs</command>
  </action>
  <action name="Dependency graph reverse (sync DBs)" >
   <title>Dependency graph reverse (sync DBs)</title>
@@ -40,7 +40,7 @@
   <icon>office-chart-polar-stacked</icon>
   <category>pactree</category>
   <description>Dependency graph reverse (sync DBs)</description>
-  <command>/usr/bin/pkg-magic -t -u -- -grs</command>
+  <command>pkg-magic -t -u -- -grs</command>
  </action>
  <action name="Dependency graph no duplicates (sync DBs)" >
   <title>Dependency graph no duplicates (sync DBs)</title>
@@ -48,7 +48,7 @@
   <icon>office-chart-area-focus-peak-node</icon>
   <category>pactree</category>
   <description>Dependency graph no duplicates (sync DBs)</description>
-  <command>/usr/bin/pkg-magic -t -u -- -glus</command>
+  <command>pkg-magic -t -u -- -glus</command>
  </action>
 
 </KrusaderUserActions>	

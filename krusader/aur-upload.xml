@@ -8,7 +8,7 @@
   <icon>go-up</icon>
   <category>aur-upload</category>
   <description>Upload to AUR</description>
-  <command>/usr/bin//usr/bin/pkg-magic -u -u</command>
+  <command>pkg-magic -u -u</command>
  </action>
 
 </KrusaderUserActions>	

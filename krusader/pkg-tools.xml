@@ -8,7 +8,7 @@
   <icon>tools-wizard</icon>
   <category>pkg-tools</category>
   <description>Configure pkg-tools</description>
-  <command>/usr/bin//usr/bin/pkg-magic -c -u</command>
+  <command>pkg-magic -c -u</command>
  </action>
 
 </KrusaderUserActions>
