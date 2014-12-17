@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE KrusaderUserActions>
+<KrusaderUserActions>
+
+ <action name="Configure pkg-tools" >
+  <title>Configure pkg-tools</title>
+  <tooltip>Configure pkg-tools</tooltip>
+  <icon>tools-wizard</icon>
+  <category>pkg-tools</category>
+  <description>Configure pkg-tools</description>
+  <command>/usr/bin//usr/bin/pkg-magic -c -u</command>
+ </action>
+
+</KrusaderUserActions>

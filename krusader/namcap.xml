@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE KrusaderUserActions>
+<KrusaderUserActions>
+
+ <action name="Check with namcap" >
+  <title>Check with namcap</title>
+  <tooltip>Check with namcap</tooltip>
+  <icon>kbugbuster</icon>
+  <category>namcap</category>
+  <description>Check with namcap</description>
+  <command>/usr/bin/pkg-magic -n -u -- -i</command>
+ </action>
+
+</KrusaderUserActions>	

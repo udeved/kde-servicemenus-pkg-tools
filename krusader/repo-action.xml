@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE KrusaderUserActions>
+<KrusaderUserActions>
+
+ <action name="Add selected (db)" >
+  <title>Add selected (db)</title>
+  <tooltip>Add selected (db)</tooltip>
+  <icon>list-add</icon>
+  <category>repo-action</category>
+  <description>Add selected (db)</description>
+  <command>/usr/bin//usr/bin/pkg-magic -a -u</command>
+ </action>
+ <action name="Remove selected (db)" >
+  <title>Remove selected (db)</title>
+  <tooltip>Remove selected (db)</tooltip>
+  <icon>list-remove</icon>
+  <category>repo-action</category>
+  <description>Remove selected (db)</description>
+  <command>/usr/bin//usr/bin/pkg-magic -r -u</command>
+ </action>
+ <action name="Add selected (files)" >
+  <title>Add selected (files)</title>
+  <tooltip>Add selected (files)</tooltip>
+  <icon>list-add</icon>
+  <category>repo-action</category>
+  <description>Add selected (files)</description>
+  <command>/usr/bin//usr/bin/pkg-magic -af -u</command>
+ </action>
+ <action name="Remove selected  (files)" >
+  <title>Remove selected  (files)</title>
+  <tooltip>Remove selected  (files)</tooltip>
+  <icon>list-remove</icon>
+  <category>repo-action</category>
+  <description>Remove selected  (files)</description>
+  <command>/usr/bin//usr/bin/pkg-magic -rf -u</command>
+ </action>
+
+</KrusaderUserActions>

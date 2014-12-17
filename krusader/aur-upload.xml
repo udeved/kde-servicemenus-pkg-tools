@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE KrusaderUserActions>
+<KrusaderUserActions>
+
+ <action name="Upload to AUR" >
+  <title>Upload to AUR</title>
+  <tooltip>Upload to AUR</tooltip>
+  <icon>go-up</icon>
+  <category>aur-upload</category>
+  <description>Upload to AUR</description>
+  <command>/usr/bin//usr/bin/pkg-magic -u -u</command>
+ </action>
+
+</KrusaderUserActions>	
