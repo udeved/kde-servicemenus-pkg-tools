@@ -10,7 +10,7 @@ X-KDE-Submenu=Pkg-tools
 [Desktop Action mk_md5]
 Name=Add checksum
 Icon=preflight-verifier
-Exec=pkg-magic "-m" "%u"
+Exec=pkg-magic "-Z" "%u"
 
 [Desktop Action mk]
 Name=Make package

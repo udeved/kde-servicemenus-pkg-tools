@@ -176,6 +176,7 @@ is_aurball=false
 is_pactree=false
 is_aur=false
 is_config=false
+is_checksum=false
 
 dbtype='db'
 repo_param=''
@@ -183,13 +184,16 @@ repo_param=''
 cmd=''
 rundir=$(pwd)
 
-actions='c:u:t:A:n:m:af:rf'
+actions='c:u:t:A:Z:n:m:af:rf'
 
 while getopts "${actions}" arg;do
     case ${arg} in
 	m)
 	    is_makepkg=true
 	    uri="${OPTARG}"
+	;;
+	Z)
+		is_checksum=true
 	;;
 	a)
 	    is_repo_add=true
@@ -226,12 +230,11 @@ done
 OPTS=("${*:$OPTIND}")
 
 if ${is_makepkg}; then
-    if [[ ${OPTS} == "-g" ]];then
-	cmd="updpkgsums"
-    else
 	cmd="makepkg ${OPTS}"
-    fi
     run
+elif ${is_checksum};then
+	cmd="updpkgsums"
+	run
 elif ${is_aurball}; then
     cmd="mkaurball ${OPTS}"
     run
