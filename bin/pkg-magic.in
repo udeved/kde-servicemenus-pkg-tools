@@ -227,7 +227,7 @@ OPTS=("${*:$OPTIND}")
 
 if ${is_makepkg}; then
     if [[ ${OPTS} == "-g" ]];then
-	cmd="makepkg ${OPTS} >> ${uri}"
+	cmd="updpkgsums"
     else
 	cmd="makepkg ${OPTS}"
     fi
