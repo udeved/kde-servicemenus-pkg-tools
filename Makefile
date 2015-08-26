@@ -45,15 +45,16 @@ install:
 	install -dm0755 $(DESTDIR)$(PREFIX)/share/mime/packages
 	install -m0644 ${MIMEPKG} $(DESTDIR)$(PREFIX)/share/mime/packages
 
-	install -dm0755 $(DESTDIR)$(PREFIX)/share/kde4/services/ServiceMenus
-	install -m0644 ${SERVICES} $(DESTDIR)$(PREFIX)/share/kde4/services/ServiceMenus
+	install -dm0755 $(DESTDIR)$(PREFIX)/share/kservices5/ServiceMenus
+	install -m0644 ${SERVICES} $(DESTDIR)$(PREFIX)/share/kservices5/ServiceMenus
 
 
 uninstall:
 	for f in ${BINPROGS}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${MIMEAPP}; do rm -f $(DESTDIR)$(PREFIX)/share/mime/application/$$f; done
 	for f in ${MIMEPKG}; do rm -f $(DESTDIR)$(PREFIX)/share/mime/packages/$$f; done
-	for f in ${SERVICES}; do rm -f $(DESTDIR)$(PREFIX)/share/kde4/services/ServiceMenus/$$f; done
+	
+	for f in ${SERVICES}; do rm -f $(DESTDIR)$(PREFIX)/share/kservices5/ServiceMenus/$$f; done
 
 dist:
 	git archive --format=tar --prefix=kde-servicemenus-pkg-tools-$(V)/ $(V) | gzip -9 > kde-servicemenus-pkg-tools-$(V).tar.gz
