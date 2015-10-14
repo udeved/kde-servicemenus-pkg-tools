@@ -6,7 +6,6 @@ BINPROGS = \
 	bin/pkg-magic
 
 MIMEAPP = \
-	mime/application/x-gz-src.xml \
 	mime/application/x-pkgbuild.xml \
 	mime/application/x-xz-pkg.xml
 
@@ -14,11 +13,9 @@ MIMEPKG = \
 	mime/packages/pkg-tools.xml
 
 SERVICES = \
-	ServiceMenus/aur-upload.desktop \
 	ServiceMenus/makepkg.desktop \
 	ServiceMenus/namcap.desktop \
 	ServiceMenus/pactree.desktop \
-	ServiceMenus/pkg-tools.desktop \
 	ServiceMenus/repo-action.desktop
 
 all: $(BINPROGS)
@@ -53,7 +50,7 @@ uninstall:
 	for f in ${BINPROGS}; do rm -f $(DESTDIR)$(PREFIX)/bin/$$f; done
 	for f in ${MIMEAPP}; do rm -f $(DESTDIR)$(PREFIX)/share/mime/application/$$f; done
 	for f in ${MIMEPKG}; do rm -f $(DESTDIR)$(PREFIX)/share/mime/packages/$$f; done
-	
+
 	for f in ${SERVICES}; do rm -f $(DESTDIR)$(PREFIX)/share/kservices5/ServiceMenus/$$f; done
 
 dist:

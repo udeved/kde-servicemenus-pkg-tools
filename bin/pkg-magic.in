@@ -21,44 +21,6 @@ shopt -s nullglob
 
 VERSION=@version@
 
-catbox(){
-    declare -A item
-    item[any]=0
-    item[daemons]=2
-    item[devel]=3
-    item[editors]=4
-    item[emulators]=5
-    item[games]=6
-    item[gnome]=7
-    item[i18n]=8
-    item[kde]=9
-    item[lib]=10
-    item[modules]=11
-    item[multimedia]=12
-    item[network]=13
-    item[office]=14
-    item[science]=15
-    item[system]=16
-    item[x11]=17
-    item[xfce]=18
-    item[kernels]=19
-    local select=$(kdialog --title "Categories" --combobox "Select category"  "${!item[@]}")
-    if [[ -n $select ]];then
-	echo ${item[$select]}
-    else
-	popup "Pkg-tools" "AUR upload aborted. No category selected"
-	exit 1
-    fi
-}
-
-userbox(){
-    kdialog --title "AUR login" --inputbox "Enter username:"
-}
-
-pwdbox(){
-    kdialog --title "AUR login" --password "Enter password:"
-}
-
 popup(){
     kdialog --title "Pkg-tools" --passivepopup "$1"  10
 }
@@ -78,89 +40,6 @@ truncate(){
     echo $ret
 }
 
-configure(){
-    if [[ ! -f "${config}" ]]; then
-	config_wizzard
-    else
-	ask_config_overwrite
-    fi
-}
-
-ask_config_overwrite(){
-    kdialog --title "Warning" --warningcontinuecancel "${config} already exists. Overwrite?"
-    local flag=$?
-    if [ ${flag} -eq 0 ];then
-	config_wizzard
-    else
-	exit 1
-    fi
-}
-
-config_wizzard(){
-    local user pwd
-    user=$(userbox)
-    pwd=$(pwdbox)
-    if [[ -z ${user} ]] && [[ -z ${pwd} ]];then
-	popup "No config created."
-	exit
-    else
-	new_config
-	config_writer "USR=${user}"
-	config_writer "PWD=${pwd}"
-	popup "${config} created."
-    fi
-}
-
-config_writer(){
-    echo $1 >> "${config}"
-}
-
-new_config(){
-    echo -n > ${config}
-}
-
-aur_login(){
-    local user pwd login session loginurl="${url}/login/"
-    user=${USR}
-    pwd=${PWD}
-    login=$(curl -sSi -F user=${user} -F passwd=${pwd} -H 'Expect: ' ${loginurl})
-    session=$(echo "${login}" | awk '/^Set-Cookie: / {print $2}' | tr -d ';')
-    echo "${session}"
-}
-
-upload(){
-    local session="$(aur_login)"
-    if [[ -n ${session} ]];then
-	local submiturl="${url}/submit/" submit= sid=
-	submit=$(curl -sSi -H 'Expect: ' -b ${session} ${submiturl})
-	sid=$(echo "${submit}" | grep 'input.type..hidden..name..token..value' | cut -d\" -f6)
-	local cat=$(catbox)
-	submit=$(curl -sSi -H 'Expect: ' -F token="${sid}" -F pkgsubmit=1 -F category="${cat}" -F pfile=@${uri} -b ${session} ${submiturl} | tr -d '\r')
-	local pkgurl="${url}"$(echo "${submit}" | awk '/^Location: / {print $2}')
-	popup "$(get_link ${pkgurl})"
-    else
-	popup "No session registered. Wrong user credentials?"
-	exit 1
-    fi
-}
-
-url="https://aur.archlinux.org"
-
-if [[ -f ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs ]]; then
-    . ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs
-fi
-
-configdir=${XDG_CONFIG_HOME:-~/.config}
-
-config=${configdir}/pkg-tools.conf
-
-if [[ ! -f ${config} ]];then
-    popup "Starting config wizzard" && config_wizzard
-    . ${config}
-else
-    . ${config}
-fi
-
 graphdir=${XDG_PICTURES_DIR:-~/pactree_graphs}
 
 if ! [[ -d ${graphdir} ]];then
@@ -174,7 +53,6 @@ is_files=false
 is_namcap=false
 is_aurball=false
 is_pactree=false
-is_aur=false
 is_config=false
 is_checksum=false
 
@@ -184,7 +62,7 @@ repo_param=''
 cmd=''
 rundir=$(pwd)
 
-actions='c:u:t:A:Z:n:m:af:rf'
+actions='t:A:Z:n:m:af:rf'
 
 while getopts "${actions}" arg;do
     case ${arg} in
@@ -193,7 +71,7 @@ while getopts "${actions}" arg;do
 	    uri="${OPTARG}"
 	;;
 	Z)
-		is_checksum=true
+            is_checksum=true
 	;;
 	a)
 	    is_repo_add=true
@@ -216,13 +94,6 @@ while getopts "${actions}" arg;do
 	t)
 	    is_pactree=true
 	    uri="${OPTARG}"
-	;;
-	u)
-	    is_aur=true
-	    uri="${OPTARG}"
-	;;
-	c)
-	    is_config=true
 	;;
     esac
 done
@@ -294,8 +165,4 @@ elif ${is_pactree};then
     fn="${graphdir}/${img}.${ext}"
     echo "$(pactree ${OPTS} ${pn})" | dot -T ${ext} > "${fn}"
     popup "$(get_link "${fn}")"
-elif ${is_aur}; then
-    upload
-elif ${is_config}; then
-    configure
 fi

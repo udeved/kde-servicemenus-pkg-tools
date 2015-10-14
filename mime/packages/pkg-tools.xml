@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
-	<mime-type type="application/x-gz-src">
-		<comment>Arch linux source package</comment>
-		<sub-class-of type="application/x-compressed-tar"/>
-		<generic-icon name="package-x-generic"/>
-		<glob pattern="*.src.tar.gz"/>
-	</mime-type>
 	<mime-type type="application/x-pkgbuild">
 		<comment>Arch linux pkgbuild</comment>
 		<sub-class-of type="text/plain"/>
