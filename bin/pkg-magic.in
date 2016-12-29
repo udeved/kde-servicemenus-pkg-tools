@@ -51,7 +51,6 @@ is_repo_add=false
 is_repo_remove=false
 is_files=false
 is_namcap=false
-is_aurball=false
 is_pactree=false
 is_config=false
 is_checksum=false
@@ -88,9 +87,6 @@ while getopts "${actions}" arg;do
 	    is_namcap=true
 	    uri="${OPTARG}"
 	;;
-	A)
-	    is_aurball=true
-	;;
 	t)
 	    is_pactree=true
 	    uri="${OPTARG}"
@@ -106,9 +102,6 @@ if ${is_makepkg}; then
 elif ${is_checksum};then
 	cmd="updpkgsums"
 	run
-elif ${is_aurball}; then
-    cmd="mkaurball ${OPTS}"
-    run
 elif ${is_namcap}; then
     cmd="namcap ${OPTS} ${uri}"
     run

@@ -2,7 +2,7 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-pkgbuild;
-Actions=mk_md5;_SEPARATOR_;mk;mk_sign;mk_src;_SEPARATOR_;mk_install;_SEPARATOR_;mk_repack;mk_nobuild;mk_nodeps;_SEPARATOR_;mk_clean;
+Actions=mk_md5;_SEPARATOR_;mk;mk_sign;_SEPARATOR_;mk_install;_SEPARATOR_;mk_repack;mk_nobuild;mk_nodeps;_SEPARATOR_;mk_clean;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Pkg-tools
@@ -21,11 +21,6 @@ Exec=pkg-magic "-m" "%u" -- "-sr"
 Name=Make package ignore deps
 Icon=run-build-prune
 Exec=pkg-magic "-m" "%u" -- "-d"
-
-[Desktop Action mk_src]
-Name=Make package source
-Icon=run-build-file
-Exec=pkg-magic "-A" "%u"
 
 [Desktop Action mk_sign]
 Name=Make package signed
