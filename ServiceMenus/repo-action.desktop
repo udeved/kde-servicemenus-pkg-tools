@@ -2,7 +2,7 @@
 Type=Service
 ServiceTypes=KonqPopupMenu/Plugin
 MimeType=application/x-xz-pkg;
-Actions=add;remove;_SEPARATOR_;add_files;remove_files;
+Actions=add;_SEPARATOR_;remove;
 X-KDE-Priority=TopLevel
 X-KDE-StartupNotify=false
 X-KDE-Submenu=Repo
@@ -16,13 +16,3 @@ Exec=pkg-magic "-a" "%U"
 Name=Remove selected (db)
 Icon=list-remove
 Exec=pkg-magic "-r" "%U"
-
-[Desktop Action add_files]
-Name=Add selected (files)
-Icon=list-add
-Exec=pkg-magic "-af" "%U"
-
-[Desktop Action remove_files]
-Name=Remove selected  (files)
-Icon=list-remove
-Exec=pkg-magic "-rf" "%U"

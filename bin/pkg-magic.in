@@ -26,7 +26,7 @@ popup(){
 }
 
 run(){
-    konsole --noclose --hide-menubar --workdir "${rundir}" -e $SHELL -c "${cmd}"
+    konsole --noclose --hide-menubar --workdir "${rundir}" -e "${cmd}"
 }
 
 get_link(){
@@ -40,6 +40,38 @@ truncate(){
     echo $ret
 }
 
+get_db_name(){
+    local name=${rundir##*/} ext="tar.xz"
+    case ${name} in
+        'x86_64'|'i686'|'any')
+            rd=$(dirname ${rundir})
+            rn=${rd##*/}
+            rdb="${rn}.db.${ext}"
+        ;;
+        *) rdb="${name}.db.${ext}" ;;
+    esac
+    echo ${rdb}
+}
+
+add_pkgs(){
+    cmd="repo-add ${rundir}/$(get_db_name) ${OPTS}"
+}
+
+rm_pkgs(){
+    local list=()
+    for u in ${OPTS[@]};do
+        list+=($(truncate $u))
+    done
+    cmd="repo-remove ${rundir}/$(get_db_name) ${list[@]}"
+}
+
+get_graph(){
+    local pn=$(truncate ${uri}) fn ext="png"
+    fn="${graphdir}/${pn}.${ext}"
+    echo "$(pactree ${OPTS} ${pn})" | dot -T ${ext} > "${fn}"
+    popup "$(get_link "${fn}")"
+}
+
 graphdir=${XDG_PICTURES_DIR:-~/pactree_graphs}
 
 if ! [[ -d ${graphdir} ]];then
@@ -49,113 +81,44 @@ fi
 is_makepkg=false
 is_repo_add=false
 is_repo_remove=false
-is_files=false
 is_namcap=false
 is_pactree=false
 is_config=false
 is_checksum=false
 
-dbtype='db'
-repo_param=''
-
-cmd=''
 rundir=$(pwd)
+cmd=''
 
-actions='t:A:Z:n:m:af:rf'
+actions='t:c:n:m:af:rf'
 
 while getopts "${actions}" arg;do
     case ${arg} in
-	m)
-	    is_makepkg=true
-	    uri="${OPTARG}"
-	;;
-	Z)
-            is_checksum=true
-	;;
-	a)
-	    is_repo_add=true
-	;;
-	r)
-	    is_repo_remove=true
-	;;
-	f)
-	    is_files=true
-	    dbtype=files
-	    repo_param='-f'
-	;;
-	n)
-	    is_namcap=true
-	    uri="${OPTARG}"
-	;;
-	t)
-	    is_pactree=true
-	    uri="${OPTARG}"
-	;;
+        m) is_makepkg=true; uri="${OPTARG}" ;;
+        c) is_checksum=true; cmd="updpkgsums" ;;
+        a) is_repo_add=true ;;
+        r) is_repo_remove=true ;;
+        n) is_namcap=true; uri="${OPTARG}" ;;
+        t) is_pactree=true; uri="${OPTARG}" ;;
     esac
 done
 
 OPTS=("${*:$OPTIND}")
 
 if ${is_makepkg}; then
-	cmd="makepkg ${OPTS}"
+    cmd="makepkg ${OPTS}"
     run
 elif ${is_checksum};then
-	cmd="updpkgsums"
-	run
+
+    run
 elif ${is_namcap}; then
     cmd="namcap ${OPTS} ${uri}"
     run
 elif ${is_repo_add};then
-    name=${rundir##*/}
-    case ${name} in
-	'x86_64' | 'i686' | 'any')
-	    rd=$(dirname ${rundir})
-	    rn=${rd##*/}
-	    rdb="${rn}.${dbtype}"
-	;;
-	*)
-	    rdb="${name}.${dbtype}"
-	;;
-    esac
-    ext="tar.xz"
-    cmd="repo-add ${repo_param} ${rundir}/${rdb}.${ext} ${OPTS}"
+    add_pkgs
     run
 elif ${is_repo_remove};then
-    name=${rundir##*/} list=
-    for u in ${OPTS[@]};do
-	list+=($(truncate $u))
-    done
-    name=${rundir##*/}
-    case ${name} in
-	'x86_64' | 'i686' | 'any')
-	    rd=$(dirname ${rundir})
-	    rn=${rd##*/}
-	    rdb="${rn}.${dbtype}"
-	;;
-	*)
-	    rdb="${name}.${dbtype}"
-	;;
-    esac
-    ext="tar.xz"
-    cmd="repo-remove ${repo_param} ${rundir}/${rdb}.${ext} ${list[@]}"
+    rm_pkgs
     run
 elif ${is_pactree};then
-    pn=$(truncate ${uri})
-    for arg in ${*:$OPTIND};do
-	case ${arg} in
-	    "-g" | "-gs")
-		img="${pn}_deps"
-	    ;;
-	    "-gr" | "-grs")
-		img="${pn}_revdeps"
-	    ;;
-	    "-glu" | "-glus")
-		img="${pn}_nodup"
-	    ;;
-	esac
-    done
-    ext="png"
-    fn="${graphdir}/${img}.${ext}"
-    echo "$(pactree ${OPTS} ${pn})" | dot -T ${ext} > "${fn}"
-    popup "$(get_link "${fn}")"
+    get_graph
 fi
